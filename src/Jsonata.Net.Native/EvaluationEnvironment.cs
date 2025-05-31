@@ -9,20 +9,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native
 {
-    internal class LazyVariable
-    {
-        private Func<JToken> m_valueProvider;
-
-        public LazyVariable(Func<JToken> valueProvider)
-        {
-            this.m_valueProvider = valueProvider;
-        }
-
-        public JToken GetValue()
-        {
-            return this.m_valueProvider();
-        }
-    }
+    // LazyVariable class removed
 
     public sealed class EvaluationEnvironment
     {
@@ -59,7 +46,7 @@ namespace Jsonata.Net.Native
             return result;
         }
 
-        private readonly Dictionary<string, object> m_bindings = new Dictionary<string, object>();
+        private readonly Dictionary<string, JToken> m_bindings = new Dictionary<string, JToken>(); // Type changed back
         private readonly EvaluationEnvironment? m_parent;
         private readonly EvaluationSupplement? m_evaluationSupplement;
         private readonly Func<string, JToken>? m_lazyVariableProvider;
@@ -97,10 +84,7 @@ namespace Jsonata.Net.Native
             this.m_bindings[name] = value;  //allow overrides
         }
 
-        public void BindLazyValue(string name, Func<JToken> valueProvider)
-        {
-            this.m_bindings[name] = new LazyVariable(valueProvider); //allow overrides
-        }
+        // BindLazyValue method removed
 
         public void BindFunction(MethodInfo mi)
         {
@@ -119,17 +103,10 @@ namespace Jsonata.Net.Native
 
         internal JToken Lookup(string name)
         {
-            if (this.m_bindings.TryGetValue(name, out object? resultObj))
+            // Try to get the value from the local bindings dictionary
+            if (this.m_bindings.TryGetValue(name, out JToken? resultToken))
             {
-                if (resultObj is JToken token)
-                {
-                    return token;
-                }
-                else if (resultObj is LazyVariable lazyVariable)
-                {
-                    // Invoke the function directly, do not cache by replacing the instance.
-                    return lazyVariable.GetValue();
-                }
+                return resultToken;
             }
 
             // If not in local bindings, try the lazy variable provider

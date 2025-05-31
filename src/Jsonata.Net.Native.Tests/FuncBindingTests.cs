@@ -72,34 +72,17 @@ namespace Jsonata.Net.Native.Tests
 
         // Counter for lazy evaluations
         private static int s_lazyEvaluationCounter;
-        private static int s_anotherLazyCounter;
-
+        // s_anotherLazyCounter removed as the tests using it are deleted.
 
         private void ResetCounters()
         {
             s_lazyEvaluationCounter = 0;
-            s_anotherLazyCounter = 0;
+            // s_anotherLazyCounter reset removed.
         }
 
-        // ** Adapted Tests for Lazy Evaluation (BindLazyValue and new Provider model) **
+        // CreateLazyValue method removed as it's no longer used.
 
-        [Test]
-        public void TestBindLazyValue_IsCalledForEachAccess() // Formerly TestLazyEvaluationCaching
-        {
-            ResetCounters();
-            EvaluationEnvironment env = new EvaluationEnvironment();
-            env.BindLazyValue("boundLazyVar", () => {
-                s_lazyEvaluationCounter++;
-                return JToken.Parse("\"called_via_bindlazyvalue\"");
-            });
-
-            JsonataQuery query = new JsonataQuery("$boundLazyVar & ' ' & $boundLazyVar");
-            JToken result = query.Eval(JValue.CreateNull(), env);
-
-            Assert.AreEqual(JTokenType.String, result.Type);
-            Assert.AreEqual("called_via_bindlazyvalue called_via_bindlazyvalue", (string)result);
-            Assert.AreEqual(2, s_lazyEvaluationCounter, "Function bound with BindLazyValue should be called each time it's accessed.");
-        }
+        // ** Tests for Lazy Evaluation via Provider **
 
         [Test]
         public void TestLazyProvider_BasicEvaluation() // Formerly TestBasicLazyEvaluation
@@ -123,28 +106,7 @@ namespace Jsonata.Net.Native.Tests
             Assert.AreEqual(1, s_lazyEvaluationCounter, "Provider should be called once for a single access.");
         }
 
-        [Test]
-        public void TestBindLazyValue_MultipleVariables_CalledForEachAccess() // Formerly TestMultipleLazyVariables
-        {
-            ResetCounters();
-            EvaluationEnvironment env = new EvaluationEnvironment();
-            env.BindLazyValue("lazy1", () => {
-                s_lazyEvaluationCounter++;
-                return JToken.Parse("10");
-            });
-            env.BindLazyValue("lazy2", () => {
-                s_anotherLazyCounter++;
-                return JToken.Parse("20");
-            });
-
-            JsonataQuery query = new JsonataQuery("$lazy1 + $lazy2 + $lazy1"); // lazy1 accessed twice
-            JToken result = query.Eval(JValue.CreateNull(), env);
-
-            Assert.AreEqual(JTokenType.Integer, result.Type);
-            Assert.AreEqual(40, (long)result); // 10 + 20 + 10
-            Assert.AreEqual(2, s_lazyEvaluationCounter, "lazy1 should be called twice.");
-            Assert.AreEqual(1, s_anotherLazyCounter, "lazy2 should be called once.");
-        }
+        // TestBindLazyValue_MultipleVariables_CalledForEachAccess REMOVED
 
         [Test]
         public void TestMixed_EagerBindingAndLazyProvider() // Formerly TestMixedLazyAndEagerVariables
@@ -241,51 +203,7 @@ namespace Jsonata.Net.Native.Tests
             Assert.AreEqual(0, s_lazyEvaluationCounter, "Provider should not be called when an eager binding exists for the same name.");
         }
 
-        [Test]
-        public void TestBindLazyValue_TakesPrecedenceOverProvider()
-        {
-            ResetCounters();
-            EvaluationEnvironment env = new EvaluationEnvironment(); // Create env to use BindLazyValue
-
-            env.BindLazyValue("foo", () => {
-                s_lazyEvaluationCounter++; // Counter for BindLazyValue func
-                return new JValue("from_bind_lazy_value");
-            });
-
-            Func<string, JToken> provider = (name) => {
-                if (name == "foo")
-                {
-                    s_anotherLazyCounter++; // Counter for provider func
-                    return new JValue("from_provider");
-                }
-                return EvalProcessor.UNDEFINED;
-            };
-
-            // Need to create a new environment that has the provider, and make the one with BindLazyValue its parent.
-            // Or, more directly, instantiate Eval Env with the provider and then call BindLazyValue on it.
-            // The public constructor for Eval Env with provider already sets Default Env as parent.
-            // Let's create an environment that will have BOTH the explicit BindLazyValue AND the provider.
-            // The Lookup order is: m_bindings (where BindLazyValue stores) -> m_lazyVariableProvider -> parent.
-
-            // To test this specific precedence, we need an environment that has both.
-            // The constructor EvaluationEnvironment(Func<string, JToken> lazyVariableProvider) sets up the provider.
-            // Then we can call BindLazyValue on this specific environment.
-            EvaluationEnvironment testEnvWithProvider = new EvaluationEnvironment(provider);
-            testEnvWithProvider.BindLazyValue("foo", () => {
-                s_lazyEvaluationCounter++; // Counter for BindLazyValue func
-                return new JValue("from_bind_lazy_value");
-            });
-
-
-            JsonataQuery query = new JsonataQuery("$foo");
-            // Use the Eval overload that takes a pre-configured environment
-            JToken result = query.Eval(JValue.CreateNull(), testEnvWithProvider);
-
-            Assert.AreEqual(JTokenType.String, result.Type);
-            Assert.AreEqual("from_bind_lazy_value", (string)result);
-            Assert.AreEqual(1, s_lazyEvaluationCounter, "Function from BindLazyValue should be called.");
-            Assert.AreEqual(0, s_anotherLazyCounter, "General provider should not be called for 'foo'.");
-        }
+        // TestBindLazyValue_TakesPrecedenceOverProvider REMOVED
 
         [Test]
         public void TestLazyProvider_VariableNotFound()
