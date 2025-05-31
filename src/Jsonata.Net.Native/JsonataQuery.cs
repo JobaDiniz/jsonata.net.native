@@ -36,7 +36,30 @@ namespace Jsonata.Net.Native
             EvaluationEnvironment env;
             if (bindings != null)
             {
-                env = new EvaluationEnvironment(bindings);
+                // Check if we're using the default environment or creating a new one for bindings
+                EvaluationEnvironment baseEnv = EvaluationEnvironment.DefaultEnvironment;
+                env = new EvaluationEnvironment(baseEnv, null); // Create a new environment that inherits from DefaultEnvironment
+
+                foreach (KeyValuePair<string, JToken> property in bindings.Properties)
+                {
+                    if (property.Value is JValue jValue && jValue.Type == JTokenType.String)
+                    {
+                        string stringValue = (string)jValue.Value!;
+                        if (stringValue.StartsWith("LAZY:"))
+                        {
+                            string valueToParse = stringValue.Substring("LAZY:".Length);
+                            env.BindLazyValue(property.Key, () => JToken.Parse(valueToParse, ParseSettings.DefaultSettings));
+                        }
+                        else
+                        {
+                            env.BindValue(property.Key, property.Value);
+                        }
+                    }
+                    else
+                    {
+                        env.BindValue(property.Key, property.Value);
+                    }
+                }
             }
             else
             {
