@@ -12,24 +12,15 @@ namespace Jsonata.Net.Native
     internal class LazyVariable
     {
         private Func<JToken> m_valueProvider;
-        private JToken? m_value;
-        private bool m_evaluated;
 
         public LazyVariable(Func<JToken> valueProvider)
         {
             this.m_valueProvider = valueProvider;
-            this.m_evaluated = false;
-            this.m_value = null;
         }
 
         public JToken GetValue()
         {
-            if (!this.m_evaluated)
-            {
-                this.m_value = this.m_valueProvider();
-                this.m_evaluated = true;
-            }
-            return this.m_value!;
+            return this.m_valueProvider();
         }
     }
 
@@ -44,7 +35,7 @@ namespace Jsonata.Net.Native
 
         internal static EvaluationEnvironment CreateDefault() //main parent, contains default function bindings
         {
-            EvaluationEnvironment result = new EvaluationEnvironment(null, null);
+            EvaluationEnvironment result = new EvaluationEnvironment(null, null, null); // No parent, no supplement, no lazy provider
             foreach (MethodInfo mi in typeof(BuiltinFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
             {
                 result.BindFunction(mi);
@@ -55,37 +46,45 @@ namespace Jsonata.Net.Native
         //used at actual EvalProcessor.EvaluateJson start to inject EvaluationSupplement
         internal static EvaluationEnvironment CreateEvalEnvironment(EvaluationEnvironment parentEnvironment)
         {
-            EvaluationEnvironment result = new EvaluationEnvironment(parentEnvironment, new EvaluationSupplement());
+            // Inherit lazyVariableProvider from the parent environment
+            EvaluationEnvironment result = new EvaluationEnvironment(parentEnvironment, new EvaluationSupplement(), parentEnvironment.m_lazyVariableProvider);
             return result;
         }
 
         //used during evaluation when nesting
         internal static EvaluationEnvironment CreateNestedEnvironment(EvaluationEnvironment parent)
         {
-            EvaluationEnvironment result = new EvaluationEnvironment(parent, parent.m_evaluationSupplement);
+            // Inherit lazyVariableProvider from the parent environment
+            EvaluationEnvironment result = new EvaluationEnvironment(parent, parent.m_evaluationSupplement, parent.m_lazyVariableProvider);
             return result;
         }
 
         private readonly Dictionary<string, object> m_bindings = new Dictionary<string, object>();
         private readonly EvaluationEnvironment? m_parent;
         private readonly EvaluationSupplement? m_evaluationSupplement;
+        private readonly Func<string, JToken>? m_lazyVariableProvider;
 
-        private EvaluationEnvironment(EvaluationEnvironment? parent, EvaluationSupplement? evaluationSupplement)
+        private EvaluationEnvironment(EvaluationEnvironment? parent, EvaluationSupplement? evaluationSupplement, Func<string, JToken>? lazyVariableProvider = null)
         {
             this.m_parent = parent;
             this.m_evaluationSupplement = evaluationSupplement;
+            this.m_lazyVariableProvider = lazyVariableProvider;
         }
 
         //public version to provide for JsonataQuery.Eval()
-        public EvaluationEnvironment()
-            : this(EvaluationEnvironment.DefaultEnvironment, null)
+        public EvaluationEnvironment(Func<string, JToken>? lazyVariableProvider = null)
+            : this(EvaluationEnvironment.DefaultEnvironment, null, lazyVariableProvider)
         {
 
         }
 
-        public EvaluationEnvironment(JObject bindings)
-            : this()
+        public EvaluationEnvironment(JObject bindings, Func<string, JToken>? lazyVariableProvider = null)
+            : this(lazyVariableProvider)
+
         {
+            // It's important that the base constructor (this(lazyVariableProvider)) is called first,
+            // which sets up the DefaultEnvironment as parent and the provider.
+            // Then, process the explicit bindings.
             foreach (KeyValuePair<string, JToken> property in bindings.Properties)
             {
                 this.BindValue(property.Key, property.Value);
@@ -128,15 +127,25 @@ namespace Jsonata.Net.Native
                 }
                 else if (resultObj is LazyVariable lazyVariable)
                 {
-                    JToken value = lazyVariable.GetValue();
-                    // Cache the value for future lookups by replacing the LazyVariable
-                    // instance with the actual JToken. This ensures that the Func<JToken>
-                    // is only evaluated once.
-                    this.m_bindings[name] = value;
-                    return value;
+                    // Invoke the function directly, do not cache by replacing the instance.
+                    return lazyVariable.GetValue();
                 }
             }
-            else if (this.m_parent != null)
+
+            // If not in local bindings, try the lazy variable provider
+            if (this.m_lazyVariableProvider != null)
+            {
+                JToken? providerResult = this.m_lazyVariableProvider(name);
+                // Check if the provider returned a valid, non-undefined token.
+                // A provider returning EvalProcessor.UNDEFINED means it didn't handle this variable.
+                if (providerResult != null && providerResult != EvalProcessor.UNDEFINED)
+                {
+                    return providerResult;
+                }
+            }
+
+            // If not found locally or by provider, try the parent environment
+            if (this.m_parent != null)
             {
                 return this.m_parent.Lookup(name);
             }

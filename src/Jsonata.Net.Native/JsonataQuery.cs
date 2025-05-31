@@ -27,44 +27,40 @@ namespace Jsonata.Net.Native
         public string Eval(string dataJson)
         {
             JToken data = JToken.Parse(dataJson, ParseSettings.DefaultSettings);
-            JToken result = this.Eval(data);
+            // Call the new primary Eval overload, passing null for bindings and lazyVariableProvider
+            JToken result = this.Eval(data, null, null);
             return result.ToIndentedString();
         }
 
+        // This overload now delegates to the new primary overload with lazyVariableProvider = null
         public JToken Eval(JToken data, JObject? bindings = null)
+        {
+            return this.Eval(data, bindings, null);
+        }
+
+        // New primary Eval method with lazyVariableProvider
+        public JToken Eval(JToken data, JObject? bindings = null, Func<string, JToken>? lazyVariableProvider = null)
         {
             EvaluationEnvironment env;
             if (bindings != null)
             {
-                // Check if we're using the default environment or creating a new one for bindings
-                EvaluationEnvironment baseEnv = EvaluationEnvironment.DefaultEnvironment;
-                env = new EvaluationEnvironment(baseEnv, null); // Create a new environment that inherits from DefaultEnvironment
-
-                foreach (KeyValuePair<string, JToken> property in bindings.Properties)
-                {
-                    if (property.Value is JValue jValue && jValue.Type == JTokenType.String)
-                    {
-                        string stringValue = (string)jValue.Value!;
-                        if (stringValue.StartsWith("LAZY:"))
-                        {
-                            string valueToParse = stringValue.Substring("LAZY:".Length);
-                            env.BindLazyValue(property.Key, () => JToken.Parse(valueToParse, ParseSettings.DefaultSettings));
-                        }
-                        else
-                        {
-                            env.BindValue(property.Key, property.Value);
-                        }
-                    }
-                    else
-                    {
-                        env.BindValue(property.Key, property.Value);
-                    }
-                }
+                // If bindings are provided, use them and the lazyVariableProvider.
+                // The EvaluationEnvironment constructor (new EvaluationEnvironment(JObject, Func<string,JToken>?)
+                // handles if lazyVariableProvider is null.
+                env = new EvaluationEnvironment(bindings, lazyVariableProvider);
+            }
+            else if (lazyVariableProvider != null)
+            {
+                // If only a lazyVariableProvider is provided, use it.
+                // This constructor (new EvaluationEnvironment(Func<string,JToken>?)
+                // ensures it parents from DefaultEnvironment.
+                env = new EvaluationEnvironment(lazyVariableProvider);
             }
             else
             {
+                // If neither bindings nor a provider is given, use the DefaultEnvironment
                 env = EvaluationEnvironment.DefaultEnvironment;
-            };
+            }
             return EvalProcessor.EvaluateJson(this.m_node, data, env);
         }
 
@@ -78,8 +74,8 @@ namespace Jsonata.Net.Native
             return this.m_node.ToString()!;
         }
 
-        public Node GetDom() { 
-            return this.m_node; 
+        public Node GetDom() {
+            return this.m_node;
         }
     }
 }
