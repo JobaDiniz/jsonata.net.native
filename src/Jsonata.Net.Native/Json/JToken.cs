@@ -8,6 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Eval;
@@ -125,42 +127,52 @@ namespace Jsonata.Net.Native.Json
 
         public static JToken Parse(TextReader reader, ParseSettings? settings = null)
         {
-            JsonParser parser = new JsonParser(reader, settings ?? ParseSettings.DefaultSettings);
-            return parser.Parse();
+            var jsonText = reader.ReadToEnd();
+            return ParseViaSystemTextJson(jsonText, settings);
         }
 
         public static JToken Parse(string source, ParseSettings? settings = null)
         {
-            using (StringReader reader = new StringReader(source))
-            {
-                return Parse(reader, settings);
-            }
+            return ParseViaSystemTextJson(source, settings);
         }
 
-        public static Task<JToken> ParseAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
+        public static async Task<JToken> ParseAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
         {
-            JsonParserAsync parser = new JsonParserAsync(reader, settings ?? ParseSettings.DefaultSettings);
-            return parser.ParseAsync(ct);
+            string jsonText;
+            if (reader is StreamReader streamReader)
+            {
+                jsonText = await streamReader.ReadToEndAsync();
+            }
+            else
+            {
+                jsonText = reader.ReadToEnd();
+            }
+            return ParseViaSystemTextJson(jsonText, settings);
         }
 
         public static void Validate(TextReader reader, ParseSettings? settings = null)
         {
-            JsonParser parser = new JsonParser(reader, settings ?? ParseSettings.DefaultSettings);
-            parser.Validate();
+            var jsonText = reader.ReadToEnd();
+            ValidateViaSystemTextJson(jsonText, settings);
         }
 
         public static void Validate(string source, ParseSettings? settings = null)
         {
-            using (StringReader reader = new StringReader(source))
-            {
-                Validate(reader, settings);
-            }
+            ValidateViaSystemTextJson(source, settings);
         }
 
-        public static Task ValidateAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
+        public static async Task ValidateAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
         {
-            JsonParserAsync parser = new JsonParserAsync(reader, settings ?? ParseSettings.DefaultSettings);
-            return parser.ValidateAsync(ct);
+            string jsonText;
+            if (reader is StreamReader streamReader)
+            {
+                jsonText = await streamReader.ReadToEndAsync();
+            }
+            else
+            {
+                jsonText = reader.ReadToEnd();
+            }
+            ValidateViaSystemTextJson(jsonText, settings);
         }
 
         public static JToken FromObject(object? sourceObj)
@@ -573,6 +585,119 @@ namespace Jsonata.Net.Native.Json
                 default:
                     target.Append(c);
                     break;
+                }
+            }
+        }
+        
+        // Helper method to parse JSON using System.Text.Json
+        private static JToken ParseViaSystemTextJson(string jsonText, ParseSettings? settings)
+        {
+            // If System.Text.Json can't handle it, fall back to custom parser
+            try
+            {
+                var options = new JsonDocumentOptions
+                {
+                    AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+                    CommentHandling = JsonCommentHandling.Skip
+                };
+                
+                using var doc = JsonDocument.Parse(jsonText, options);
+                return ConvertFromJsonElement(doc.RootElement);
+            }
+            catch (Exception ex) when (ex is JsonException || ex is InvalidOperationException)
+            {
+                // Fall back to custom parser for edge cases like invalid UTF-16 sequences
+                // System.Text.Json throws InvalidOperationException for invalid UTF-16
+                using (StringReader reader = new StringReader(jsonText))
+                {
+                    JsonParser parser = new JsonParser(reader, settings ?? ParseSettings.DefaultSettings);
+                    return parser.Parse();
+                }
+            }
+        }
+        
+        private static JToken ConvertFromJsonElement(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Array:
+                    {
+                        JArray result = new JArray(element.GetArrayLength());
+                        foreach (JsonElement child in element.EnumerateArray())
+                        {
+                            result.Add(ConvertFromJsonElement(child));
+                        }
+                        return result;
+                    }
+                case JsonValueKind.True:
+                    return new JValue(true);
+                case JsonValueKind.False:
+                    return new JValue(false);
+                case JsonValueKind.Number:
+                    {
+                        if (element.TryGetInt32(out int intValue))
+                        {
+                            return new JValue(intValue);
+                        }
+                        else if (element.TryGetInt64(out long longValue))
+                        {
+                            return new JValue(longValue);
+                        }
+                        else if (element.TryGetDecimal(out decimal decimalValue))
+                        {
+                            return new JValue(decimalValue);
+                        }
+                        else if (element.TryGetDouble(out double doubleValue))
+                        {
+                            return new JValue(doubleValue);
+                        }
+                        else
+                        {
+                            throw new Exception("Failed to parse number from " + element);
+                        }
+                    }
+                case JsonValueKind.Null:
+                    return JValue.CreateNull();
+                case JsonValueKind.Object:
+                    {
+                        JObject result = new JObject();
+                        foreach (JsonProperty prop in element.EnumerateObject())
+                        {
+                            result.Add(prop.Name, ConvertFromJsonElement(prop.Value));
+                        }
+                        return result;
+                    }
+                case JsonValueKind.String:
+                    return new JValue(element.GetString()!);
+                case JsonValueKind.Undefined:
+                    return JValue.CreateUndefined();
+                default:
+                    throw new ArgumentException("JsonValueKind " + element.ValueKind);
+            }
+        }
+        
+        private static void ValidateViaSystemTextJson(string jsonText, ParseSettings? settings)
+        {
+            // Try System.Text.Json first
+            try
+            {
+                var options = new JsonDocumentOptions
+                {
+                    AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+                    CommentHandling = JsonCommentHandling.Skip
+                };
+                
+                using var doc = JsonDocument.Parse(jsonText, options);
+                // If parsing succeeds, the JSON is valid
+            }
+            catch (Exception ex) when (ex is JsonException || ex is InvalidOperationException)
+            {
+                // Fall back to custom parser for edge cases
+                // System.Text.Json throws InvalidOperationException for invalid UTF-16
+                using (StringReader reader = new StringReader(jsonText))
+                {
+                    JsonParser parser = new JsonParser(reader, settings ?? ParseSettings.DefaultSettings);
+                    parser.Validate();
                 }
             }
         }
