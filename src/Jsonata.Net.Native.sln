@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native", "Jsona
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.Tests", "Jsonata.Net.Native.Tests\Jsonata.Net.Native.Tests.csproj", "{BE20B518-F1F6-4F51-95E8-AAA6D98D38C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.TestSuite", "Jsonata.Net.Native.TestSuite\Jsonata.Net.Native.TestSuite.csproj", "{B9E0AE50-801A-4192-BB56-11C9556CBBD4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp", "BenchmarkApp\BenchmarkApp.csproj", "{3EA3F316-CAE2-47B4-BCDF-0E6411C50C71}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{12CCE27F-BCF2-4DBC-9F3F-ACBE8BACF87F}"
@@ -17,19 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestResultsExporter", "Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonataExerciser", "JsonataExerciser\JsonataExerciser.csproj", "{35662B41-E569-4A8A-9F0C-66B375902155}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonNet", "Jsonata.Net.Native.JsonNet\Jsonata.Net.Native.JsonNet.csproj", "{66A15CEC-C5F7-4D99-9FF0-3654034F0829}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonParser.TestSuite", "Jsonata.Net.Native.JsonParser.TestSuite\Jsonata.Net.Native.JsonParser.TestSuite.csproj", "{6B58099F-5FD7-4B54-A339-12255DA9C351}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.SystemTextJson", "Jsonata.Net.Native.SystemTextJson\Jsonata.Net.Native.SystemTextJson.csproj", "{130552AC-C901-4E02-A16F-0BB3E479E905}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.SystemTextJson.Tests", "Jsonata.Net.Native.SystemTextJson.Tests\Jsonata.Net.Native.SystemTextJson.Tests.csproj", "{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jsonata.Net.Native.JsonNet.Tests", "Jsonata.Net.Native.JsonNet.Tests\Jsonata.Net.Native.JsonNet.Tests.csproj", "{E7F029E6-D32B-4D9E-B589-DE37BC923249}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectParsingTestsData", "ObjectParsingTestsData\ObjectParsingTestsData.csproj", "{9B30AEED-A458-4E37-86E0-18C0183BB461}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jsonata.Net.Native.TestsUnsigned", "Jsonata.Net.Native.TestsUnsigned\Jsonata.Net.Native.TestsUnsigned.csproj", "{F97A3C54-383C-D2D7-E1EA-324ABEB25360}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jsonata.Net.Native.TestSuite", "Jsonata.Net.Native.TestSuite\Jsonata.Net.Native.TestSuite.csproj", "{0335808E-6E82-B9EB-55BF-797D8EA94561}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +41,6 @@ Global
 		{BE20B518-F1F6-4F51-95E8-AAA6D98D38C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE20B518-F1F6-4F51-95E8-AAA6D98D38C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE20B518-F1F6-4F51-95E8-AAA6D98D38C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9E0AE50-801A-4192-BB56-11C9556CBBD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9E0AE50-801A-4192-BB56-11C9556CBBD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9E0AE50-801A-4192-BB56-11C9556CBBD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9E0AE50-801A-4192-BB56-11C9556CBBD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3EA3F316-CAE2-47B4-BCDF-0E6411C50C71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3EA3F316-CAE2-47B4-BCDF-0E6411C50C71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EA3F316-CAE2-47B4-BCDF-0E6411C50C71}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,10 +57,6 @@ Global
 		{35662B41-E569-4A8A-9F0C-66B375902155}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35662B41-E569-4A8A-9F0C-66B375902155}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35662B41-E569-4A8A-9F0C-66B375902155}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,10 +69,6 @@ Global
 		{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B30AEED-A458-4E37-86E0-18C0183BB461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B30AEED-A458-4E37-86E0-18C0183BB461}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B30AEED-A458-4E37-86E0-18C0183BB461}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -93,6 +77,10 @@ Global
 		{F97A3C54-383C-D2D7-E1EA-324ABEB25360}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F97A3C54-383C-D2D7-E1EA-324ABEB25360}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F97A3C54-383C-D2D7-E1EA-324ABEB25360}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0335808E-6E82-B9EB-55BF-797D8EA94561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0335808E-6E82-B9EB-55BF-797D8EA94561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0335808E-6E82-B9EB-55BF-797D8EA94561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0335808E-6E82-B9EB-55BF-797D8EA94561}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

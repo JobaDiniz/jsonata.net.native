@@ -19,7 +19,7 @@ namespace Jsonata.Net.Native.Tests
             Assert.IsTrue(JToken.DeepEquals(expectedResultJson, resultJson), $"expected {expectedResult}, got {resultJson.ToString(Formatting.None)}");
         }
 
-        [Test] 
+        [Test]
         public void TestSimple_1()
         {
             Check("a", "{'a': 'b'}", "'b'");
@@ -65,7 +65,7 @@ namespace Jsonata.Net.Native.Tests
         public void TestFlatten_1()
         {
             Check(
-                "nest2.[nest3]", 
+                "nest2.[nest3]",
                 @"{
                     'nest2': [
                         {
@@ -307,7 +307,7 @@ namespace Jsonata.Net.Native.Tests
         public void Test_Parent_5()
         {
             Check(
-                @"data.name.{ 
+                @"data.name.{
                     'ident': %.id
                 }",
                 @"{ 'data': [ { 'id': 1, 'name': 'a' }, { 'id': 2, 'name': 'b' } ] }",
@@ -333,74 +333,6 @@ namespace Jsonata.Net.Native.Tests
                 @"{ 'data': [ { 'id': 1, 'name': 'a' }, { 'id': 2, 'name': 'b' } ] }",
                 @"[ { 'id': 1, 'name': 'a' }, { 'id': 2, 'name': 'b' } ]"
             );
-        }
-
-        [Test]
-        public void Test_Issue14_1()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = DateTime.Now });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken);
-            Assert.Pass();
-        }
-
-
-        [Test]
-        public void Test_Issue14_2()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = Guid.NewGuid() });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken);
-            Assert.Pass();
-        }
-
-        [Test]
-        public void Test_Issue14_3()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = TimeSpan.FromSeconds(5) });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken);
-            Assert.Pass();
-        }
-
-        [Test]
-        public void Test_Issue14_4()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = new Uri("http://abc.xyz") });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken);
-            Assert.Pass();
-        }
-
-        [Test]
-        public void Test_Issue14_5()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = DateTimeOffset.Now });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken);
-            Assert.Pass();
-        }
-
-        [Test]
-        public void Test_Issue14_6()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = new DateTime(2023, 09, 17, 22, 28, 00) });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken, CultureInfo.InvariantCulture, datetimeFormat: "yyyy~MM~dd HH:mm:ss");
-            string value = (string)((Jsonata.Net.Native.Json.JObject)jToken).Properties["key"];
-            Assert.AreEqual("2023~09~17 22:28:00", value);
-        }
-
-        [Test]
-        public void Test_Issue14_7()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = new TimeSpan(10, 12, 13, 14, 156) });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken, CultureInfo.InvariantCulture, timespanFormat: @"ddd\-hh\-mm\-ss\-fff");
-            string value = (string)((Jsonata.Net.Native.Json.JObject)jToken).Properties["key"];
-            Assert.AreEqual("010-12-13-14-156", value);
-        }
-
-        [Test]
-        public void Test_Issue14_8()
-        {
-            Newtonsoft.Json.Linq.JToken newtonsoftToken = Newtonsoft.Json.Linq.JToken.FromObject(new { key = Guid.Empty });
-            Jsonata.Net.Native.Json.JToken jToken = Jsonata.Net.Native.JsonNet.JsonataExtensions.FromNewtonsoft(newtonsoftToken, CultureInfo.InvariantCulture, guidFormat: "N");
-            string value = (string)((Jsonata.Net.Native.Json.JObject)jToken).Properties["key"];
-            Assert.AreEqual("00000000000000000000000000000000", value);
         }
 
         [Test]

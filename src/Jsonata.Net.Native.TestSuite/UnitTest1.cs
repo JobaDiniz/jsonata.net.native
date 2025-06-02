@@ -1,12 +1,10 @@
 #define IGNORE_FAILED
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Jsonata.Net.Native.SystemTextJson;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Jsonata.Net.Native.JsonNet;
 
 namespace Jsonata.Net.Native.TestSuite
 {
@@ -96,7 +94,7 @@ namespace Jsonata.Net.Native.TestSuite
                 try
                 {
                     JsonataQuery query = new JsonataQuery(caseInfo.expr!);
-                    result = query.EvalNewtonsoft(data, caseInfo.bindings);
+                    result = query.EvalSystemTextJson(data, caseInfo.bindings);
                 }
                 catch (JsonataException)
                 {
