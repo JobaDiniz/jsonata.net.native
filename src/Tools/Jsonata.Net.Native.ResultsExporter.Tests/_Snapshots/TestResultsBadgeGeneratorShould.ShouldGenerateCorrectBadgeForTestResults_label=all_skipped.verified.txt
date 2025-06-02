@@ -1,0 +1,6 @@
+﻿{
+  schemaVersion: 1,
+  label: all skipped,
+  message: 2 skipped,
+  color: yellow
+}

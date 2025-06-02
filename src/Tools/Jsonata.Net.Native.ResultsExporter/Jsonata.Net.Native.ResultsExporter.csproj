@@ -10,7 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <InternalsVisibleTo Include="Jsonata.Net.Native.ResultsExporter.Tests" />
   </ItemGroup>
+
 
 </Project>

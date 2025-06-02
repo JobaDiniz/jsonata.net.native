@@ -1,0 +1,6 @@
+﻿{
+  schemaVersion: 1,
+  label: mixed results,
+  message: 2 passed | 1 failed | 1 skipped,
+  color: orange
+}

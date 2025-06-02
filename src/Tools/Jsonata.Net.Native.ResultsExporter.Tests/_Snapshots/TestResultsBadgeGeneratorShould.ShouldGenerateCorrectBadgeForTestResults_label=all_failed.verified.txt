@@ -1,0 +1,6 @@
+﻿{
+  schemaVersion: 1,
+  label: all failed,
+  message: 3 failed,
+  color: red
+}

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-run id="0" name="Sample.TestSuite.dll" fullname="C:\Sample\TestSuite.dll" runstate="Runnable" testcasecount="8" result="Failed" total="8" passed="4" failed="2" inconclusive="0" skipped="2" asserts="6" engine-version="3.12.0.0" clr-version="8.0.15" start-time="2025-06-02 10:00:00Z" end-time="2025-06-02 10:00:10Z" duration="10.0">
+  <test-suite type="Assembly" id="0-1" name="Sample.TestSuite.dll" fullname="C:/Sample/TestSuite.dll" runstate="Runnable" testcasecount="8" result="Failed" site="Child" start-time="2025-06-02T10:00:00.0000000Z" end-time="2025-06-02T10:00:10.0000000Z" duration="10.0" total="8" passed="4" failed="2" warnings="0" inconclusive="0" skipped="2" asserts="6">
+    <test-suite type="TestSuite" id="0-2" name="Tests" fullname="Sample.TestSuite.Tests" runstate="Runnable" testcasecount="8" result="Failed" site="Child" start-time="2025-06-02T10:00:00.0000000Z" end-time="2025-06-02T10:00:10.0000000Z" duration="10.0" total="8" passed="4" failed="2" warnings="0" inconclusive="0" skipped="2" asserts="6">
+      <test-suite type="ParameterizedMethod" id="0-3" name="array-constructor" fullname="Sample.TestSuite.Tests.array-constructor" runstate="Runnable" testcasecount="3" result="Passed" start-time="2025-06-02T10:00:00.0000000Z" end-time="2025-06-02T10:00:03.0000000Z" duration="3.0" total="3" passed="3" failed="0" warnings="0" inconclusive="0" skipped="0" asserts="3">
+        <test-case id="0-1001" name="array-constructor.case001" fullname="Sample.TestSuite.Tests.array-constructor.case001" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12345" result="Passed" start-time="2025-06-02T10:00:00.0000000Z" end-time="2025-06-02T10:00:01.0000000Z" duration="1.0" asserts="1">
+          <properties>
+            <property name="Description" value="expr: '[1, 2, 3]'; result: [1, 2, 3]" />
+          </properties>
+        </test-case>
+        <test-case id="0-1002" name="array-constructor.case002" fullname="Sample.TestSuite.Tests.array-constructor.case002" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12346" result="Passed" start-time="2025-06-02T10:00:01.0000000Z" end-time="2025-06-02T10:00:02.0000000Z" duration="1.0" asserts="1">
+          <properties>
+            <property name="Description" value="expr: '[]'; result: []" />
+          </properties>
+        </test-case>
+        <test-case id="0-1003" name="array-constructor.case003" fullname="Sample.TestSuite.Tests.array-constructor.case003" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12347" result="Passed" start-time="2025-06-02T10:00:02.0000000Z" end-time="2025-06-02T10:00:03.0000000Z" duration="1.0" asserts="1">
+          <properties>
+            <property name="Description" value="expr: '[a, b, c]'; result: [a, b, c]" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="ParameterizedMethod" id="0-4" name="function-abs" fullname="Sample.TestSuite.Tests.function-abs" runstate="Runnable" testcasecount="3" result="Failed" start-time="2025-06-02T10:00:03.0000000Z" end-time="2025-06-02T10:00:06.0000000Z" duration="3.0" total="3" passed="1" failed="2" warnings="0" inconclusive="0" skipped="0" asserts="1">
+        <test-case id="0-1004" name="function-abs.case001" fullname="Sample.TestSuite.Tests.function-abs.case001" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12348" result="Passed" start-time="2025-06-02T10:00:03.0000000Z" end-time="2025-06-02T10:00:04.0000000Z" duration="1.0" asserts="1">
+          <properties>
+            <property name="Description" value="expr: '$abs(-5)'; result: 5" />
+          </properties>
+        </test-case>
+        <test-case id="0-1005" name="function-abs.case002" fullname="Sample.TestSuite.Tests.function-abs.case002" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12349" result="Failed" start-time="2025-06-02T10:00:04.0000000Z" end-time="2025-06-02T10:00:05.0000000Z" duration="1.0" asserts="1">
+          <properties>
+            <property name="Description" value="expr: '$abs(-3.14)'; result: 3.14" />
+          </properties>
+          <failure>
+            <message><![CDATA[Expected "3.14", got "3.15"]]></message>
+            <stack-trace><![CDATA[at Sample.TestSuite.Tests.Test() in TestSuite.cs:line 42]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="0-1006" name="function-abs.case003" fullname="Sample.TestSuite.Tests.function-abs.case003" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12350" result="Failed" start-time="2025-06-02T10:00:05.0000000Z" end-time="2025-06-02T10:00:06.0000000Z" duration="1.0" asserts="1">
+          <properties>
+            <property name="Description" value="expr: '$abs(0)'; result: 0" />
+          </properties>
+          <failure>
+            <message><![CDATA[Expected "0", got "1"]]></message>
+            <stack-trace><![CDATA[at Sample.TestSuite.Tests.Test() in TestSuite.cs:line 52]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="ParameterizedMethod" id="0-5" name="conditional" fullname="Sample.TestSuite.Tests.conditional" runstate="Runnable" testcasecount="2" result="Skipped" start-time="2025-06-02T10:00:06.0000000Z" end-time="2025-06-02T10:00:08.0000000Z" duration="2.0" total="2" passed="0" failed="0" warnings="0" inconclusive="0" skipped="2" asserts="0">
+        <test-case id="0-1007" name="conditional.case001" fullname="Sample.TestSuite.Tests.conditional.case001" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12351" result="Skipped" label="Ignored" start-time="2025-06-02T10:00:06.0000000Z" end-time="2025-06-02T10:00:07.0000000Z" duration="1.0" asserts="0">
+          <properties>
+            <property name="Description" value="expr: 'true ? 1 : 2'; result: 1" />
+          </properties>
+          <reason>
+            <message><![CDATA[Test skipped due to known issue]]></message>
+          </reason>
+        </test-case>
+        <test-case id="0-1008" name="conditional.case002" fullname="Sample.TestSuite.Tests.conditional.case002" methodname="Test" classname="Sample.TestSuite.Tests" runstate="Runnable" seed="12352" result="Skipped" label="Ignored" start-time="2025-06-02T10:00:07.0000000Z" end-time="2025-06-02T10:00:08.0000000Z" duration="1.0" asserts="0">
+          <properties>
+            <property name="Description" value="expr: 'false ? 1 : 2'; result: 2" />
+          </properties>
+          <reason>
+            <message><![CDATA[Test skipped due to known issue]]></message>
+          </reason>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

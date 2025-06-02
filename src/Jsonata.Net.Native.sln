@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp", "BenchmarkAp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{12CCE27F-BCF2-4DBC-9F3F-ACBE8BACF87F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestResultsExporter", "TestResultsExporter\TestResultsExporter.csproj", "{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.ResultsExporter", "Tools\Jsonata.Net.Native.ResultsExporter\Jsonata.Net.Native.ResultsExporter.csproj", "{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.ResultsExporter.Tests", "Tools\Jsonata.Net.Native.ResultsExporter.Tests\Jsonata.Net.Native.ResultsExporter.Tests.csproj", "{A1234567-89AB-CDEF-0123-456789ABCDEF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonParser.TestSuite", "Jsonata.Net.Native.JsonParser.TestSuite\Jsonata.Net.Native.JsonParser.TestSuite.csproj", "{6B58099F-5FD7-4B54-A339-12255DA9C351}"
 EndProject
@@ -55,6 +59,10 @@ Global
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1234567-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1234567-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1234567-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1234567-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -78,6 +86,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB} = {D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}
+		{A1234567-89AB-CDEF-0123-456789ABCDEF} = {D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8E149D3D-F4B0-4DEC-B098-99F26FE08855}

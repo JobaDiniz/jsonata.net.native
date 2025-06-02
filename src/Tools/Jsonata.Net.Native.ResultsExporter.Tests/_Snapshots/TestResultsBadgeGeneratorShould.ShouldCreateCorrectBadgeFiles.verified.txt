@@ -1,0 +1,26 @@
+﻿{
+  _all: {
+    schemaVersion: 1,
+    label: all tests,
+    message: 4 passed | 2 failed | 2 skipped,
+    color: orange
+  },
+  array-constructor: {
+    schemaVersion: 1,
+    label: array-constructor,
+    message: 3 passed,
+    color: brightgreen
+  },
+  conditional: {
+    schemaVersion: 1,
+    label: conditional,
+    message: 2 skipped,
+    color: yellow
+  },
+  function-abs: {
+    schemaVersion: 1,
+    label: function-abs,
+    message: 1 passed | 2 failed,
+    color: orange
+  }
+}
