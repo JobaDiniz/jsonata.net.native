@@ -420,23 +420,11 @@ namespace Jsonata.Net.Native.Json
             else if (type.IsEnum)
             {
                 string? value = (string)this;
-#if (NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1)
                 if (!Enum.TryParse(type, value, out object? result))
                 {
                     throw new ArgumentException($"Failed to parse '{value}' to enum {type.Name}");
                 }
                 return result;
-#else
-                try
-                {
-                    object? result = Enum.Parse(type, value);
-                    return result;
-                }
-                catch (Exception)
-                {
-                    throw new ArgumentException($"Failed to parse '{value}' to enum {type.Name}");
-                }
-#endif
             }
             else if (type == typeof(object))
             {
