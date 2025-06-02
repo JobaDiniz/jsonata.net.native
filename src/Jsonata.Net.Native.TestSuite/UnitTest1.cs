@@ -1,23 +1,20 @@
 #define IGNORE_FAILED
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Jsonata.Net.Native.JsonNet;
+using System.Text.Json;
+using Jsonata.Net.Native.SystemTextJson;
 
 namespace Jsonata.Net.Native.TestSuite
 {
     public sealed class Tests
     {
-        private static readonly JsonSerializerSettings s_serializerSettings = new JsonSerializerSettings() {
-            DateParseHandling = DateParseHandling.None
-        };
+        private static readonly JsonSerializerOptions s_serializerOptions = new JsonSerializerOptions();
 
         private const string TEST_SUITE_ROOT = "../../../../../jsonata-js/test/test-suite";
-        private Dictionary<string, JToken> m_datasets = new Dictionary<string, JToken>();
+        private Dictionary<string, Jsonata.Net.Native.Json.JToken> m_datasets = new Dictionary<string, Jsonata.Net.Native.Json.JToken>();
         private readonly Dictionary<string, string> m_disabledTests = new Dictionary<string, string>() {
             { "tail-recursion.case005", "Tail recursion is not supported yet, and having StackOverflow here breaks tests" },
             { "tail-recursion.case006", "Tail recursion is not supported yet, and having StackOverflow here breaks tests" },
@@ -38,8 +35,8 @@ namespace Jsonata.Net.Native.TestSuite
             string datasetDirectory = Path.Combine(testSuiteRoot, "datasets");
             foreach (string file in Directory.EnumerateFiles(datasetDirectory, "*.json"))
             {
-                //JToken dataset = JToken.Parse(File.ReadAllText(file));
-                JToken dataset = JsonConvert.DeserializeObject<JToken>(File.ReadAllText(file), s_serializerSettings)!;
+                //JsonNode dataset = JsonNode.Parse(File.ReadAllText(file));
+                Jsonata.Net.Native.Json.JToken dataset = Jsonata.Net.Native.Json.JToken.Parse(File.ReadAllText(file));
                 this.m_datasets.Add(Path.GetFileNameWithoutExtension(file), dataset);
             }
             Assert.AreNotEqual(0, this.m_datasets.Count);
@@ -63,14 +60,14 @@ namespace Jsonata.Net.Native.TestSuite
              Otherwise, the dataset field contains the name of the dataset (in the datasets directory) to use as input data. 
              If value of the dataset field is null, then use 'undefined' as the input data when evaluating the jsonata expression.
              */
-            JToken data;
+            Jsonata.Net.Native.Json.JToken data;
             if (caseInfo.data != null)
             {
                 data = caseInfo.data;
             }
             else if (caseInfo.dataset != null)
             {
-                if (!this.m_datasets.TryGetValue(caseInfo.dataset, out JToken? datset))
+                if (!this.m_datasets.TryGetValue(caseInfo.dataset, out Jsonata.Net.Native.Json.JToken? datset))
                 {
                     Assert.Fail("No datset with name " + caseInfo.dataset);
                     throw new NotImplementedException("Fix for compiler");
@@ -82,7 +79,7 @@ namespace Jsonata.Net.Native.TestSuite
             }
             else
             {
-                data = JValue.CreateUndefined();
+                data = Jsonata.Net.Native.Json.JValue.CreateUndefined();
             };
 
             try
@@ -92,11 +89,11 @@ namespace Jsonata.Net.Native.TestSuite
                     Console.WriteLine($"Description: '{caseInfo.description}'");
                 };
                 Console.WriteLine($"Expr is '{caseInfo.expr}'");
-                JToken result;
+                Jsonata.Net.Native.Json.JToken result;
                 try
                 {
                     JsonataQuery query = new JsonataQuery(caseInfo.expr!);
-                    result = query.EvalNewtonsoft(data, caseInfo.bindings);
+                    result = query.Eval(data, caseInfo.bindings);
                 }
                 catch (JsonataException)
                 {
@@ -121,7 +118,7 @@ namespace Jsonata.Net.Native.TestSuite
 #endif
                 }
 
-                Console.WriteLine($"Result: '{result.ToString(Formatting.None)}'");
+                Console.WriteLine($"Result: '{result.ToFlatString()}'");
                 /*
                 In addition, (exactly) one of the following fields is specified for each test case:
 
@@ -139,23 +136,23 @@ namespace Jsonata.Net.Native.TestSuite
 
                 if (caseInfo.result != null)
                 {
-                    Console.WriteLine($"Expected: '{caseInfo.result.ToString(Formatting.None)}'");
-                    Assert.IsTrue(JToken.DeepEquals(caseInfo.result, result), $"Expected '{caseInfo.result.ToString(Formatting.None)}', got '{result.ToString(Formatting.None)}'");
+                    Console.WriteLine($"Expected: '{caseInfo.result.ToFlatString()}'");
+                    Assert.IsTrue(Jsonata.Net.Native.Json.JToken.DeepEquals(caseInfo.result, result), $"Expected '{caseInfo.result.ToFlatString()}', got '{result.ToFlatString()}'");
                 }
                 else if (caseInfo.undefinedResult.HasValue && caseInfo.undefinedResult.Value)
                 {
                     Console.WriteLine($"Expected 'undefined'");
-                    Assert.IsTrue(result.Type == JTokenType.Undefined, $"Expected 'undefined', got '{result.ToString(Formatting.None)}'");
+                    Assert.IsTrue(result.Type == Jsonata.Net.Native.Json.JTokenType.Undefined, $"Expected 'undefined', got '{result.ToFlatString()}'");
                 }
                 else if (caseInfo.code != null)
                 {
                     Console.WriteLine($"Expected error {caseInfo.code}");
-                    Assert.Fail($"Expected error {caseInfo.code} ({caseInfo.token}), got '{result.ToString(Formatting.None)}'");
+                    Assert.Fail($"Expected error {caseInfo.code} ({caseInfo.token}), got '{result.ToFlatString()}'");
                 }
                 else if (caseInfo.error != null)
                 {
                     Console.WriteLine($"Expected error {caseInfo.error.code}");
-                    Assert.Fail($"Expected error {caseInfo.error.code} ({caseInfo.error.message}{caseInfo.error.functionName}), got '{result.ToString(Formatting.None)}'");
+                    Assert.Fail($"Expected error {caseInfo.error.code} ({caseInfo.error.message}{caseInfo.error.functionName}), got '{result.ToFlatString()}'");
                 }
                 else
                 {
@@ -223,22 +220,21 @@ namespace Jsonata.Net.Native.TestSuite
                         //dot works like path separator in NUnit
                         string info = infoGroupPrefix + "." + Path.GetFileNameWithoutExtension(testFile);
                         string testStr = File.ReadAllText(testFile);
-                        JsonSerializer serializer = new JsonSerializer();
-                        //JToken testToken = JToken.Parse(testStr);
-                        JToken testToken = JsonConvert.DeserializeObject<JToken>(testStr, s_serializerSettings)!;
-                        if (testToken is JArray array)
+                        //JsonDocument doc = JsonDocument.Parse(testStr);
+                        Jsonata.Net.Native.Json.JToken testToken = Jsonata.Net.Native.Json.JToken.Parse(testStr);
+                        if (testToken is Jsonata.Net.Native.Json.JArray array)
                         {
                             int index = 0;
-                            foreach (JToken subTestToken in array)
+                            foreach (Jsonata.Net.Native.Json.JToken subTestToken in array.ChildrenTokens)
                             {
-                                CaseInfo caseInfo = subTestToken.ToObject<CaseInfo>() ?? throw new Exception("null");
+                                CaseInfo caseInfo = CreateCaseInfoFromJToken(subTestToken);
                                 ++index;
                                 ProcessAndAddCaseData(testFile, results, caseInfo, info + "[" + index + "]");
                             }
                         }
                         else
                         {
-                            CaseInfo caseInfo = testToken.ToObject<CaseInfo>() ?? throw new Exception("null");
+                            CaseInfo caseInfo = CreateCaseInfoFromJToken(testToken);
                             ProcessAndAddCaseData(testFile, results, caseInfo, info);
                         }
                     }
@@ -251,17 +247,76 @@ namespace Jsonata.Net.Native.TestSuite
             return results;
         }
 
+        private static CaseInfo CreateCaseInfoFromJToken(Jsonata.Net.Native.Json.JToken token)
+        {
+            if (token is not Jsonata.Net.Native.Json.JObject obj)
+                throw new Exception("Expected JObject for test case");
+
+            var caseInfo = new CaseInfo();
+            
+            if (obj.Properties.TryGetValue("description", out var desc) && desc.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                caseInfo.description = (string)desc;
+            
+            if (obj.Properties.TryGetValue("expr", out var expr) && expr.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                caseInfo.expr = (string)expr;
+            
+            if (obj.Properties.TryGetValue("expr-file", out var exprFile) && exprFile.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                caseInfo.expr_file = (string)exprFile;
+            
+            if (obj.Properties.TryGetValue("data", out var data))
+                caseInfo.data = data;
+            
+            if (obj.Properties.TryGetValue("dataset", out var dataset) && dataset.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                caseInfo.dataset = (string)dataset;
+            
+            if (obj.Properties.TryGetValue("timelimit", out var timelimit) && timelimit.Type == Jsonata.Net.Native.Json.JTokenType.Integer)
+                caseInfo.timelimit = (int)timelimit;
+            
+            if (obj.Properties.TryGetValue("depth", out var depth) && depth.Type == Jsonata.Net.Native.Json.JTokenType.Integer)
+                caseInfo.depth = (int)depth;
+            
+            if (obj.Properties.TryGetValue("bindings", out var bindings) && bindings is Jsonata.Net.Native.Json.JObject bindingsObj)
+                caseInfo.bindings = bindingsObj;
+            
+            if (obj.Properties.TryGetValue("result", out var result))
+                caseInfo.result = result;
+            
+            if (obj.Properties.TryGetValue("undefinedResult", out var undefinedResult) && undefinedResult.Type == Jsonata.Net.Native.Json.JTokenType.Boolean)
+                caseInfo.undefinedResult = (bool)undefinedResult;
+            
+            if (obj.Properties.TryGetValue("code", out var code) && code.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                caseInfo.code = (string)code;
+            
+            if (obj.Properties.TryGetValue("token", out var tokenVal) && tokenVal.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                caseInfo.token = (string)tokenVal;
+            
+            if (obj.Properties.TryGetValue("error", out var error) && error is Jsonata.Net.Native.Json.JObject errorObj)
+            {
+                caseInfo.error = new CaseInfo.Error();
+                if (errorObj.Properties.TryGetValue("code", out var errorCode) && errorCode.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                    caseInfo.error.code = (string)errorCode;
+                if (errorObj.Properties.TryGetValue("message", out var errorMessage) && errorMessage.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                    caseInfo.error.message = (string)errorMessage;
+                if (errorObj.Properties.TryGetValue("functionName", out var errorFunctionName) && errorFunctionName.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                    caseInfo.error.functionName = (string)errorFunctionName;
+                if (errorObj.Properties.TryGetValue("value", out var errorValue) && errorValue.Type == Jsonata.Net.Native.Json.JTokenType.String)
+                    caseInfo.error.value = (string)errorValue;
+            }
+            
+            return caseInfo;
+        }
+
         private static void FixCaseInfo(CaseInfo caseInfo)
         {
             switch (caseInfo.testName!)
             {
             case "range-operator.case021":
                 //TODO: old value was "10000000.0" for unclear reason. Why should count() return such value? Also https://try.jsonata.org/ does not return fractional zero here
-                caseInfo.result = 10000000; 
+                caseInfo.result = new Jsonata.Net.Native.Json.JValue(10000000); 
                 break;
             case "range-operator.case024":
                 //TODO: old value was "10000000.0" for unclear reason. Why should count() return such value? Also https://try.jsonata.org/ does not return fractional zero here
-                caseInfo.result = 10000000;
+                caseInfo.result = new Jsonata.Net.Native.Json.JValue(10000000);
                 break;
             }
         }

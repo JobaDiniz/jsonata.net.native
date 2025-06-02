@@ -15,15 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestResultsExporter", "TestResultsExporter\TestResultsExporter.csproj", "{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonNet", "Jsonata.Net.Native.JsonNet\Jsonata.Net.Native.JsonNet.csproj", "{66A15CEC-C5F7-4D99-9FF0-3654034F0829}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonParser.TestSuite", "Jsonata.Net.Native.JsonParser.TestSuite\Jsonata.Net.Native.JsonParser.TestSuite.csproj", "{6B58099F-5FD7-4B54-A339-12255DA9C351}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.SystemTextJson", "Jsonata.Net.Native.SystemTextJson\Jsonata.Net.Native.SystemTextJson.csproj", "{130552AC-C901-4E02-A16F-0BB3E479E905}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.SystemTextJson.Tests", "Jsonata.Net.Native.SystemTextJson.Tests\Jsonata.Net.Native.SystemTextJson.Tests.csproj", "{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jsonata.Net.Native.JsonNet.Tests", "Jsonata.Net.Native.JsonNet.Tests\Jsonata.Net.Native.JsonNet.Tests.csproj", "{E7F029E6-D32B-4D9E-B589-DE37BC923249}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectParsingTestsData", "ObjectParsingTestsData\ObjectParsingTestsData.csproj", "{9B30AEED-A458-4E37-86E0-18C0183BB461}"
 EndProject
@@ -59,10 +55,6 @@ Global
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B58099F-5FD7-4B54-A339-12255DA9C351}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,10 +67,6 @@ Global
 		{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9DAD074-C2B6-4471-9C63-85AFE68C3DB0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7F029E6-D32B-4D9E-B589-DE37BC923249}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B30AEED-A458-4E37-86E0-18C0183BB461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B30AEED-A458-4E37-86E0-18C0183BB461}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B30AEED-A458-4E37-86E0-18C0183BB461}.Release|Any CPU.ActiveCfg = Release|Any CPU

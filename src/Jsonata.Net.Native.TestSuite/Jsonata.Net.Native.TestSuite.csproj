@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jsonata.Net.Native.JsonNet\Jsonata.Net.Native.JsonNet.csproj" />
+    <ProjectReference Include="..\Jsonata.Net.Native.SystemTextJson\Jsonata.Net.Native.SystemTextJson.csproj" />
     <ProjectReference Include="..\Jsonata.Net.Native\Jsonata.Net.Native.csproj" />
   </ItemGroup>
 
