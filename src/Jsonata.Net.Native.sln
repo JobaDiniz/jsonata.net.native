@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestResultsExporter", "TestResultsExporter\TestResultsExporter.csproj", "{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonataExerciser", "JsonataExerciser\JsonataExerciser.csproj", "{35662B41-E569-4A8A-9F0C-66B375902155}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonNet", "Jsonata.Net.Native.JsonNet\Jsonata.Net.Native.JsonNet.csproj", "{66A15CEC-C5F7-4D99-9FF0-3654034F0829}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jsonata.Net.Native.JsonParser.TestSuite", "Jsonata.Net.Native.JsonParser.TestSuite\Jsonata.Net.Native.JsonParser.TestSuite.csproj", "{6B58099F-5FD7-4B54-A339-12255DA9C351}"
@@ -61,10 +59,6 @@ Global
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50BFFDEA-116E-407A-854B-EB0E73B9B9CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{35662B41-E569-4A8A-9F0C-66B375902155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35662B41-E569-4A8A-9F0C-66B375902155}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35662B41-E569-4A8A-9F0C-66B375902155}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35662B41-E569-4A8A-9F0C-66B375902155}.Release|Any CPU.Build.0 = Release|Any CPU
 		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66A15CEC-C5F7-4D99-9FF0-3654034F0829}.Release|Any CPU.ActiveCfg = Release|Any CPU
