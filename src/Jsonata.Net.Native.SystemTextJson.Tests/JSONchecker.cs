@@ -1,5 +1,5 @@
 using Jsonata.Net.Native.Json;
-using NUnit.Framework;
+using Xunit;
 using ObjectParsingTestsData;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Jsonata.Net.Native.SystemTextJson.Tests
 {
     public sealed class JSONchecker
     {
-        [Test, TestCaseSource(nameof(GetTestCases))]
+        [Theory, MemberData(nameof(GetTestCases))]
         public void Test(JsonCheckerData caseInfo)
         {
 
@@ -25,7 +25,7 @@ namespace Jsonata.Net.Native.SystemTextJson.Tests
                 JToken resultToken = JsonataExtensions.FromSystemTextJson(JsonDocument.Parse(caseInfo.json));
                 Console.WriteLine($"Parsed: '{resultToken.ToFlatString()}'");
                 JToken reference = JToken.Parse(caseInfo.json);
-                Assert.IsTrue(reference.DeepEquals(resultToken));
+                Assert.True(reference.DeepEquals(resultToken));
             }
             catch (JsonParseException ex)
             {
@@ -37,9 +37,9 @@ namespace Jsonata.Net.Native.SystemTextJson.Tests
             }
         }
 
-        public static List<TestCaseData> GetTestCases()
+        public static IEnumerable<object[]> GetTestCases()
         {
-            return JsonCheckerData.GetTestCasesNunit();
+            return JsonCheckerData.GetTestCasesXunit();
         }
     }
 }

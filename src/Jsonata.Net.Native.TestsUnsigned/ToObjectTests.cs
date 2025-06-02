@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Json;
-using NUnit.Framework;
+using Xunit;
 using ObjectParsingTestsData;
 
 namespace Jsonata.Net.Native.Tests
@@ -68,17 +68,17 @@ namespace Jsonata.Net.Native.Tests
 
         private readonly ObjectsComparer.Comparer m_comparer = new ObjectsComparer.Comparer();
 
-        [Test]
+        [Fact]
         public void TestComparer()
         {
-            Assert.IsTrue(this.m_comparer.Compare("a", "a"), "a == a");
-            Assert.IsFalse(this.m_comparer.Compare("a", "b"), "a != b");
+            Assert.True(this.m_comparer.Compare("a", "a")); // a == a
+            Assert.False(this.m_comparer.Compare("a", "b")); // a != b
             //TODO: WTF! see https://github.com/ValeraT1982/ObjectsComparer/issues/23
-            Assert.IsTrue(this.m_comparer.Compare(typeof(object), "a", "b"), "a == b (obj)");
+            Assert.True(this.m_comparer.Compare(typeof(object), "a", "b")); // a == b (obj)
         }
 
 
-        [Test, TestCaseSource(nameof(GetTestCases))]
+        [Theory, MemberData(nameof(GetTestCases))]
         public void Check(TestData data)
         {
             JToken token = JToken.Parse(data.json);
@@ -87,11 +87,11 @@ namespace Jsonata.Net.Native.Tests
             { 
                 value = token.ToObject(data.type, data.settings);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (data.exceptionExpected)
                 {
-                    Assert.Pass(ex.Message);
+                    // Expected exception - test passes
                     return;
                 }
                 else
@@ -102,14 +102,14 @@ namespace Jsonata.Net.Native.Tests
 
             if (data.exceptionExpected)
             {
-                Assert.Fail("Expected exception");
+                throw new Exception("Expected exception");
             }
 
             bool areEqual = this.m_comparer.Compare(data.type, data.expectedValue, value, out IEnumerable<ObjectsComparer.Difference> diffs);
-            Assert.That(areEqual, $"Mismatch:\n{String.Join("\n", diffs)}");
+            Assert.True(areEqual, $"Mismatch:\n{String.Join("\n", diffs)}");
         }
 
-        public static List<TestCaseData> GetTestCases()
+        public static IEnumerable<object[]> GetTestCases()
         {
             List<TestData> tests = new List<TestData>() {
                 new TestData("null", typeof(object), null),
@@ -138,9 +138,7 @@ namespace Jsonata.Net.Native.Tests
                 new TestData("{'foo': 'goo', 'bar': 10, 'zoo': 1}", TestData.AllowUndeclaredProps, new TestObj() { foo = "goo", bar = 10 }),
             };
 
-            return tests
-                .Select(v => new TestCaseData(v) { TestName = v.json })
-                .ToList();
+            return tests.Select(v => new object[] { v });
         }
 
         private sealed class TestObj

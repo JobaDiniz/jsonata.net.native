@@ -1,5 +1,6 @@
 #define IGNORE_FAILED
-using NUnit.Framework;
+using Xunit;
+using Xunit.Sdk;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,8 +29,7 @@ namespace Jsonata.Net.Native.TestSuite
             { "function-decodeUrl.case002", "JS function encodeURI throws URIError 'if one attempts to encode a surrogate which is not part of a high-low pair', which is seem to be not a case with C#" },
         };
 
-        [OneTimeSetUp]
-        public void Setup()
+        public Tests()
         {
             string testSuiteRoot = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, TEST_SUITE_ROOT);
             string datasetDirectory = Path.Combine(testSuiteRoot, "datasets");
@@ -39,19 +39,18 @@ namespace Jsonata.Net.Native.TestSuite
                 Jsonata.Net.Native.Json.JToken dataset = Jsonata.Net.Native.Json.JToken.Parse(File.ReadAllText(file));
                 this.m_datasets.Add(Path.GetFileNameWithoutExtension(file), dataset);
             }
-            Assert.AreNotEqual(0, this.m_datasets.Count);
+            Assert.NotEmpty(this.m_datasets);
             Console.WriteLine($"Loaded {this.m_datasets.Count} datasets");
         }
 
-        [Test, TestCaseSource(nameof(GetTestCases))]
+        [SkippableTheory, MemberData(nameof(GetTestCases))]
         public void Test(CaseInfo caseInfo)
         {
             //check disabled tests
             {
                 if (this.m_disabledTests.TryGetValue(caseInfo.testName!, out string? justification))
                 {
-                    Assert.Fail(justification);
-                    return;
+                    throw new XunitException(justification);
                 }
             }
 
@@ -69,7 +68,7 @@ namespace Jsonata.Net.Native.TestSuite
             {
                 if (!this.m_datasets.TryGetValue(caseInfo.dataset, out Jsonata.Net.Native.Json.JToken? datset))
                 {
-                    Assert.Fail("No datset with name " + caseInfo.dataset);
+                    throw new XunitException("No datset with name " + caseInfo.dataset);
                     throw new NotImplementedException("Fix for compiler");
                 }
                 else
@@ -102,7 +101,7 @@ namespace Jsonata.Net.Native.TestSuite
                 catch (NotImplementedException niEx)
                 {
 #if IGNORE_FAILED
-                    Assert.Ignore($"Failed with exception: {niEx.Message}\n({niEx.GetType().Name})\n{niEx.StackTrace}");
+                    Skip.If(true, $"Failed with exception: {niEx.Message}\n({niEx.GetType().Name})\n{niEx.StackTrace}");
                     return;
 #else
                     throw;
@@ -111,7 +110,7 @@ namespace Jsonata.Net.Native.TestSuite
                 catch (Exception ex) //TODO: remove after removing BaseException
                 {
 #if IGNORE_FAILED
-                    Assert.Ignore($"Failed with exception: {ex.Message}\n({ex.GetType().Name})\n{ex.StackTrace}");
+                    Skip.If(true, $"Failed with exception: {ex.Message}\n({ex.GetType().Name})\n{ex.StackTrace}");
                     return;
 #else
                     throw;
@@ -129,7 +128,7 @@ namespace Jsonata.Net.Native.TestSuite
 
                 if (this.m_suppressedTests.TryGetValue(caseInfo.testName!, out string? justification))
                 {
-                    Assert.Ignore(justification);
+                    Skip.If(true, justification);
                     return;
                 }
 
@@ -137,26 +136,26 @@ namespace Jsonata.Net.Native.TestSuite
                 if (caseInfo.result != null)
                 {
                     Console.WriteLine($"Expected: '{caseInfo.result.ToFlatString()}'");
-                    Assert.IsTrue(Jsonata.Net.Native.Json.JToken.DeepEquals(caseInfo.result, result), $"Expected '{caseInfo.result.ToFlatString()}', got '{result.ToFlatString()}'");
+                    Assert.True(Jsonata.Net.Native.Json.JToken.DeepEquals(caseInfo.result, result), $"Expected '{caseInfo.result.ToFlatString()}', got '{result.ToFlatString()}'");
                 }
                 else if (caseInfo.undefinedResult.HasValue && caseInfo.undefinedResult.Value)
                 {
                     Console.WriteLine($"Expected 'undefined'");
-                    Assert.IsTrue(result.Type == Jsonata.Net.Native.Json.JTokenType.Undefined, $"Expected 'undefined', got '{result.ToFlatString()}'");
+                    Assert.True(result.Type == Jsonata.Net.Native.Json.JTokenType.Undefined, $"Expected 'undefined', got '{result.ToFlatString()}'");
                 }
                 else if (caseInfo.code != null)
                 {
                     Console.WriteLine($"Expected error {caseInfo.code}");
-                    Assert.Fail($"Expected error {caseInfo.code} ({caseInfo.token}), got '{result.ToFlatString()}'");
+                    throw new XunitException($"Expected error {caseInfo.code} ({caseInfo.token}), got '{result.ToFlatString()}'");
                 }
                 else if (caseInfo.error != null)
                 {
                     Console.WriteLine($"Expected error {caseInfo.error.code}");
-                    Assert.Fail($"Expected error {caseInfo.error.code} ({caseInfo.error.message}{caseInfo.error.functionName}), got '{result.ToFlatString()}'");
+                    throw new XunitException($"Expected error {caseInfo.error.code} ({caseInfo.error.message}{caseInfo.error.functionName}), got '{result.ToFlatString()}'");
                 }
                 else
                 {
-                    Assert.Fail("Bad test case?");
+                    throw new XunitException("Bad test case?");
                 }
             }
             catch (JsonataException jsonataEx)
@@ -164,14 +163,14 @@ namespace Jsonata.Net.Native.TestSuite
                 if (caseInfo.code != null)
                 {
                     //Assert.Equals(caseInfo.code, jsonataEx.Code); //TODO: enable code checking later
-                    Assert.Pass($"Expected to throw error with code {caseInfo.code}.\nActually thrown {jsonataEx.Code}.\nNot checking codes yet");
+                    return; // Expected to throw error with code {caseInfo.code}. Actually thrown {jsonataEx.Code}. Not checking codes yet
                 }
                 else if (caseInfo.error != null)
                 {
-                    Assert.AreEqual(caseInfo.error.code, jsonataEx.Code);
+                    Assert.Equal(caseInfo.error.code, jsonataEx.Code);
                     if (caseInfo.error.message != null)
                     {
-                        Assert.AreEqual(caseInfo.error.message, jsonataEx.RawMessage);
+                        Assert.Equal(caseInfo.error.message, jsonataEx.RawMessage);
                     }
                 }
                 else
@@ -181,7 +180,7 @@ namespace Jsonata.Net.Native.TestSuite
             }
         }
 
-        private static void ProcessAndAddCaseData(string sourceFile, List<TestCaseData> results, CaseInfo caseInfo, string info)
+        private static void ProcessAndAddCaseData(string sourceFile, List<object[]> results, CaseInfo caseInfo, string info)
         {
             if (caseInfo.expr == null)
             {
@@ -196,19 +195,14 @@ namespace Jsonata.Net.Native.TestSuite
                 }
             }
 
-            TestCaseData caseData = new TestCaseData(caseInfo);
-            //see https://docs.nunit.org/articles/nunit/running-tests/Template-Based-Test-Naming.html
-            //caseData.SetName(info + " {a}"); // can't use {a} to show parametetrs here becasue of https://github.com/nunit/nunit3-vs-adapter/issues/691
             caseInfo.testName = info;
             FixCaseInfo(caseInfo);
-            caseData.SetName(info);
-            caseData.SetDescription(caseInfo.GetDescription()); //doens not do much for VS Test Executor (
-            results.Add(caseData);
+            results.Add(new object[] { caseInfo });
         }
 
-        public static List<TestCaseData> GetTestCases()
+        public static IEnumerable<object[]> GetTestCases()
         {
-            List<TestCaseData> results = new List<TestCaseData>();
+            List<object[]> results = new List<object[]>();
             string caseGroupsDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, TEST_SUITE_ROOT, "groups");
             foreach (string groupDir in Directory.EnumerateDirectories(caseGroupsDirectory))
             {

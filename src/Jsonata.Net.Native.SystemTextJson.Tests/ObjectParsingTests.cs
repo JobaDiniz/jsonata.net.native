@@ -1,24 +1,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using Jsonata.Net.Native.Json;
-using NUnit.Framework;
+using Xunit;
 using ObjectParsingTestsData;
 
 namespace Jsonata.Net.Native.SystemTextJson.Tests
 {
     public sealed class ObjectParsingTests
     {
-        [Test, TestCaseSource(nameof(GetTestCases))]
+        [Theory, MemberData(nameof(GetTestCases))]
         public void RegularCases(TestData testData)
         {
             JToken token = JsonataExtensions.FromObjectViaSystemTextJson(testData.SourceObject);
             string result = token.ToFlatString();
-            Assert.That(result, Is.EqualTo(testData.ExpectedJson));
+            Assert.Equal(testData.ExpectedJson, result);
         }
 
-        public static List<TestCaseData> GetTestCases()
+        public static IEnumerable<object[]> GetTestCases()
         {
-            return TestData.GetTestCasesNunit();
+            return TestData.GetTestCasesXunit();
         }
     }
 }

@@ -1,8 +1,9 @@
 using Jsonata.Net.Native.Json;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
             { "fail1",  "Not a problem at all"}
         };
 
-        [Test, TestCaseSource(nameof(GetTestCasesSync))]
+        [SkippableTheory, MemberData(nameof(GetTestCasesSync))]
         public void Test(CaseInfo caseInfo)
         {
 
@@ -35,8 +36,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (s_testsToIgnore.TryGetValue(caseInfo.fileName, out string? message))
             {
-                Assert.Ignore(message);
-                return;
+                Skip.If(true, message);
             }
 
             Console.WriteLine($"JSON: '{caseInfo.json}'");
@@ -58,9 +58,8 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
             {
                 if (jsEx.Code == "S0102" && caseInfo.expectedResult == null)
                 {
-                    Assert.Ignore("Skipping ambigous test with integer overflows");
-                    return;
-                }
+                    Skip.If(true, "Skipping ambigous test with integer overflows");
+                    }
                 throw;
             }
             catch (Exception)
@@ -72,7 +71,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (caseInfo.expectedResult == null)
             {
-                Assert.Ignore("This is an ambigous test");
+                Skip.If(true, "This is an ambigous test");
             }
             else if (
                 caseInfo.expectedResult == false 
@@ -80,15 +79,15 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 && s_allowRejectingTestsToPass.TryGetValue(caseInfo.fileName, out message)
             )
             {
-                Assert.Ignore(message);
+                Skip.If(true, message);
             }
             else
             {
-                Assert.That(caseInfo.expectedResult.Value, Is.EqualTo(parsed));
+                Assert.Equal(caseInfo.expectedResult.Value, parsed);
             }
         }
 
-        [Test, TestCaseSource(nameof(GetTestCasesValidateSync))]
+        [SkippableTheory, MemberData(nameof(GetTestCasesValidateSync))]
         public void TestValidate(CaseInfo caseInfo)
         {
 
@@ -96,8 +95,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (s_testsToIgnore.TryGetValue(caseInfo.fileName, out string? message))
             {
-                Assert.Ignore(message);
-                return;
+                Skip.If(true, message);
             }
 
             Console.WriteLine($"JSON: '{caseInfo.json}'");
@@ -119,9 +117,8 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
             {
                 if (jsEx.Code == "S0102" && caseInfo.expectedResult == null)
                 {
-                    Assert.Ignore("Skipping ambigous test with integer overflows");
-                    return;
-                }
+                    Skip.If(true, "Skipping ambigous test with integer overflows");
+                    }
                 throw;
             }
             catch (Exception)
@@ -133,7 +130,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (caseInfo.expectedResult == null)
             {
-                Assert.Ignore("This is an ambigous test");
+                Skip.If(true, "This is an ambigous test");
             }
             else if (
                 caseInfo.expectedResult == false
@@ -141,15 +138,15 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 && s_allowRejectingTestsToPass.TryGetValue(caseInfo.fileName, out message)
             )
             {
-                Assert.Ignore(message);
+                Skip.If(true, message);
             }
             else
             {
-                Assert.That(caseInfo.expectedResult.Value, Is.EqualTo(parsed));
+                Assert.Equal(caseInfo.expectedResult.Value, parsed);
             }
         }
 
-        [Test, TestCaseSource(nameof(GetTestCasesAsync))]
+        [SkippableTheory, MemberData(nameof(GetTestCasesAsync))]
         public async Task TestAsync(CaseInfo caseInfo)
         {
 
@@ -157,8 +154,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (s_testsToIgnore.TryGetValue(caseInfo.fileName, out string? message))
             {
-                Assert.Ignore(message);
-                return;
+                Skip.If(true, message);
             }
 
             Console.WriteLine($"JSON: '{caseInfo.json}'");
@@ -183,9 +179,8 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
             {
                 if (jsEx.Code == "S0102" && caseInfo.expectedResult == null)
                 {
-                    Assert.Ignore("Skipping ambigous test with integer overflows");
-                    return;
-                }
+                    Skip.If(true, "Skipping ambigous test with integer overflows");
+                    }
                 throw;
             }
             catch (Exception)
@@ -197,7 +192,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (caseInfo.expectedResult == null)
             {
-                Assert.Ignore("This is an ambigous test");
+                Skip.If(true, "This is an ambigous test");
             }
             else if (
                 caseInfo.expectedResult == false
@@ -205,23 +200,22 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 && s_allowRejectingTestsToPass.TryGetValue(caseInfo.fileName, out message)
             )
             {
-                Assert.Ignore(message);
+                Skip.If(true, message);
             }
             else
             {
-                Assert.That(caseInfo.expectedResult.Value, Is.EqualTo(parsed));
+                Assert.Equal(caseInfo.expectedResult.Value, parsed);
             }
         }
 
-        [Test, TestCaseSource(nameof(GetTestCasesValidateAsync))]
+        [SkippableTheory, MemberData(nameof(GetTestCasesValidateAsync))]
         public async Task ValidateAsync(CaseInfo caseInfo)
         {
             Console.WriteLine($"File: '{caseInfo.fileName}'");
 
             if (s_testsToIgnore.TryGetValue(caseInfo.fileName, out string? message))
             {
-                Assert.Ignore(message);
-                return;
+                Skip.If(true, message);
             }
 
             Console.WriteLine($"JSON: '{caseInfo.json}'");
@@ -246,9 +240,8 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
             {
                 if (jsEx.Code == "S0102" && caseInfo.expectedResult == null)
                 {
-                    Assert.Ignore("Skipping ambigous test with integer overflows");
-                    return;
-                }
+                    Skip.If(true, "Skipping ambigous test with integer overflows");
+                    }
                 throw;
             }
             catch (Exception)
@@ -260,7 +253,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
 
             if (caseInfo.expectedResult == null)
             {
-                Assert.Ignore("This is an ambigous test");
+                Skip.If(true, "This is an ambigous test");
             }
             else if (
                 caseInfo.expectedResult == false
@@ -268,47 +261,42 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 && s_allowRejectingTestsToPass.TryGetValue(caseInfo.fileName, out message)
             )
             {
-                Assert.Ignore(message);
+                Skip.If(true, message);
             }
             else
             {
-                Assert.That(caseInfo.expectedResult.Value, Is.EqualTo(parsed));
+                Assert.Equal(caseInfo.expectedResult.Value, parsed);
             }
         }
 
-        private static void ProcessAndAddCaseData(List<TestCaseData> results, CaseInfo caseInfo)
+        private static void ProcessAndAddCaseData(List<object[]> results, CaseInfo caseInfo)
         {
-            TestCaseData caseData = new TestCaseData(caseInfo);
-            //see https://docs.nunit.org/articles/nunit/running-tests/Template-Based-Test-Naming.html
-            //caseData.SetName(info + " {a}"); // can't use {a} to show parametetrs here becasue of https://github.com/nunit/nunit3-vs-adapter/issues/691
-            caseData.SetName(caseInfo.displayName);
-            //caseData.SetDescription(caseInfo.GetDescription()); //doens not do much for VS Test Executor (
-            results.Add(caseData);
+            results.Add(new object[] { caseInfo });
         }
 
-        public static List<TestCaseData> GetTestCasesSync()
+        public static IEnumerable<object[]> GetTestCasesSync()
         {
             return GetTestCasesImpl("parse_sync");
         }
 
-        public static List<TestCaseData> GetTestCasesAsync()
+        public static IEnumerable<object[]> GetTestCasesAsync()
         {
             return GetTestCasesImpl("parse_async");
         }
 
-        public static List<TestCaseData> GetTestCasesValidateSync()
+        public static IEnumerable<object[]> GetTestCasesValidateSync()
         {
             return GetTestCasesImpl("validate_sync");
         }
 
-        public static List<TestCaseData> GetTestCasesValidateAsync()
+        public static IEnumerable<object[]> GetTestCasesValidateAsync()
         {
             return GetTestCasesImpl("validate_async");
         }
 
-        private static List<TestCaseData> GetTestCasesImpl(string prefix)
+        private static IEnumerable<object[]> GetTestCasesImpl(string prefix)
         {
-            List<TestCaseData> results = new List<TestCaseData>();
+            List<object[]> results = new List<object[]>();
             string casesDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, TEST_SUITE_ROOT);
             foreach (string testFile in Directory.EnumerateFiles(casesDirectory, "*.json"))
             {

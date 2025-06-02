@@ -38,5 +38,10 @@ namespace ObjectParsingTestsData
                 .Select((td, i) => new TestCaseData(td) { TestName = $"{i + 1}: {td.Name}" })
                 .ToList();
         }
+
+        public static IEnumerable<object[]> GetTestCasesXunit()
+        {
+            return TestData.GetTests().Select(td => new object[] { td });
+        }
     }
 }

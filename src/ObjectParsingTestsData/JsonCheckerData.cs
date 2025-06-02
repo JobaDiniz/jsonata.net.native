@@ -71,5 +71,40 @@ namespace ObjectParsingTestsData
             }
             return results;
         }
+
+        public static IEnumerable<object[]> GetTestCasesXunit()
+        {
+            List<JsonCheckerData> cases = new List<JsonCheckerData>();
+            string casesDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, TEST_SUITE_ROOT);
+            foreach (string testFile in Directory.EnumerateFiles(casesDirectory, "pass*.json"))
+            {
+                string fileName = Path.GetFileNameWithoutExtension(testFile);
+                string displayName = fileName.Replace(".", "_");
+                string json = File.ReadAllText(testFile);
+                bool? result;
+
+                if (fileName.StartsWith("pass"))
+                {
+                    result = true;
+                }
+                else if (fileName.StartsWith("fail"))
+                {
+                    result = false;
+                }
+                else
+                {
+                    throw new Exception("Unexpected file name " + fileName);
+                }
+
+                JsonCheckerData caseInfo = new JsonCheckerData() {
+                    displayName = displayName,
+                    fileName = fileName,
+                    json = json,
+                    expectedResult = result
+                };
+                cases.Add(caseInfo);
+            }
+            return cases.Select(c => new object[] { c });
+        }
     }
 }

@@ -3,27 +3,27 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Jsonata.Net.Native.Json;
-using NUnit.Framework;
+using Xunit;
 using ObjectParsingTestsData;
 
 namespace Jsonata.Net.Native.SystemTextJson.Tests
 {
     public sealed class UndefinedKindTests
     {
-        [Test]
+        [Fact]
         public void CreateNodeWithUndefinedKind()
         {
             JsonNode node = JsonValue.Create(new JsonElement())!;
-            Assert.That(node.GetValueKind(), Is.EqualTo(JsonValueKind.Undefined));
+            Assert.Equal(JsonValueKind.Undefined, node.GetValueKind());
         }
 
-        [Test]
+        [Fact]
         public void ConvertFromJTokenWithUndefined()
         {
             JToken jToken = JValue.CreateUndefined();
             JsonNode? node = jToken.ToSystemTextJsonNode();
-            Assert.That(node, Is.Not.Null);
-            Assert.That(node!.GetValueKind(), Is.EqualTo(JsonValueKind.Undefined));
+            Assert.NotNull(node);
+            Assert.Equal(JsonValueKind.Undefined, node!.GetValueKind());
         }
 
     }
