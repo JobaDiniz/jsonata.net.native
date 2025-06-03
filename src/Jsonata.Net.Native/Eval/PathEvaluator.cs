@@ -40,7 +40,7 @@ internal sealed class PathEvaluator
                 {
                     if (!obj.Properties.TryGetValue(nameNode.value, out JToken? result))
                     {
-                        return JsonataEvaluator.UNDEFINED;
+                        return JValue.Undefined;
                     }
                     result.parent = data;
                     return result;
@@ -69,7 +69,7 @@ internal sealed class PathEvaluator
                     return result;
                 }
             default:
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
         }
     }
 
@@ -119,7 +119,7 @@ internal sealed class PathEvaluator
     {
         if (node.steps.Count == 0)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
 
         // if the first step is a variable reference ($...), including root reference ($$),

@@ -27,9 +27,9 @@ public abstract class JToken
         get => this.parentToken;
         set
         {
-            if (this == JsonataEvaluator.UNDEFINED && value != null)
+            if (this == JValue.Undefined && value != null)
             {
-                throw new InvalidOperationException($"Attempt to set parent on {nameof(JsonataEvaluator)}.{nameof(JsonataEvaluator.UNDEFINED)}");
+                throw new InvalidOperationException($"Attempt to set parent on {nameof(JValue)}.{nameof(JValue.Undefined)}");
             }
             this.parentToken = value;
         }

@@ -31,7 +31,7 @@ internal sealed class ControlFlowEvaluator
         }
         else
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
     }
 
@@ -50,7 +50,7 @@ internal sealed class ControlFlowEvaluator
 
         // invoke each expression in turn
         // only return the result of the last one
-        JToken result = JsonataEvaluator.UNDEFINED;
+        JToken result = JValue.Undefined;
         foreach (Node expression in blockNode.expressions)
         {
             result = evaluateNode(expression, input, localEnvironment);

@@ -379,7 +379,7 @@ public static class ArrayFunctions
 
         if (!found)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
 
         return FunctionToken.ReturnDecimalResult(result);
@@ -419,7 +419,7 @@ public static class ArrayFunctions
 
         if (!found)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
 
         return FunctionToken.ReturnDecimalResult(result);
@@ -455,7 +455,7 @@ public static class ArrayFunctions
 
         if (count == 0)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         };
         return FunctionToken.ReturnDecimalResult(result / count);
     }

@@ -50,7 +50,7 @@ namespace Jsonata.Net.Native.Eval
             switch (args[0].Type)
             {
                 case JTokenType.Undefined:
-                    return JsonataEvaluator.UNDEFINED;
+                    return JValue.Undefined;
                 case JTokenType.Array:
                 case JTokenType.Object:
                     break;

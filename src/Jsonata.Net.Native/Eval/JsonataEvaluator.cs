@@ -22,7 +22,6 @@ internal delegate JToken NodeEvaluator(Node node, JToken input, EvaluationEnviro
 /// </summary>
 internal sealed class JsonataEvaluator
 {
-    internal static readonly JValue UNDEFINED = JValue.CreateUndefined();
 
     private readonly LiteralEvaluator literalEvaluator;
     private readonly PathEvaluator pathEvaluator;
@@ -77,7 +76,7 @@ internal sealed class JsonataEvaluator
         {
             if (sequence.Count == 0)
             {
-                return UNDEFINED;
+                return JValue.Undefined;
             }
             else if (sequence.Count == 1 && !sequence.keepSingletons)
             {

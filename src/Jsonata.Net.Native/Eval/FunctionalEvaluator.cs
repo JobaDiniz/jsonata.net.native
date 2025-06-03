@@ -127,7 +127,7 @@ internal sealed class FunctionalEvaluator
                 );
                 */
                 JsonataQuery chainAST = new JsonataQuery("function($f, $g) { function($x){ $g($f($x)) } }");
-                JToken chain = chainAST.Eval(JsonataEvaluator.UNDEFINED); //TODO: probably need to provide env as an environment here
+                JToken chain = chainAST.Eval(JValue.Undefined); //TODO: probably need to provide env as an environment here
                 if (chain.Type != JTokenType.Function)
                 {
                     throw new Exception("should not happen 1");

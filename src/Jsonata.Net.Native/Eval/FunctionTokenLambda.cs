@@ -84,7 +84,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
             JToken value;
             if (i >= args.Count)
             {
-                value = JsonataEvaluator.UNDEFINED;
+                value = JValue.Undefined;
             }
             else
             {

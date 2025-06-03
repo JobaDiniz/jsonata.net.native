@@ -37,7 +37,7 @@ internal sealed class StructuralEvaluator
         else if (lhs.Type == JTokenType.Undefined || rhs.Type == JTokenType.Undefined)
         {
             // if either side is undefined, the result is undefined
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
         ;
 
@@ -47,7 +47,7 @@ internal sealed class StructuralEvaluator
         if (lhsValue > rhsValue)
         {
             // if the lhs is greater than the rhs, return undefined
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
         ;
 
@@ -123,7 +123,7 @@ internal sealed class StructuralEvaluator
         // if the array is empty, add an undefined entry to enable literal JSON object to be generated
         if (inputArray.Count == 0)
         {
-            inputArray.Add(JsonataEvaluator.UNDEFINED);
+            inputArray.Add(JValue.Undefined);
         }
         */
 
@@ -183,7 +183,7 @@ internal sealed class StructuralEvaluator
         JToken itemsToken = evaluateNode(predicateNode.expr, input, env);
         if (itemsToken.Type == JTokenType.Undefined)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
         ;
 
@@ -212,7 +212,7 @@ internal sealed class StructuralEvaluator
             itemsArray = EvalFilter(filter, itemsArray, env);
             if (itemsArray.Count == 0)
             {
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
             }
         }
 
@@ -229,7 +229,7 @@ internal sealed class StructuralEvaluator
         switch (items.Type)
         {
             case JTokenType.Undefined:
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
             case JTokenType.Array:
                 break;
             default:
@@ -396,7 +396,7 @@ internal sealed class StructuralEvaluator
             index = WrapArrayIndex(array, index);
             if (index < 0 || index >= array.Count)
             {
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
             }
             else
             {

@@ -98,7 +98,7 @@ internal sealed class FunctionTokenCsharp : FunctionToken
         object?[] parameters = this.BindFunctionArguments(args, context, env, out bool returnUndefined);
         if (returnUndefined)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         };
 
         object? resultObj;
@@ -215,7 +215,7 @@ internal sealed class FunctionTokenCsharp : FunctionToken
             if (argumentInfo.propagateUndefined)
             {
                 returnUndefined = true;
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
             }
             if (argumentInfo.isOptional)
             {

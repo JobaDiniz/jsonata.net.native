@@ -35,11 +35,11 @@ public static class ObjectFunctions
                         .ToList();
                 break;
             default:
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
         }
         if (keys.Count == 0)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
         else if (keys.Count == 1)
         {
@@ -90,11 +90,11 @@ public static class ObjectFunctions
                     }
                     else
                     {
-                        return JsonataEvaluator.UNDEFINED;
+                        return JValue.Undefined;
                     };
                 };
             default:
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
 
         }
     }
@@ -115,7 +115,7 @@ public static class ObjectFunctions
                     JObject obj = (JObject)arg;
                     if (obj.Count == 0)
                     {
-                        return JsonataEvaluator.UNDEFINED;
+                        return JValue.Undefined;
                     }
                     JArray result = new JArray(obj.Properties.Count);
                     foreach (KeyValuePair<string, JToken> property in obj.Properties)
@@ -131,7 +131,7 @@ public static class ObjectFunctions
                     JArray array = (JArray)arg;
                     if (array.Count == 0)
                     {
-                        return JsonataEvaluator.UNDEFINED;
+                        return JValue.Undefined;
                     }
                     JArray result = new JArray();
                     foreach (JToken element in array.ChildrenTokens)
@@ -267,7 +267,7 @@ public static class ObjectFunctions
         }
         else
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
     }
 

@@ -24,7 +24,7 @@ internal sealed class OperatorEvaluator
         switch (rhs.Type)
         {
             case JTokenType.Undefined:
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
             case JTokenType.Integer:
                 return new JValue(-(long)rhs);
             case JTokenType.Float:
@@ -40,7 +40,7 @@ internal sealed class OperatorEvaluator
         JToken rhs = evaluateNode(numericOperatorNode.rhs, input, env);
         if (lhs.Type == JTokenType.Undefined || rhs.Type == JTokenType.Undefined)
         {
-            return JsonataEvaluator.UNDEFINED;
+            return JValue.Undefined;
         }
         else if (lhs.Type == JTokenType.Integer && rhs.Type == JTokenType.Integer)
         {
@@ -99,7 +99,7 @@ internal sealed class OperatorEvaluator
                     }
                     else
                     {
-                        return JsonataEvaluator.UNDEFINED;
+                        return JValue.Undefined;
                     }
             }
         }

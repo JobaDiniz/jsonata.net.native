@@ -9,6 +9,11 @@ namespace Jsonata.Net.Native.Json
 {
     public class JValue : JToken
     {
+        /// <summary>
+        /// Gets a reusable instance representing an undefined value in JSONata expressions.
+        /// </summary>
+        public static JValue Undefined { get; } = new JValue(JTokenType.Undefined, null);
+
         public static JValue CreateUndefined()
         {
             return new JValue(JTokenType.Undefined, null);

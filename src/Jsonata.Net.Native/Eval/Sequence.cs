@@ -19,7 +19,7 @@ namespace Jsonata.Net.Native.Eval
         {
             if (this.ChildrenTokens.Count == 0)
             {
-                return JsonataEvaluator.UNDEFINED;
+                return JValue.Undefined;
             }
             else if (this.ChildrenTokens.Count == 1 && !this.keepSingletons)
             {
