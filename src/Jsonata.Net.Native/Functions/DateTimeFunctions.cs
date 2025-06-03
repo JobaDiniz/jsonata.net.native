@@ -17,24 +17,24 @@ public static class DateTimeFunctions
     /// </summary>
     /// <param name="picture">Optional format picture string</param>
     /// <param name="timezone">Optional timezone offset</param>
-    /// <param name="evalEnv">The evaluation supplement (automatically provided)</param>
+    /// <param name="executionState">The query execution state (automatically provided)</param>
     /// <returns>Current timestamp as formatted string</returns>
     [FunctionName("now")]
-    public static string Now([OptionalArgument(UTC_FORMAT)] string picture, [OptionalArgument(null)] string? timezone, [EvalSupplementArgument] EvaluationSupplement evalEnv)
+    public static string Now([OptionalArgument(UTC_FORMAT)] string picture, [OptionalArgument(null)] string? timezone, [ExecutionStateArgument] QueryExecutionState executionState)
     {
-        return FromMillis(Millis(evalEnv), picture, timezone);
+        return FromMillis(Millis(executionState), picture, timezone);
     }
 
     /// <summary>
     /// Returns the number of milliseconds since the Unix Epoch (1 January, 1970 UTC) as a number.
     /// All invocations of $millis() within an evaluation of an expression will all return the same value.
     /// </summary>
-    /// <param name="evalEnv">The evaluation supplement (automatically provided)</param>
+    /// <param name="executionState">The query execution state (automatically provided)</param>
     /// <returns>Milliseconds since Unix Epoch</returns>
     [FunctionName("millis")]
-    public static long Millis([EvalSupplementArgument] EvaluationSupplement evalEnv)
+    public static long Millis([ExecutionStateArgument] QueryExecutionState executionState)
     {
-        return evalEnv.Now.ToUnixTimeMilliseconds();
+        return executionState.Now.ToUnixTimeMilliseconds();
     }
 
     /// <summary>

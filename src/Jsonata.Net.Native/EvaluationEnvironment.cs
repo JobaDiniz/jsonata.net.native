@@ -3,10 +3,7 @@ using Jsonata.Net.Native.Json;
 using Jsonata.Net.Native.Functions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native;
 
@@ -48,33 +45,38 @@ public sealed class EvaluationEnvironment
             else
             {
                 // Fallback to method name if no attribute
-                env.BindFunction(mi);
+                env.BindFunctionInternal(mi.Name, mi);
             }
         }
     }
 
-    //used at actual EvalProcessor.EvaluateJson start to inject EvaluationSupplement
-    internal static EvaluationEnvironment CreateEvalEnvironment(EvaluationEnvironment parentEnvironment)
+    /// <summary>
+    /// Creates an evaluation environment with query execution state for a new query evaluation.
+    /// </summary>
+    internal static EvaluationEnvironment CreateWithExecutionState(EvaluationEnvironment parentEnvironment)
     {
-        EvaluationEnvironment result = new EvaluationEnvironment(parentEnvironment, new EvaluationSupplement());
+        EvaluationEnvironment result = new EvaluationEnvironment(parentEnvironment, new QueryExecutionState());
         return result;
     }
 
-    //used during evaluation when nesting
-    internal static EvaluationEnvironment CreateNestedEnvironment(EvaluationEnvironment parent)
+    /// <summary>
+    /// Creates a nested evaluation environment that shares the parent's execution state.
+    /// Used for lambda functions and scoped expressions.
+    /// </summary>
+    internal static EvaluationEnvironment CreateNested(EvaluationEnvironment parent)
     {
-        EvaluationEnvironment result = new EvaluationEnvironment(parent, parent.evaluationSupplement);
+        EvaluationEnvironment result = new EvaluationEnvironment(parent, parent.queryExecutionState);
         return result;
     }
 
     private readonly Dictionary<string, JToken> bindings = new Dictionary<string, JToken>();
     private readonly EvaluationEnvironment? parent;
-    private readonly EvaluationSupplement? evaluationSupplement;
+    private readonly QueryExecutionState? queryExecutionState;
 
-    private EvaluationEnvironment(EvaluationEnvironment? parent, EvaluationSupplement? evaluationSupplement)
+    private EvaluationEnvironment(EvaluationEnvironment? parent, QueryExecutionState? queryExecutionState)
     {
         this.parent = parent;
-        this.evaluationSupplement = evaluationSupplement;
+        this.queryExecutionState = queryExecutionState;
     }
 
     //public version to provide for JsonataQuery.Eval()
@@ -99,12 +101,13 @@ public sealed class EvaluationEnvironment
         this.bindings[name] = value;  //allow overrides
     }
 
-    public void BindFunction(MethodInfo mi)
+
+    internal void BindFunction(string name, MethodInfo mi)
     {
-        this.BindFunction(mi.Name, mi);
+        this.BindFunctionInternal(name, mi);
     }
 
-    public void BindFunction(string name, MethodInfo mi)
+    private void BindFunctionInternal(string name, MethodInfo mi)
     {
         this.bindings.Add(name, new FunctionTokenCsharp(name, mi));
     }
@@ -112,6 +115,19 @@ public sealed class EvaluationEnvironment
     public void BindFunction(string name, Delegate funcDelegate)
     {
         this.bindings.Add(name, new FunctionTokenCsharp(name, funcDelegate));
+    }
+
+    /// <summary>
+    /// Binds a static method as a function using the method's name.
+    /// </summary>
+    /// <param name="methodInfo">The MethodInfo for the static method to bind</param>
+    public void BindFunction(MethodInfo methodInfo)
+    {
+        if (!methodInfo.IsStatic)
+        {
+            throw new ArgumentException("Only static methods can be bound as functions", nameof(methodInfo));
+        }
+        this.BindFunctionInternal(methodInfo.Name, methodInfo);
     }
 
     internal JToken Lookup(string name)
@@ -130,12 +146,12 @@ public sealed class EvaluationEnvironment
         }
     }
 
-    internal EvaluationSupplement GetEvaluationSupplement()
+    internal QueryExecutionState GetQueryExecutionState()
     {
-        if (this.evaluationSupplement == null)
+        if (this.queryExecutionState == null)
         {
-            throw new Exception($"Calling {nameof(GetEvaluationSupplement)}() at non-evaluation env. Should not happen");
+            throw new Exception($"Calling {nameof(GetQueryExecutionState)}() at non-evaluation env. Should not happen");
         };
-        return this.evaluationSupplement;
+        return this.queryExecutionState;
     }
 }

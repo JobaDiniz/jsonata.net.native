@@ -168,12 +168,12 @@ public static class NumericFunctions
     /// <summary>
     /// Returns a pseudo random number greater than or equal to zero and less than one (0 ≤ n &lt; 1).
     /// </summary>
-    /// <param name="evalEnv">The evaluation supplement (automatically provided)</param>
+    /// <param name="executionState">The query execution state (automatically provided)</param>
     /// <returns>A random number between 0 and 1</returns>
     [FunctionName("random")]
-    public static double Random([EvalSupplementArgument] EvaluationSupplement evalEnv)
+    public static double Random([ExecutionStateArgument] QueryExecutionState executionState)
     {
-        return evalEnv.Random.NextDouble();
+        return executionState.Random.NextDouble();
     }
 
     /// <summary>

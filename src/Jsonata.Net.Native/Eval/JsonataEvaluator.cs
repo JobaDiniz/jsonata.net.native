@@ -1,9 +1,5 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
 using Jsonata.Net.Native.Dom;
 
 namespace Jsonata.Net.Native.Eval;
@@ -42,7 +38,7 @@ internal sealed class JsonataEvaluator
 
     internal JToken ExecuteQuery(Node rootNode, JToken data, EvaluationEnvironment parentEnvironment)
     {
-        EvaluationEnvironment environment = EvaluationEnvironment.CreateEvalEnvironment(parentEnvironment);
+        EvaluationEnvironment environment = EvaluationEnvironment.CreateWithExecutionState(parentEnvironment);
 
         environment.BindValue("$", data);
 
@@ -71,7 +67,7 @@ internal sealed class JsonataEvaluator
 
     internal JToken EvaluateNode(Node node, JToken input, EvaluationEnvironment env)
     {
-        JToken result = EvalInternal(node, input, env);
+        JToken result = EvaluateInternal(node, input, env);
         if (result is Sequence sequence)
         {
             if (sequence.Count == 0)
@@ -87,7 +83,7 @@ internal sealed class JsonataEvaluator
         return result;
     }
 
-    private JToken EvalInternal(Node node, JToken input, EvaluationEnvironment env)
+    private JToken EvaluateInternal(Node node, JToken input, EvaluationEnvironment env)
     {
         switch (node)
         {

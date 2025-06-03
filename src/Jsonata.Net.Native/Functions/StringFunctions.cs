@@ -581,7 +581,7 @@ public static class StringFunctions
                             {
                                 FunctionToken replacementFunction = (FunctionToken)replacement;
                                 StringBuilder builder = new StringBuilder();
-                                EvaluationEnvironment env = EvaluationEnvironment.CreateEvalEnvironment(EvaluationEnvironment.DefaultEnvironment); //TODO: think of providing proper env. Maybe via a func param?
+                                EvaluationEnvironment env = EvaluationEnvironment.CreateWithExecutionState(EvaluationEnvironment.DefaultEnvironment); //TODO: think of providing proper env. Maybe via a func param?
                                 int replacesCount = 0;
                                 int replaceStartAt = 0;
                                 foreach (Match match in matches)

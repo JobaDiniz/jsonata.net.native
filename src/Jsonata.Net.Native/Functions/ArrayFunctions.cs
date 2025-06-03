@@ -176,10 +176,10 @@ public static class ArrayFunctions
     /// Returns an array containing all the values from the array parameter, but shuffled into random order.
     /// </summary>
     /// <param name="arrayToken">The array to shuffle</param>
-    /// <param name="evalEnv">The evaluation supplement (automatically provided)</param>
+    /// <param name="executionState">The query execution state (automatically provided)</param>
     /// <returns>Shuffled array</returns>
     [FunctionName("shuffle")]
-    public static JArray Shuffle([PropagateUndefined] JToken arrayToken, [EvalSupplementArgument] EvaluationSupplement evalEnv)
+    public static JArray Shuffle([PropagateUndefined] JToken arrayToken, [ExecutionStateArgument] QueryExecutionState executionState)
     {
         if (arrayToken.Type != JTokenType.Array)
         {
@@ -200,7 +200,7 @@ public static class ArrayFunctions
         }
         for (int i = 0; i < arr.Length; ++i)
         {
-            int j = evalEnv.Random.Next(i, arr.Length);
+            int j = executionState.Random.Next(i, arr.Length);
             if (i != j)
             {
                 JToken tmp = arr[i];

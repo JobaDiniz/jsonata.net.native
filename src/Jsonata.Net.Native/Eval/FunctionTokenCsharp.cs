@@ -42,9 +42,9 @@ internal sealed class FunctionTokenCsharp : FunctionToken
             .Select(pi => new ArgumentInfo(funcName, pi))
             .ToList();
         this.hasContextParameter = this.parameters.Any(p => p.allowContextAsValue);
-        this.hasEnvParameter = this.parameters.Any(p => p.isEvaluationSupplement);
+        this.hasEnvParameter = this.parameters.Any(p => p.isQueryExecutionState);
 
-        this.RequiredArgsCount = this.parameters.Where(p => !p.isOptional && !p.isEvaluationSupplement).Count();
+        this.RequiredArgsCount = this.parameters.Where(p => !p.isOptional && !p.isQueryExecutionState).Count();
     }
 
     internal sealed class ArgumentInfo
@@ -56,7 +56,7 @@ internal sealed class FunctionTokenCsharp : FunctionToken
         internal readonly bool packSingleValueToSequence;
         internal readonly bool isOptional;
         internal readonly object? defaultValueForOptional;
-        internal readonly bool isEvaluationSupplement;
+        internal readonly bool isQueryExecutionState;
         internal readonly bool isVariableArgumentsArray;
 
         internal ArgumentInfo(string functionName, ParameterInfo parameterInfo)
@@ -79,10 +79,10 @@ internal sealed class FunctionTokenCsharp : FunctionToken
                 this.defaultValueForOptional = null;
             };
 
-            this.isEvaluationSupplement = parameterInfo.IsDefined(typeof(EvalSupplementArgumentAttribute), false);
-            if (this.isEvaluationSupplement && parameterInfo.ParameterType != typeof(EvaluationSupplement))
+            this.isQueryExecutionState = parameterInfo.IsDefined(typeof(ExecutionStateArgumentAttribute), false);
+            if (this.isQueryExecutionState && parameterInfo.ParameterType != typeof(QueryExecutionState))
             {
-                throw new JsonataException("????", $"Declaration error for function '{functionName}': attribute [{nameof(EvalSupplementArgumentAttribute)}] can only be specified for arguments of type {nameof(EvaluationSupplement)}");
+                throw new JsonataException("????", $"Declaration error for function '{functionName}': attribute [{nameof(ExecutionStateArgumentAttribute)}] can only be specified for arguments of type {nameof(QueryExecutionState)}");
             };
 
             this.isVariableArgumentsArray = parameterInfo.IsDefined(typeof(VariableNumberArgumentAsArrayAttribute), false);
@@ -160,9 +160,9 @@ internal sealed class FunctionTokenCsharp : FunctionToken
                     returnUndefined = true;
                 }
             }
-            else if (argumentInfo.isEvaluationSupplement)
+            else if (argumentInfo.isQueryExecutionState)
             {
-                result[targetIndex] = env.GetEvaluationSupplement();
+                result[targetIndex] = env.GetQueryExecutionState();
             }
             else if (sourceIndex >= args.Count)
             {

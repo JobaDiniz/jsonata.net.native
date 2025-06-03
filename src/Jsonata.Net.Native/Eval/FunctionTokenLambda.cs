@@ -62,7 +62,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
             alignedArgs = this.AlignArgs(args);
         }
 
-        EvaluationEnvironment executionEnv = EvaluationEnvironment.CreateNestedEnvironment(this.environment);
+        EvaluationEnvironment executionEnv = EvaluationEnvironment.CreateNested(this.environment);
         foreach ((string name, JToken value) in alignedArgs)
         {
             executionEnv.BindValue(name, value);
