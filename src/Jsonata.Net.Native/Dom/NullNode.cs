@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public sealed class NullNode : Node
+/// <summary>
+/// Represents a null literal expression in a JSONata query.
+/// Contains the JSON null value as a constant node.
+/// </summary>
+internal sealed class NullNode : Node
 {
     public NullNode() { }
 

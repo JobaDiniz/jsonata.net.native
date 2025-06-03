@@ -64,7 +64,7 @@ internal sealed class PredicateNode_ : Node
 }
 
 // A PredicateNode represents a predicate expression.
-public sealed class PredicateNode : Node
+internal sealed class PredicateNode : Node
 {
     public Node expr { get; }
     public List<Node> filters { get; }

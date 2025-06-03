@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom
 {
-    public sealed class NumericOperatorNode : Node
+    internal sealed class NumericOperatorNode : Node
     {
-        public enum Operator
+        internal enum Operator
         {
             Add,
             Subtract,

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
-public sealed class RegexNode : Node
+internal sealed class RegexNode : Node
 {
     public Regex regex { get; }
 

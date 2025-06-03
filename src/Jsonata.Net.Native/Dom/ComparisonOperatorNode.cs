@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public sealed class ComparisonOperatorNode : Node
+/// <summary>
+/// Represents a comparison expression in a JSONata query.
+/// Performs equality, relational, and membership comparisons between operands.
+/// </summary>
+internal sealed class ComparisonOperatorNode : Node
 {
-    public enum Operator
+    internal enum Operator
     {
         Equal,
         NotEqual,

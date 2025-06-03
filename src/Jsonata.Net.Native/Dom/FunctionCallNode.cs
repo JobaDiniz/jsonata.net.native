@@ -7,8 +7,11 @@ using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom
 {
-    // A FunctionCallNode represents a call to a function.
-    public sealed class FunctionCallNode : Node
+    /// <summary>
+    /// Represents a function call expression in a JSONata query.
+    /// Contains the function expression and the argument list to be evaluated.
+    /// </summary>
+    internal sealed class FunctionCallNode : Node
     {
         public Node func { get; }
         public IReadOnlyList<Node> args { get; }

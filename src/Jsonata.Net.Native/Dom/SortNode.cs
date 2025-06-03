@@ -5,16 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
-public sealed class SortNode : Node
+internal sealed class SortNode : Node
 {
-    public enum Direction
+    internal enum Direction
     {
         Default,
         Ascending,
         Descending
     }
 
-    public sealed class Term
+    internal sealed class Term
     {
         public Direction dir { get; }
         public Node expr { get; }

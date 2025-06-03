@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Jsonata.Net.Native.Dom;
 
 // An AssignmentNode represents a variable assignment.
-public sealed class AssignmentNode : Node
+internal sealed class AssignmentNode : Node
 {
     public string name { get; }
     public Node value { get; }

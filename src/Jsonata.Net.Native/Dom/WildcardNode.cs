@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Jsonata.Net.Native.Dom;
 
 // A WildcardNode represents the wildcard operator.
-public sealed class WildcardNode() : Node
+internal sealed class WildcardNode() : Node
 {
     internal override Node optimize()
     {

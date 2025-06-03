@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public sealed class NumberIntNode : NumberNode
+/// <summary>
+/// Represents an integer literal expression in a JSONata query.
+/// Contains a 64-bit signed integer value as a constant node.
+/// </summary>
+internal sealed class NumberIntNode : NumberNode
 {
     public long value { get; }
 

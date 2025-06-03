@@ -7,9 +7,11 @@ using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom;
 
-// A PathNode represents a JSON object path. It consists of one
-// or more 'steps' or Nodes (most commonly NameNode objects).
-public sealed class PathNode : Node
+/// <summary>
+/// Represents a path expression in a JSONata query.
+/// Contains a sequence of navigation steps to traverse JSON data structures.
+/// </summary>
+internal sealed class PathNode : Node
 {
     internal readonly List<Node> steps;
     public IReadOnlyList<Node> Steps => this.steps;

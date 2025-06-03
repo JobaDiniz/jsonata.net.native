@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public abstract class Node : IEquatable<Node>
+/// <summary>
+/// Represents an abstract syntax tree node in a JSONata expression.
+/// Provides the foundation for all expression nodes in the parsing tree.
+/// </summary>
+internal abstract class Node : IEquatable<Node>
 {
     internal abstract Node optimize();
 

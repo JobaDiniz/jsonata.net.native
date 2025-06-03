@@ -8,7 +8,7 @@ using Jsonata.Net.Native.Parsing;
 namespace Jsonata.Net.Native.Dom;
 
 // A NameNode represents a JSON field name.
-public sealed class FieldNameNode : Node
+internal sealed class FieldNameNode : Node
 {
     public string value { get; }
     public bool escaped { get; }

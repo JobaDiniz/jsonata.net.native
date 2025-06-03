@@ -8,7 +8,7 @@ namespace Jsonata.Net.Native.Dom
 {
     // A FunctionApplicationNode represents a function application
     // operation.
-    public sealed class FunctionApplicationNode : Node
+    internal sealed class FunctionApplicationNode : Node
     {
         public Node lhs { get; }
         public Node rhs { get; }

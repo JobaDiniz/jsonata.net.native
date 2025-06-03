@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-// An ObjectNode represents an object, an unordered list of
-// key-value pairs.
-public sealed class ObjectNode : Node
+/// <summary>
+/// Represents an object constructor expression in a JSONata query.
+/// Contains key-value pairs where both keys and values are expression nodes.
+/// </summary>
+internal sealed class ObjectNode : Node
 {
     internal readonly List<Tuple<Node, Node>> pairs;
     public IReadOnlyList<Tuple<Node, Node>> Pairs => this.pairs;

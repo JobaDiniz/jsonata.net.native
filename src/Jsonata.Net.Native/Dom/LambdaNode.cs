@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-// A LambdaNode represents a user-defined JSONata function.
-public sealed class LambdaNode : Node
+/// <summary>
+/// Represents a function definition expression in a JSONata query.
+/// Contains parameter signatures and function body for user-defined functions.
+/// </summary>
+internal sealed class LambdaNode : Node
 {
     public bool isShorthand { get; }
     public IReadOnlyList<string> paramNames { get; }
@@ -81,7 +84,7 @@ public sealed class LambdaNode : Node
             && this.body.Equals(otherNode.body);
     }
 
-    public enum ParamOpt
+    internal enum ParamOpt
     {
         None,
 
@@ -98,7 +101,7 @@ public sealed class LambdaNode : Node
     };
 
     [Flags]
-    public enum ParamType
+    internal enum ParamType
     {
         Bool = 0x01,
         Number = 0x02,
@@ -132,7 +135,7 @@ public sealed class LambdaNode : Node
             Tuple.Create(ParamType.Func, "f"),
         };
 
-    public sealed class Param
+    internal sealed class Param
     {
         public ParamType type { get; }
         public ParamOpt option { get; }
@@ -204,7 +207,7 @@ public sealed class LambdaNode : Node
         }
     }
 
-    public sealed class Signature
+    internal sealed class Signature
     {
         public IReadOnlyList<Param> args { get; }
         public Param? result { get; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Jsonata.Net.Native.Dom
 {
     // A NegationNode represents a numeric negation operation.
-    public sealed class NegationNode : Node
+    internal sealed class NegationNode : Node
     {
         public Node rhs { get; }
 

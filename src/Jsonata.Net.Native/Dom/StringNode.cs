@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public sealed class StringNode : Node
+/// <summary>
+/// Represents a string literal expression in a JSONata query.
+/// Contains the parsed string value as a constant node.
+/// </summary>
+internal sealed class StringNode : Node
 {
     public string value { get; }
 

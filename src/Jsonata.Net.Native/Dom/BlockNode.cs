@@ -7,8 +7,11 @@ using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom;
 
-// A BlockNode represents a block expression.
-public sealed class BlockNode : Node
+/// <summary>
+/// Represents a block expression in a JSONata query.
+/// Contains a sequence of expressions that are evaluated in order, returning the last result.
+/// </summary>
+internal sealed class BlockNode : Node
 {
     internal readonly List<Node> expressions;
     public IReadOnlyList<Node> Expressions => this.expressions;

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public sealed class BooleanNode : Node
+/// <summary>
+/// Represents a boolean literal expression in a JSONata query.
+/// Contains a true or false value as a constant node.
+/// </summary>
+internal sealed class BooleanNode : Node
 {
     public bool value { get; }
 

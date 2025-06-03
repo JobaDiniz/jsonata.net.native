@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom
 {
-    public sealed class StringConcatenationNode : Node
+    internal sealed class StringConcatenationNode : Node
     {
         public Node lhs { get; }
         public Node rhs { get; }

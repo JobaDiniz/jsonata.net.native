@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-// A ConditionalNode represents an if-then-else expression.
-public sealed class ConditionalNode : Node
+/// <summary>
+/// Represents a conditional (ternary) expression in a JSONata query.
+/// Evaluates a predicate and returns one of two alternative expressions based on the result.
+/// </summary>
+internal sealed class ConditionalNode : Node
 {
     public Node predicate { get; }
     public Node thenExpr { get; }

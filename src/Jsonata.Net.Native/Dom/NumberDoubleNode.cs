@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom
 {
-    public sealed class NumberDoubleNode : NumberNode
+    internal sealed class NumberDoubleNode : NumberNode
     {
         public double value { get; }
 

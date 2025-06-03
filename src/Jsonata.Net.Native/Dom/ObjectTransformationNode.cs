@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom
 {
-    public sealed class ObjectTransformationNode : Node
+    internal sealed class ObjectTransformationNode : Node
     {
         public Node pattern { get; }
         public Node updates { get; }

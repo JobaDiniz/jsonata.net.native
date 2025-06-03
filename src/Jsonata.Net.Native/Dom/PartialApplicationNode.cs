@@ -8,7 +8,7 @@ using Jsonata.Net.Native.Extensions;
 namespace Jsonata.Net.Native.Dom
 {
     // A PartialNode represents a partially applied function.
-    public sealed class PartialApplicationNode : Node
+    internal sealed class PartialApplicationNode : Node
     {
         public Node func { get; }
         public IReadOnlyList<Node> args { get; }

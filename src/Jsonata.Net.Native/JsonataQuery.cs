@@ -19,7 +19,7 @@ public sealed class JsonataQuery
     {
     }
 
-    public JsonataQuery(Node node)
+    internal JsonataQuery(Node node)
     {
         this.node = node.optimize();
     }
@@ -55,7 +55,7 @@ public sealed class JsonataQuery
         return this.node.ToString()!;
     }
 
-    public Node GetDom()
+    internal Node GetDom()
     {
         return this.node;
     }

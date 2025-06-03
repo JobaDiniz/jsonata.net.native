@@ -7,8 +7,11 @@ using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom;
 
-// An ArrayNode represents an array of items.
-public sealed class ArrayNode : Node
+/// <summary>
+/// Represents an array constructor expression in a JSONata query.
+/// Contains a sequence of expression nodes that evaluate to array elements.
+/// </summary>
+internal sealed class ArrayNode : Node
 {
     internal readonly List<Node> items;
     public IReadOnlyList<Node> Items => this.items;

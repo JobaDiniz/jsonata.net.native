@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Jsonata.Net.Native.Dom
 {
     // A GroupNode represents a group expression.
-    public sealed class GroupNode : Node
+    internal sealed class GroupNode : Node
     {
         public Node expr { get; }
         public ObjectNode objectNode { get; }

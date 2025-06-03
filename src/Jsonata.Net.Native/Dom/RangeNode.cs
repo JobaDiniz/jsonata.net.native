@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 // A RangeNode represents the range operator.
-public sealed class RangeNode : Node
+internal sealed class RangeNode : Node
 {
     public Node lhs { get; }
     public Node rhs { get; }

@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom
 {
-    // A VariableNode represents a JSONata variable.
-    public sealed class VariableNode : Node
+    /// <summary>
+    /// Represents a variable reference expression in a JSONata query.
+    /// Contains the variable name to be resolved from the evaluation context.
+    /// </summary>
+    internal sealed class VariableNode : Node
     {
         public string name { get; }
 

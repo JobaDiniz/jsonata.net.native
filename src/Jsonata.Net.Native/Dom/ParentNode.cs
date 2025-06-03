@@ -8,7 +8,7 @@ using Jsonata.Net.Native.Parsing;
 namespace Jsonata.Net.Native.Dom;
 
 // A ParentNode represents a parent loockback.
-public sealed class ParentNode : Node
+internal sealed class ParentNode : Node
 {
     public ParentNode() { }
 

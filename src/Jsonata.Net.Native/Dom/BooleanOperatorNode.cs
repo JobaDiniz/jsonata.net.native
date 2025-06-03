@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public sealed class BooleanOperatorNode : Node
+/// <summary>
+/// Represents a boolean logic expression in a JSONata query.
+/// Performs AND and OR operations on boolean-compatible operands.
+/// </summary>
+internal sealed class BooleanOperatorNode : Node
 {
     public Operator op { get; }
     public Node lhs { get; }
     public Node rhs { get; }
 
-    public enum Operator
+    internal enum Operator
     {
         And,
         Or,

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Dom;
 
-public abstract class NumberNode : Node
+internal abstract class NumberNode : Node
 {
     public abstract int GetIntValue();
 }
