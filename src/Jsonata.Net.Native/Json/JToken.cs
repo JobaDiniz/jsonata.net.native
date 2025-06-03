@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Jsonata.Net.Native.Eval;
 
 namespace Jsonata.Net.Native.Json;
+
 [DebuggerDisplay("{Type}: {ToFlatString()}")]
 public abstract class JToken
 {

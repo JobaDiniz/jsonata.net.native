@@ -4,19 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Json
-{
-    public enum JTokenType
-    {
-        Object,
-        Array,
-        Integer,
-        Float,
-        String,
-        Boolean,
-        Null,
-        Undefined,
+namespace Jsonata.Net.Native.Json;
 
-        Function,
-    }
+public enum JTokenType
+{
+    Object,
+    Array,
+    Integer,
+    Float,
+    String,
+    Boolean,
+    Null,
+    Undefined,
+
+    Function,
 }

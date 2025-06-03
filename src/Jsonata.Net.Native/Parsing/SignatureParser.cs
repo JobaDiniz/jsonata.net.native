@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Dom;
 
+
 namespace Jsonata.Net.Native.Parsing;
+
 internal sealed class SignatureParser
 {
     private static readonly Dictionary<char, LambdaNode.ParamType> s_paramTypeChars;
@@ -24,7 +26,8 @@ internal sealed class SignatureParser
             if (!parser.Finished)
             {
                 throw new Exception($"Signature string has some stray chars");
-            };
+            }
+            ;
             return result;
         }
         catch (Exception ex)
@@ -66,17 +69,20 @@ internal sealed class SignatureParser
         while (!this.Finished && this.Current != ':' && this.Current != '>')
         {
             args.Add(this.ParseParam());
-        };
+        }
+        ;
         LambdaNode.Param? result = null;
         if (!this.Finished && this.Current == ':')
         {
             this.Advance();
             result = this.ParseParam();
-        };
+        }
+        ;
         if (this.Finished || this.Current != '>')
         {
             throw new Exception($"Signature string does not end with '>'");
-        };
+        }
+        ;
         this.Advance();
         return new LambdaNode.Signature(args, result);
     }
@@ -94,7 +100,8 @@ internal sealed class SignatureParser
         if (this.Finished)
         {
             return LambdaNode.ParamOpt.None;
-        };
+        }
+        ;
         LambdaNode.ParamOpt result = this.Current switch
         {
             '?' => LambdaNode.ParamOpt.Optional,
@@ -105,7 +112,8 @@ internal sealed class SignatureParser
         if (result != LambdaNode.ParamOpt.None)
         {
             this.Advance();
-        };
+        }
+        ;
         return result;
     }
 
@@ -122,11 +130,13 @@ internal sealed class SignatureParser
             while (!this.Finished && this.Current != ')')
             {
                 result |= ParseParamType();
-            };
+            }
+            ;
             if (this.Finished)
             {
                 throw new Exception("Param type group has no closing brace");
-            };
+            }
+            ;
             this.Advance(); //consume ')';
             if (result == LambdaNode.ParamType.None)
             {
@@ -142,6 +152,7 @@ internal sealed class SignatureParser
         else
         {
             throw new Exception($"Unexpected param type char '{this.Current}'");
-        };
+        }
+        ;
     }
 }

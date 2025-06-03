@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Jsonata.Net.Native.Parsing;
+
 internal sealed partial class Parser
 {
     private readonly Lexer lexer;

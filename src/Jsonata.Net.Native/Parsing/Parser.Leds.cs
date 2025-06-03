@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Jsonata.Net.Native.Dom;
 
 namespace Jsonata.Net.Native.Parsing;
+
 internal sealed partial class Parser
 {
     private Node parseFunctionCall(Token t, Node lhs)
