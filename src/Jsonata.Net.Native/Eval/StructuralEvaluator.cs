@@ -8,19 +8,23 @@ using System.Runtime.ExceptionServices;
 
 namespace Jsonata.Net.Native.Eval;
 
+/// <summary>
+/// Evaluates structural nodes including arrays, objects, ranges, predicates, sorting, and grouping operations.
+/// Handles data structure construction, filtering, ordering, and transformation in JSONata expressions.
+/// </summary>
 internal sealed class StructuralEvaluator
 {
-    private readonly EvalProcessor evalProcessor;
+    private readonly NodeEvaluator evaluateNode;
 
-    internal StructuralEvaluator(EvalProcessor evalProcessor)
+    internal StructuralEvaluator(NodeEvaluator evaluateNode)
     {
-        this.evalProcessor = evalProcessor;
+        this.evaluateNode = evaluateNode;
     }
 
     internal JToken EvalRange(RangeNode rangeNode, JToken input, EvaluationEnvironment env)
     {
-        JToken lhs = evalProcessor.Eval(rangeNode.lhs, input, env);
-        JToken rhs = evalProcessor.Eval(rangeNode.rhs, input, env);
+        JToken lhs = evaluateNode(rangeNode.lhs, input, env);
+        JToken rhs = evaluateNode(rangeNode.rhs, input, env);
 
         if (lhs.Type != JTokenType.Undefined && lhs.Type != JTokenType.Integer)
         {
@@ -33,7 +37,7 @@ internal sealed class StructuralEvaluator
         else if (lhs.Type == JTokenType.Undefined || rhs.Type == JTokenType.Undefined)
         {
             // if either side is undefined, the result is undefined
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
         ;
 
@@ -43,7 +47,7 @@ internal sealed class StructuralEvaluator
         if (lhsValue > rhsValue)
         {
             // if the lhs is greater than the rhs, return undefined
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
         ;
 
@@ -70,7 +74,7 @@ internal sealed class StructuralEvaluator
         JArray result = new ExplicitArray();
         foreach (Node node in arrayNode.items)
         {
-            JToken res = evalProcessor.Eval(node, input, env);
+            JToken res = evaluateNode(node, input, env);
             switch (res.Type)
             {
                 case JTokenType.Undefined:
@@ -119,7 +123,7 @@ internal sealed class StructuralEvaluator
         // if the array is empty, add an undefined entry to enable literal JSON object to be generated
         if (inputArray.Count == 0)
         {
-            inputArray.Add(EvalProcessor.UNDEFINED);
+            inputArray.Add(JsonataEvaluator.UNDEFINED);
         }
         */
 
@@ -131,7 +135,7 @@ internal sealed class StructuralEvaluator
             for (int pairIndex = 0; pairIndex < objectNode.pairs.Count; ++pairIndex)
             {
                 Node keyNode = objectNode.pairs[pairIndex].Item1;
-                JToken keyToken = evalProcessor.Eval(keyNode, item, env);
+                JToken keyToken = evaluateNode(keyNode, item, env);
                 if (keyToken.Type != JTokenType.String)
                 {
                     throw new JsonataException("T1003", $"Object key should be String. Expression evaluated to {keyToken.Type} '{keyToken.ToFlatString()}'");
@@ -165,7 +169,7 @@ internal sealed class StructuralEvaluator
             string key = keyPair.Key;
             Node rhs = objectNode.pairs[keyPair.Value.pairIndex].Item2;
             JToken context = keyPair.Value.inputs;
-            JToken value = evalProcessor.Eval(rhs, context, env);
+            JToken value = evaluateNode(rhs, context, env);
             if (value.Type != JTokenType.Undefined)
             {
                 result.Add(key, value);
@@ -176,10 +180,10 @@ internal sealed class StructuralEvaluator
 
     internal JToken EvalPredicate(PredicateNode predicateNode, JToken input, EvaluationEnvironment env)
     {
-        JToken itemsToken = evalProcessor.Eval(predicateNode.expr, input, env);
+        JToken itemsToken = evaluateNode(predicateNode.expr, input, env);
         if (itemsToken.Type == JTokenType.Undefined)
         {
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
         ;
 
@@ -208,7 +212,7 @@ internal sealed class StructuralEvaluator
             itemsArray = EvalFilter(filter, itemsArray, env);
             if (itemsArray.Count == 0)
             {
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
             }
         }
 
@@ -221,11 +225,11 @@ internal sealed class StructuralEvaluator
 
     internal JToken EvalSort(SortNode sortNode, JToken input, EvaluationEnvironment env)
     {
-        JToken items = evalProcessor.Eval(sortNode.expr, input, env);
+        JToken items = evaluateNode(sortNode.expr, input, env);
         switch (items.Type)
         {
             case JTokenType.Undefined:
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
             case JTokenType.Array:
                 break;
             default:
@@ -261,9 +265,9 @@ internal sealed class StructuralEvaluator
             foreach (SortNode.Term term in sortNode.terms)
             {
                 //evaluate the sort term in the context of a
-                JToken aa = evalProcessor.Eval(term.expr, a, env);
+                JToken aa = evaluateNode(term.expr, a, env);
                 //evaluate the sort term in the context of b
-                JToken bb = evalProcessor.Eval(term.expr, b, env);
+                JToken bb = evaluateNode(term.expr, b, env);
 
                 // undefined should be last in sort order
                 if (aa.Type == JTokenType.Undefined)
@@ -330,7 +334,7 @@ internal sealed class StructuralEvaluator
 
     internal JToken EvalGroup(GroupNode groupNode, JToken input, EvaluationEnvironment env)
     {
-        JToken items = evalProcessor.Eval(groupNode.expr, input, env);
+        JToken items = evaluateNode(groupNode.expr, input, env);
         return EvalObject(groupNode.objectNode, items, env);
     }
 
@@ -357,7 +361,7 @@ internal sealed class StructuralEvaluator
             for (int index = 0; index < itemsArray.Count; ++index)
             {
                 JToken item = itemsArray.ChildrenTokens[index];
-                JToken res = evalProcessor.Eval(filter, item, env);
+                JToken res = evaluateNode(filter, item, env);
                 if (res.Type == JTokenType.Integer || res.Type == JTokenType.Float)
                 {
                     CheckAppendToken(result, item, index, res);
@@ -392,7 +396,7 @@ internal sealed class StructuralEvaluator
             index = WrapArrayIndex(array, index);
             if (index < 0 || index >= array.Count)
             {
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
             }
             else
             {

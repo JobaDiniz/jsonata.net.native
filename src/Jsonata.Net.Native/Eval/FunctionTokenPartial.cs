@@ -52,7 +52,7 @@ namespace Jsonata.Net.Native.Eval
                     }
                     else
                     {
-                        result.Add(EvalProcessor.UNDEFINED);
+                        result.Add(JsonataEvaluator.UNDEFINED);
                     }
                 }
                 else

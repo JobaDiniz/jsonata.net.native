@@ -18,10 +18,10 @@ internal sealed class FunctionTokenLambda : FunctionToken
     internal readonly Node body;
     internal readonly JToken context;
     internal readonly EvaluationEnvironment environment;
-    private readonly EvalProcessor evalProcessor;
+    private readonly NodeEvaluator evaluateNode;
 
 
-    private FunctionTokenLambda(ProcessedSignature? processedSignature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment, EvalProcessor evalProcessor)
+    private FunctionTokenLambda(ProcessedSignature? processedSignature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment, NodeEvaluator evaluateNode)
         : base("lambda", paramNames.Count)
     {
         this.signature = processedSignature;
@@ -29,14 +29,14 @@ internal sealed class FunctionTokenLambda : FunctionToken
         this.body = body;
         this.context = context;
         this.environment = environment;
-        this.evalProcessor = evalProcessor;
+        this.evaluateNode = evaluateNode;
     }
 
 
-    internal FunctionTokenLambda(LambdaNode.Signature? signature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment, EvalProcessor evalProcessor)
+    internal FunctionTokenLambda(LambdaNode.Signature? signature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment, NodeEvaluator evaluateNode)
         : this(
               signature != null ? new ProcessedSignature(signature) : null,
-              paramNames, body, context, environment, evalProcessor
+              paramNames, body, context, environment, evaluateNode
         )
     {
     }
@@ -68,7 +68,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
             executionEnv.BindValue(name, value);
         };
 
-        JToken result = this.evalProcessor.Eval(this.body, this.context, executionEnv);
+        JToken result = this.evaluateNode(this.body, this.context, executionEnv);
         return result;
     }
 
@@ -84,7 +84,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
             JToken value;
             if (i >= args.Count)
             {
-                value = EvalProcessor.UNDEFINED;
+                value = JsonataEvaluator.UNDEFINED;
             }
             else
             {
@@ -97,7 +97,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
 
     public override JToken DeepClone()
     {
-        return new FunctionTokenLambda(this.signature, this.paramNames, this.body, context.DeepClone(), this.environment, this.evalProcessor);
+        return new FunctionTokenLambda(this.signature, this.paramNames, this.body, context.DeepClone(), this.environment, this.evaluateNode);
     }
 
     protected override void ClearParentNested()

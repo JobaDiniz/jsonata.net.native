@@ -8,7 +8,19 @@ using Jsonata.Net.Native.Dom;
 
 namespace Jsonata.Net.Native.Eval;
 
-internal sealed class EvalProcessor
+/// <summary>
+/// Delegate for evaluating JSONata expression nodes.
+/// </summary>
+/// <param name="node">The node to evaluate</param>
+/// <param name="input">The input context data</param>
+/// <param name="env">The evaluation environment</param>
+/// <returns>The result of evaluating the node</returns>
+internal delegate JToken NodeEvaluator(Node node, JToken input, EvaluationEnvironment env);
+
+/// <summary>
+/// Coordinates the evaluation of JSONata expressions by delegating to specialized evaluators.
+/// </summary>
+internal sealed class JsonataEvaluator
 {
     internal static readonly JValue UNDEFINED = JValue.CreateUndefined();
 
@@ -19,17 +31,17 @@ internal sealed class EvalProcessor
     private readonly FunctionalEvaluator functionalEvaluator;
     private readonly ControlFlowEvaluator controlFlowEvaluator;
 
-    internal EvalProcessor()
+    internal JsonataEvaluator()
     {
         literalEvaluator = new LiteralEvaluator();
-        pathEvaluator = new PathEvaluator(this);
-        operatorEvaluator = new OperatorEvaluator(this);
-        structuralEvaluator = new StructuralEvaluator(this);
-        functionalEvaluator = new FunctionalEvaluator(this);
-        controlFlowEvaluator = new ControlFlowEvaluator(this);
+        pathEvaluator = new PathEvaluator(EvaluateNode);
+        operatorEvaluator = new OperatorEvaluator(EvaluateNode);
+        structuralEvaluator = new StructuralEvaluator(EvaluateNode);
+        functionalEvaluator = new FunctionalEvaluator(EvaluateNode);
+        controlFlowEvaluator = new ControlFlowEvaluator(EvaluateNode);
     }
 
-    internal JToken EvaluateJson(Node rootNode, JToken data, EvaluationEnvironment parentEnvironment)
+    internal JToken ExecuteQuery(Node rootNode, JToken data, EvaluationEnvironment parentEnvironment)
     {
         EvaluationEnvironment environment = EvaluationEnvironment.CreateEvalEnvironment(parentEnvironment);
 
@@ -42,7 +54,7 @@ internal sealed class EvalProcessor
             dataArr.Add(data);
             data = dataArr;
         }
-        JToken result = Eval(rootNode, data, environment);
+        JToken result = EvaluateNode(rootNode, data, environment);
         if (result is Sequence seq)
         {
             //result = seq.GetValue();
@@ -58,7 +70,7 @@ internal sealed class EvalProcessor
         return result;
     }
 
-    internal JToken Eval(Node node, JToken input, EvaluationEnvironment env)
+    internal JToken EvaluateNode(Node node, JToken input, EvaluationEnvironment env)
     {
         JToken result = EvalInternal(node, input, env);
         if (result is Sequence sequence)

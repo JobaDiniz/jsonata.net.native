@@ -5,22 +5,26 @@ using System;
 
 namespace Jsonata.Net.Native.Eval;
 
+/// <summary>
+/// Evaluates operator nodes including arithmetic, comparison, boolean, negation, and string concatenation operations.
+/// Handles type conversion, operator precedence, and validation for JSONata expression operators.
+/// </summary>
 internal sealed class OperatorEvaluator
 {
-    private readonly EvalProcessor evalProcessor;
+    private readonly NodeEvaluator evaluateNode;
 
-    internal OperatorEvaluator(EvalProcessor evalProcessor)
+    internal OperatorEvaluator(NodeEvaluator evaluateNode)
     {
-        this.evalProcessor = evalProcessor;
+        this.evaluateNode = evaluateNode;
     }
 
     internal JToken EvalNegation(NegationNode negationNode, JToken input, EvaluationEnvironment env)
     {
-        JToken rhs = evalProcessor.Eval(negationNode.rhs, input, env);
+        JToken rhs = evaluateNode(negationNode.rhs, input, env);
         switch (rhs.Type)
         {
             case JTokenType.Undefined:
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
             case JTokenType.Integer:
                 return new JValue(-(long)rhs);
             case JTokenType.Float:
@@ -32,11 +36,11 @@ internal sealed class OperatorEvaluator
 
     internal JToken EvalNumericOperator(NumericOperatorNode numericOperatorNode, JToken input, EvaluationEnvironment env)
     {
-        JToken lhs = evalProcessor.Eval(numericOperatorNode.lhs, input, env);
-        JToken rhs = evalProcessor.Eval(numericOperatorNode.rhs, input, env);
+        JToken lhs = evaluateNode(numericOperatorNode.lhs, input, env);
+        JToken rhs = evaluateNode(numericOperatorNode.rhs, input, env);
         if (lhs.Type == JTokenType.Undefined || rhs.Type == JTokenType.Undefined)
         {
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
         else if (lhs.Type == JTokenType.Integer && rhs.Type == JTokenType.Integer)
         {
@@ -74,8 +78,8 @@ internal sealed class OperatorEvaluator
 
     internal JToken EvalComparisonOperator(ComparisonOperatorNode comparisonOperatorNode, JToken input, EvaluationEnvironment env)
     {
-        JToken lhs = evalProcessor.Eval(comparisonOperatorNode.lhs, input, env);
-        JToken rhs = evalProcessor.Eval(comparisonOperatorNode.rhs, input, env);
+        JToken lhs = evaluateNode(comparisonOperatorNode.lhs, input, env);
+        JToken rhs = evaluateNode(comparisonOperatorNode.rhs, input, env);
         if (lhs.Type == JTokenType.Undefined || rhs.Type == JTokenType.Undefined)
         {
             switch (comparisonOperatorNode.op)
@@ -95,7 +99,7 @@ internal sealed class OperatorEvaluator
                     }
                     else
                     {
-                        return EvalProcessor.UNDEFINED;
+                        return JsonataEvaluator.UNDEFINED;
                     }
             }
         }
@@ -174,7 +178,7 @@ internal sealed class OperatorEvaluator
 
     internal JToken EvalBooleanOperator(BooleanOperatorNode booleanOperatorNode, JToken input, EvaluationEnvironment env)
     {
-        bool lhs = evalProcessor.Eval(booleanOperatorNode.lhs, input, env).Booleanize(); //here undefined works as false? see boolize() in jsonata-js
+        bool lhs = evaluateNode(booleanOperatorNode.lhs, input, env).Booleanize(); //here undefined works as false? see boolize() in jsonata-js
                                                                        //short-cirquit the operators if possible:
         switch (booleanOperatorNode.op)
         {
@@ -194,7 +198,7 @@ internal sealed class OperatorEvaluator
         ;
 
 
-        bool rhs = evalProcessor.Eval(booleanOperatorNode.rhs, input, env).Booleanize();
+        bool rhs = evaluateNode(booleanOperatorNode.rhs, input, env).Booleanize();
 
         bool result = booleanOperatorNode.op switch
         {
@@ -207,8 +211,8 @@ internal sealed class OperatorEvaluator
 
     internal JToken EvalStringConcatenation(StringConcatenationNode stringConcatenationNode, JToken input, EvaluationEnvironment env)
     {
-        string lstr = Stringify(evalProcessor.Eval(stringConcatenationNode.lhs, input, env));
-        string rstr = Stringify(evalProcessor.Eval(stringConcatenationNode.rhs, input, env));
+        string lstr = Stringify(evaluateNode(stringConcatenationNode.lhs, input, env));
+        string rstr = Stringify(evaluateNode(stringConcatenationNode.rhs, input, env));
         return new JValue(lstr + rstr);
     }
 

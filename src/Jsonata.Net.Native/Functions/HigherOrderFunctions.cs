@@ -178,7 +178,7 @@ public static class HigherOrderFunctions
         {
             if (array.Count == 0)
             {
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
             };
             accumulator = array.ChildrenTokens[0];
             elements = array.ChildrenTokens.Skip(1);
@@ -246,7 +246,7 @@ public static class HigherOrderFunctions
         }
         if (result.Count == 0)
         {
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
         return result;
 

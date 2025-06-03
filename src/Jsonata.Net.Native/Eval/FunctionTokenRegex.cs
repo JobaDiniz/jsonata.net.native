@@ -35,13 +35,13 @@ namespace Jsonata.Net.Native.Eval
             }
             else
             {
-                arg = EvalProcessor.UNDEFINED;
+                arg = JsonataEvaluator.UNDEFINED;
             }
 
             switch (arg.Type)
             {
                 case JTokenType.Undefined:
-                    return EvalProcessor.UNDEFINED;
+                    return JsonataEvaluator.UNDEFINED;
                 case JTokenType.String:
                     break;
                 default:
@@ -52,7 +52,7 @@ namespace Jsonata.Net.Native.Eval
             Match match = this.regex.Match(str);
             if (!match.Success)
             {
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
             }
             return ConvertRegexMatch(match);
         }

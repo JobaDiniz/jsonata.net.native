@@ -7,13 +7,17 @@ using System.Linq;
 
 namespace Jsonata.Net.Native.Eval;
 
+/// <summary>
+/// Evaluates path-related nodes including field access, parent references, wildcards, descendant searches, and path traversal.
+/// Handles navigation through JSON object hierarchies and array structures in JSONata expressions.
+/// </summary>
 internal sealed class PathEvaluator
 {
-    private readonly EvalProcessor evalProcessor;
+    private readonly NodeEvaluator evaluateNode;
 
-    internal PathEvaluator(EvalProcessor evalProcessor)
+    internal PathEvaluator(NodeEvaluator evaluateNode)
     {
-        this.evalProcessor = evalProcessor;
+        this.evaluateNode = evaluateNode;
     }
 
     internal JToken EvalParent(ParentNode parentNode, JToken input, EvaluationEnvironment env)
@@ -36,7 +40,7 @@ internal sealed class PathEvaluator
                 {
                     if (!obj.Properties.TryGetValue(nameNode.value, out JToken? result))
                     {
-                        return EvalProcessor.UNDEFINED;
+                        return JsonataEvaluator.UNDEFINED;
                     }
                     result.parent = data;
                     return result;
@@ -65,7 +69,7 @@ internal sealed class PathEvaluator
                     return result;
                 }
             default:
-                return EvalProcessor.UNDEFINED;
+                return JsonataEvaluator.UNDEFINED;
         }
     }
 
@@ -115,7 +119,7 @@ internal sealed class PathEvaluator
     {
         if (node.steps.Count == 0)
         {
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
 
         // if the first step is a variable reference ($...), including root reference ($$),
@@ -149,7 +153,7 @@ internal sealed class PathEvaluator
             // if the first step is an explicit array constructor, then just evaluate that (i.e. don't iterate over a context array)
             if (stepIndex == 0 && step is ArrayNode arrayStepNode)
             {
-                array = (JArray)evalProcessor.Eval(arrayStepNode, array, env);
+                array = (JArray)evaluateNode(arrayStepNode, array, env);
             }
             else
             {
@@ -193,7 +197,7 @@ internal sealed class PathEvaluator
         List<JToken> result = new List<JToken>(array.Count);
         foreach (JToken obj in array.ChildrenTokens)
         {
-            JToken resultToken = evalProcessor.Eval(step, obj, env);
+            JToken resultToken = evaluateNode(step, obj, env);
             if (resultToken.Type != JTokenType.Undefined)
             {
                 result.Add(resultToken);

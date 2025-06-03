@@ -6,13 +6,17 @@ using System.Collections.Generic;
 
 namespace Jsonata.Net.Native.Eval;
 
+/// <summary>
+/// Evaluates functional nodes including variables, lambdas, function calls, partial application, and object transformations.
+/// Handles function definition, invocation, currying, and higher-order function operations in JSONata expressions.
+/// </summary>
 internal sealed class FunctionalEvaluator
 {
-    private readonly EvalProcessor evalProcessor;
+    private readonly NodeEvaluator evaluateNode;
 
-    internal FunctionalEvaluator(EvalProcessor evalProcessor)
+    internal FunctionalEvaluator(NodeEvaluator evaluateNode)
     {
-        this.evalProcessor = evalProcessor;
+        this.evaluateNode = evaluateNode;
     }
 
     internal JToken EvalVariable(VariableNode variableNode, JToken input, EvaluationEnvironment env)
@@ -33,13 +37,13 @@ internal sealed class FunctionalEvaluator
             body: lambdaNode.body,
             context: input,
             environment: env,
-            evalProcessor: evalProcessor
+            evaluateNode: evaluateNode
         );
     }
 
     internal JToken EvalPartial(PartialApplicationNode partialNode, JToken input, EvaluationEnvironment env)
     {
-        JToken func = evalProcessor.Eval(partialNode.func, input, env);
+        JToken func = evaluateNode(partialNode.func, input, env);
 
         if (func is not FunctionToken function)
         {
@@ -56,7 +60,7 @@ internal sealed class FunctionalEvaluator
             }
             else
             {
-                JToken arg = evalProcessor.Eval(argNode, input, env);
+                JToken arg = evaluateNode(argNode, input, env);
                 argsOrNulls.Add(arg);
             }
         }
@@ -65,7 +69,7 @@ internal sealed class FunctionalEvaluator
 
     internal JToken EvalFunctionCall(FunctionCallNode functionCallNode, JToken input, EvaluationEnvironment env, JToken? evaluatedFirstArgFromApplication)
     {
-        JToken func = evalProcessor.Eval(functionCallNode.func, input, env);
+        JToken func = evaluateNode(functionCallNode.func, input, env);
         if (func is not FunctionToken function)
         {
             throw new JsonataException("T1006", $"Attempted to invoke a non-function '{func.ToFlatString()}' got from '{functionCallNode.func}'");
@@ -79,7 +83,7 @@ internal sealed class FunctionalEvaluator
         ;
         foreach (Node argNode in functionCallNode.args)
         {
-            JToken argValue = evalProcessor.Eval(argNode, input, env);
+            JToken argValue = evaluateNode(argNode, input, env);
             args.Add(argValue);
         }
 
@@ -90,7 +94,7 @@ internal sealed class FunctionalEvaluator
 
     internal JToken EvalFunctionApplication(FunctionApplicationNode functionApplicationNode, JToken input, EvaluationEnvironment env)
     {
-        JToken lhs = evalProcessor.Eval(functionApplicationNode.lhs, input, env);
+        JToken lhs = evaluateNode(functionApplicationNode.lhs, input, env);
         if (functionApplicationNode.rhs is FunctionCallNode functionCallNode)
         {
             // this is a function _invocation_; invoke it with lhs expression as the first argument
@@ -98,7 +102,7 @@ internal sealed class FunctionalEvaluator
         }
         else
         {
-            JToken rhs = evalProcessor.Eval(functionApplicationNode.rhs, input, env);
+            JToken rhs = evaluateNode(functionApplicationNode.rhs, input, env);
             if (rhs.Type != JTokenType.Function)
             {
                 throw new JsonataException("T2006", "The right side of the function application operator ~> must be a function, got " + rhs.Type);
@@ -123,7 +127,7 @@ internal sealed class FunctionalEvaluator
                 );
                 */
                 JsonataQuery chainAST = new JsonataQuery("function($f, $g) { function($x){ $g($f($x)) } }");
-                JToken chain = chainAST.Eval(EvalProcessor.UNDEFINED); //TODO: probably need to provide env as an environment here
+                JToken chain = chainAST.Eval(JsonataEvaluator.UNDEFINED); //TODO: probably need to provide env as an environment here
                 if (chain.Type != JTokenType.Function)
                 {
                     throw new Exception("should not happen 1");
@@ -161,7 +165,7 @@ internal sealed class FunctionalEvaluator
             updates: transformationNode.updates,
             deletes: transformationNode.deletes,
             environment: env,
-            evalProcessor: evalProcessor
+            evaluateNode: evaluateNode
         );
     }
 }

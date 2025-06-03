@@ -126,7 +126,7 @@ public sealed class EvaluationEnvironment
         }
         else
         {
-            return EvalProcessor.UNDEFINED;
+            return JsonataEvaluator.UNDEFINED;
         }
     }
 
