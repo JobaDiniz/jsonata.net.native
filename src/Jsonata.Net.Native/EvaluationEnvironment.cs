@@ -1,5 +1,6 @@
 ﻿using Jsonata.Net.Native.Eval;
 using Jsonata.Net.Native.Json;
+using Jsonata.Net.Native.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,35 @@ public sealed class EvaluationEnvironment
     internal static EvaluationEnvironment CreateDefault() //main parent, contains default function bindings
     {
         EvaluationEnvironment result = new EvaluationEnvironment(null, null);
-        foreach (MethodInfo mi in typeof(BuiltinFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
-        {
-            result.BindFunction(mi);
-        }
+
+        // Register functions from new organized static classes
+        RegisterFunctionsFromType(result, typeof(StringFunctions));
+        RegisterFunctionsFromType(result, typeof(NumericFunctions));
+        RegisterFunctionsFromType(result, typeof(ArrayFunctions));
+        RegisterFunctionsFromType(result, typeof(BooleanFunctions));
+        RegisterFunctionsFromType(result, typeof(ObjectFunctions));
+        RegisterFunctionsFromType(result, typeof(DateTimeFunctions));
+        RegisterFunctionsFromType(result, typeof(HigherOrderFunctions));
+
         return result;
+    }
+
+    private static void RegisterFunctionsFromType(EvaluationEnvironment env, Type type)
+    {
+        foreach (MethodInfo mi in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+        {
+            // Check if the method has a FunctionNameAttribute
+            var functionNameAttr = mi.GetCustomAttribute<FunctionNameAttribute>();
+            if (functionNameAttr != null)
+            {
+                env.BindFunction(functionNameAttr.Name, mi);
+            }
+            else
+            {
+                // Fallback to method name if no attribute
+                env.BindFunction(mi);
+            }
+        }
     }
 
     //used at actual EvalProcessor.EvaluateJson start to inject EvaluationSupplement

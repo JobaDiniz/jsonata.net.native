@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using Jsonata.Net.Native.Eval;
+using Jsonata.Net.Native.Functions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -10,7 +10,7 @@ public class ToMillisTest
 {
     private static void Check(string dateStr, string? picture, long expectedMillis)
     {
-        long result = BuiltinFunctions.toMillis(timestamp: dateStr, picture: picture);
+        long result = DateTimeFunctions.ToMillis(timestamp: dateStr, picture: picture);
 
         Assert.AreEqual(expectedMillis, result);
     }
@@ -26,7 +26,7 @@ public class ToMillisTest
     public void TestDocs_1_ExplicitPicture()
     {
         //see https://docs.jsonata.org/date-time-functions
-        Check("2017-11-07T15:12:37.121Z", BuiltinFunctions.UTC_FORMAT, 1510067557121);
+        Check("2017-11-07T15:12:37.121Z", DateTimeFunctions.UTC_FORMAT, 1510067557121);
     }
 
     [Test]
