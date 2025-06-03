@@ -589,31 +589,17 @@ namespace Jsonata.Net.Native.Json
             }
         }
         
-        // Helper method to parse JSON using System.Text.Json
+        // Helper method to parse JSON using System.Text.Json only
         private static JToken ParseViaSystemTextJson(string jsonText, ParseSettings? settings)
         {
-            // If System.Text.Json can't handle it, fall back to custom parser
-            try
+            var options = new JsonDocumentOptions
             {
-                var options = new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
-                    CommentHandling = JsonCommentHandling.Skip
-                };
-                
-                using var doc = JsonDocument.Parse(jsonText, options);
-                return ConvertFromJsonElement(doc.RootElement);
-            }
-            catch (Exception ex) when (ex is JsonException || ex is InvalidOperationException)
-            {
-                // Fall back to custom parser for edge cases like invalid UTF-16 sequences
-                // System.Text.Json throws InvalidOperationException for invalid UTF-16
-                using (StringReader reader = new StringReader(jsonText))
-                {
-                    JsonParser parser = new JsonParser(reader, settings ?? ParseSettings.DefaultSettings);
-                    return parser.Parse();
-                }
-            }
+                AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+                CommentHandling = JsonCommentHandling.Skip
+            };
+            
+            using var doc = JsonDocument.Parse(jsonText, options);
+            return ConvertFromJsonElement(doc.RootElement);
         }
         
         private static JToken ConvertFromJsonElement(JsonElement element)
@@ -678,28 +664,14 @@ namespace Jsonata.Net.Native.Json
         
         private static void ValidateViaSystemTextJson(string jsonText, ParseSettings? settings)
         {
-            // Try System.Text.Json first
-            try
+            var options = new JsonDocumentOptions
             {
-                var options = new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
-                    CommentHandling = JsonCommentHandling.Skip
-                };
-                
-                using var doc = JsonDocument.Parse(jsonText, options);
-                // If parsing succeeds, the JSON is valid
-            }
-            catch (Exception ex) when (ex is JsonException || ex is InvalidOperationException)
-            {
-                // Fall back to custom parser for edge cases
-                // System.Text.Json throws InvalidOperationException for invalid UTF-16
-                using (StringReader reader = new StringReader(jsonText))
-                {
-                    JsonParser parser = new JsonParser(reader, settings ?? ParseSettings.DefaultSettings);
-                    parser.Validate();
-                }
-            }
+                AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+                CommentHandling = JsonCommentHandling.Skip
+            };
+            
+            using var doc = JsonDocument.Parse(jsonText, options);
+            // If parsing succeeds, the JSON is valid according to System.Text.Json standards
         }
     }
 }

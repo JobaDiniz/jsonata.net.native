@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,7 +50,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 Console.WriteLine($"Parsed: '{resultToken.ToFlatString()}'");
                 parsed = true;
             }
-            catch (JsonParseException ex)
+            catch (JsonException ex)
             {
                 Console.WriteLine($"Exception: '{ex.Message}'");
                 parsed = false;
@@ -108,7 +109,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 Console.WriteLine($"Validated");
                 parsed = true;
             }
-            catch (JsonParseException ex)
+            catch (JsonException ex)
             {
                 Console.WriteLine($"Exception: '{ex.Message}'");
                 parsed = false;
@@ -170,7 +171,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 }
                 parsed = true;
             }
-            catch (JsonParseException ex)
+            catch (JsonException ex)
             {
                 Console.WriteLine($"Exception: '{ex.Message}'");
                 parsed = false;
@@ -231,7 +232,7 @@ namespace Jsonata.Net.Native.JsonParser.TestSuite
                 }
                 parsed = true;
             }
-            catch (JsonParseException ex)
+            catch (JsonException ex)
             {
                 Console.WriteLine($"Exception: '{ex.Message}'");
                 parsed = false;
