@@ -4,36 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+public sealed class NumberIntNode : NumberNode
 {
-    public sealed class NumberIntNode : NumberNode
+    public long value { get; }
+
+    public NumberIntNode(long value)
     {
-        public long value { get; }
+        this.value = value;
+    }
 
-        public NumberIntNode(long value)
-        {
-            this.value = value;
-        }
+    internal override Node optimize()
+    {
+        return this;
+    }
 
-        internal override Node optimize()
-        {
-            return this;
-        }
+    public override string ToString()
+    {
+        return this.value.ToString();
+    }
 
-        public override string ToString()
-        {
-            return this.value.ToString();
-        }
+    public override int GetIntValue()
+    {
+        return (int)this.value;
+    }
 
-        public override int GetIntValue()
-        {
-            return (int)this.value;
-        }
-
-        protected override bool EqualsSpecific(Node other)
-        {
-            NumberIntNode otherNode = (NumberIntNode)other;
-            return otherNode.value == this.value;
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        NumberIntNode otherNode = (NumberIntNode)other;
+        return otherNode.value == this.value;
     }
 }

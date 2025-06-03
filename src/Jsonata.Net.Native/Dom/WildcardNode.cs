@@ -4,24 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+// A WildcardNode represents the wildcard operator.
+public sealed class WildcardNode() : Node
 {
-    // A WildcardNode represents the wildcard operator.
-    public sealed class WildcardNode() : Node
+    internal override Node optimize()
     {
-        internal override Node optimize()
-        {
-            return this;
-        }
+        return this;
+    }
 
-        public override string ToString()
-        {
-            return "*";
-        }
+    public override string ToString()
+    {
+        return "*";
+    }
 
-        protected override bool EqualsSpecific(Node other)
-        {
-            return true;
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        return true;
     }
 }

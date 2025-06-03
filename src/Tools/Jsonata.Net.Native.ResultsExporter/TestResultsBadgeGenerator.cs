@@ -110,7 +110,7 @@ namespace Jsonata.Net.Native.ResultsExporter
 
             string testName = parts[0];
             string testGroup = testName.Substring(0, testName.IndexOf('.'));
-            
+
             if (!Enum.TryParse<TestStatus>(parts[1].ToLower(), out TestStatus status))
             {
                 throw new ArgumentException($"Invalid test status: {parts[1]}");
@@ -122,7 +122,7 @@ namespace Jsonata.Net.Native.ResultsExporter
         private static string BuildStatusMessage(Dictionary<TestStatus, int> statusCounts)
         {
             var messageBuilder = new StringBuilder();
-            
+
             foreach (TestStatus status in Enum.GetValues<TestStatus>())
             {
                 if (statusCounts.TryGetValue(status, out int count))
@@ -161,7 +161,7 @@ namespace Jsonata.Net.Native.ResultsExporter
                 .Select(Path.GetFileName)
                 .Where(fileName => fileName != null)
                 .OrderBy(fileName => fileName)
-                .Select(fileName => 
+                .Select(fileName =>
                 {
                     string name = Path.GetFileNameWithoutExtension(fileName) ?? "";
                     string url = $"https://raw.githubusercontent.com/mikhail-barg/jsonata.net.native/master/src/Jsonata.Net.Native.TestSuite/TestReport/extract/{fileName}";

@@ -5,37 +5,36 @@ using System.Text;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Parsing;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+// A BlockNode represents a block expression.
+public sealed class BlockNode : Node
 {
-    // A BlockNode represents a block expression.
-    public sealed class BlockNode : Node
+    internal readonly List<Node> expressions;
+    public IReadOnlyList<Node> Expressions => this.expressions;
+
+    public BlockNode(List<Node> expressions)
     {
-        private readonly List<Node> m_expressions;
-        public IReadOnlyList<Node> expressions => this.m_expressions;
+        this.expressions = expressions ?? throw new ArgumentNullException(nameof(expressions));
+    }
 
-        public BlockNode(List<Node> expressions)
+    internal override Node optimize()
+    {
+        for (int i = 0; i < this.expressions.Count; ++i)
         {
-            this.m_expressions = expressions ?? throw new ArgumentNullException(nameof(expressions));
+            this.expressions[i] = this.expressions[i].optimize();
         }
+        return this;
+    }
 
-        internal override Node optimize()
-        {
-            for (int i = 0; i < this.m_expressions.Count; ++i)
-            {
-                this.m_expressions[i] = this.m_expressions[i].optimize();
-            }
-            return this;
-        }
+    public override string ToString()
+    {
+        return "(" + Helpers.JoinNodes(this.expressions, "; ") + ")";
+    }
 
-        public override string ToString()
-        {
-            return "(" + Helpers.JoinNodes(this.m_expressions, "; ") + ")";
-        }
-
-        protected override bool EqualsSpecific(Node other)
-        {
-            BlockNode otherNode = (BlockNode)other;
-            return Helpers.NodeListsEqual(this.m_expressions, otherNode.m_expressions);
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        BlockNode otherNode = (BlockNode)other;
+        return Helpers.NodeListsEqual(this.expressions, otherNode.expressions);
     }
 }

@@ -4,32 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+// A dotNode is an interim structure used to process JSONata path
+// expressions. It is deliberately unexported and creates a PathNode
+// during its optimize phase.
+internal sealed class DotNode_ : Node
 {
-    // A dotNode is an interim structure used to process JSONata path
-    // expressions. It is deliberately unexported and creates a PathNode
-    // during its optimize phase.
-    internal sealed class DotNode_ : Node
+    private readonly Node lhs;
+    private readonly Node rhs;
+
+    internal DotNode_(Node lhs, Node rhs)
     {
-        private readonly Node m_lhs;
-        private readonly Node m_rhs;
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
 
-        internal DotNode_(Node lhs, Node rhs)
+    internal override Node optimize()
+    {
+        List<Node> steps = new List<Node>();
+        bool keepArrays = false;
+
+        //lhs
         {
-            this.m_lhs = lhs;
-            this.m_rhs = rhs;
-        }
-
-        internal override Node optimize()
-        {
-            List<Node> steps = new List<Node>();
-            bool keepArrays = false;
-
-            //lhs
+            Node lhs = this.lhs.optimize();
+            switch (lhs)
             {
-                Node lhs = this.m_lhs.optimize();
-                switch (lhs)
-                {
                 case NumberDoubleNode:
                 case NumberIntNode:
                 case BooleanNode:
@@ -46,14 +46,14 @@ namespace Jsonata.Net.Native.Dom
                 default:
                     steps.Add(lhs);
                     break;
-                }
             }
+        }
 
-            //rhs
+        //rhs
+        {
+            Node rhs = this.rhs.optimize();
+            switch (rhs)
             {
-                Node rhs = this.m_rhs.optimize();
-                switch (rhs)
-                {
                 case NumberDoubleNode:
                 case NumberIntNode:
                 case BooleanNode:
@@ -70,20 +70,19 @@ namespace Jsonata.Net.Native.Dom
                 default:
                     steps.Add(rhs);
                     break;
-                }
             }
-
-            return new PathNode(steps, keepArrays);
         }
 
-        public override string ToString()
-        {
-            return $"{this.m_lhs}.{this.m_rhs}";
-        }
+        return new PathNode(steps, keepArrays);
+    }
 
-        protected override bool EqualsSpecific(Node other)
-        {
-            throw new NotImplementedException();
-        }
+    public override string ToString()
+    {
+        return $"{this.lhs}.{this.rhs}";
+    }
+
+    protected override bool EqualsSpecific(Node other)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -9,7 +9,7 @@ namespace Jsonata.Net.Native.Eval
     //provides support for cases when
     // "undefined inputs always return undefined"
     [AttributeUsage(AttributeTargets.Parameter)]
-    public sealed class PropagateUndefinedAttribute: Attribute
+    public sealed class PropagateUndefinedAttribute : Attribute
     {
     }
 

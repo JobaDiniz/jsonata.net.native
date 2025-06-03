@@ -5,48 +5,46 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.TestSuite
+namespace Jsonata.Net.Native.TestSuite;
+//see https://github.com/jsonata-js/jsonata/blob/master/test/test-suite/TESTSUITE.md
+public sealed class CaseInfo
 {
-    //see https://github.com/jsonata-js/jsonata/blob/master/test/test-suite/TESTSUITE.md
-    public sealed class CaseInfo
+    public string? description { get; set; }
+    public string? expr { get; set; }
+
+    [JsonPropertyName("expr-file")]
+    public string? expr_file { get; set; }
+
+    public Jsonata.Net.Native.Json.JToken? data { get; set; }
+    public string? dataset { get; set; }
+    public int? timelimit { get; set; }
+    public int? depth { get; set; }
+    public Jsonata.Net.Native.Json.JObject? bindings { get; set; }
+
+    public Jsonata.Net.Native.Json.JToken? result { get; set; }
+    public bool? undefinedResult { get; set; }
+    public string? code { get; set; }
+    public string? token { get; set; }
+    public Error? error { get; set; }   //see function-assert group
+
+    internal string? testName;
+
+    internal string GetDescription()
     {
-        public string? description { get; set; }
-        public string? expr { get; set; }
-        
-        [JsonPropertyName("expr-file")] 
-        public string? expr_file { get; set; }
-        
-        public Jsonata.Net.Native.Json.JToken? data { get; set; }
-        public string? dataset { get; set; }
-        public int? timelimit { get; set; }
-        public int? depth { get; set; }
-        public Jsonata.Net.Native.Json.JObject? bindings { get; set; }
+        return $"expr: '{this.expr}';\n result: {this.result?.ToFlatString() ?? ((this.undefinedResult.HasValue && this.undefinedResult.Value) ? "undefined" : "error " + this.code)}";
+    }
 
-        public Jsonata.Net.Native.Json.JToken? result { get; set; }
-        public bool? undefinedResult { get; set; }
+    public override string ToString()
+    {
+        return this.expr ?? this.expr_file ?? "<some bad data?>";
+    }
+
+    public sealed class Error
+    {
         public string? code { get; set; }
-        public string? token { get; set; }
-        public Error? error { get; set; }   //see function-assert group
+        public string? message { get; set; }
 
-        internal string? testName;
-
-        internal string GetDescription()
-        {
-            return $"expr: '{this.expr}';\n result: {this.result?.ToFlatString() ?? ((this.undefinedResult.HasValue && this.undefinedResult.Value) ? "undefined" : "error " + this.code)}";
-        }
-
-        public override string ToString()
-        {
-            return this.expr ?? this.expr_file ?? "<some bad data?>";
-        }
-
-        public sealed class Error
-        {
-            public string? code { get; set; }
-            public string? message { get; set; }
-
-            public string? functionName { get; set; }
-            public string? value { get; set; }
-        }
+        public string? functionName { get; set; }
+        public string? value { get; set; }
     }
 }

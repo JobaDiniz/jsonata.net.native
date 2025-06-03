@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace Jsonata.Net.Native.Dom
 {
     // A GroupNode represents a group expression.
-    public sealed class GroupNode: Node
+    public sealed class GroupNode : Node
     {
         public Node expr { get; }
         public ObjectNode objectNode { get; }
 
-        public GroupNode(Node expr, ObjectNode objectNode) 
+        public GroupNode(Node expr, ObjectNode objectNode)
         {
             this.expr = expr;
             this.objectNode = objectNode;

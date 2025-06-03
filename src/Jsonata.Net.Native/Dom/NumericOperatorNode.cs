@@ -17,7 +17,8 @@ namespace Jsonata.Net.Native.Dom
             Modulo
         }
 
-        public static string OperatorToString(Operator op) => op switch {
+        public static string OperatorToString(Operator op) => op switch
+        {
             Operator.Add => "+",
             Operator.Subtract => "-",
             Operator.Multiply => "*",

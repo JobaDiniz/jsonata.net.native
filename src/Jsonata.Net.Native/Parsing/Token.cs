@@ -20,12 +20,12 @@ namespace Jsonata.Net.Native.Parsing
         }
     }
 
-    internal sealed class RegexToken: Token
+    internal sealed class RegexToken : Token
     {
         internal RegexOptions flags;
 
         internal RegexToken(string value, int position)
-            :base(TokenType.typeRegex, value, position)
+            : base(TokenType.typeRegex, value, position)
         {
         }
     }

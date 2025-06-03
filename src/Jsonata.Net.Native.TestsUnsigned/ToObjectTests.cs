@@ -7,111 +7,112 @@ using Jsonata.Net.Native.Json;
 using Xunit;
 using ObjectParsingTestsData;
 
-namespace Jsonata.Net.Native.Tests
+namespace Jsonata.Net.Native.Tests;
+public sealed class ToObjectTests
 {
-    public sealed class ToObjectTests
+    public sealed class TestData
     {
-        public sealed class TestData
+        private static readonly ToObjectSettings DefaultSettings = new ToObjectSettings();
+        internal static readonly ToObjectSettings AllowMissingProps = new ToObjectSettings()
         {
-            private static readonly ToObjectSettings DefaultSettings = new ToObjectSettings();
-            internal static readonly ToObjectSettings AllowMissingProps = new ToObjectSettings() {
-                AllowMissingProperties = true
-            };
-            internal static readonly ToObjectSettings AllowUndeclaredProps = new ToObjectSettings() {
-                AllowUndecaredProperties = true
-            };
+            AllowMissingProperties = true
+        };
+        internal static readonly ToObjectSettings AllowUndeclaredProps = new ToObjectSettings()
+        {
+            AllowUndecaredProperties = true
+        };
 
-            internal readonly string json;
-            internal readonly Type type;
-            internal readonly object? expectedValue;
-            internal readonly ToObjectSettings settings;
-            internal readonly bool exceptionExpected;
+        internal readonly string json;
+        internal readonly Type type;
+        internal readonly object? expectedValue;
+        internal readonly ToObjectSettings settings;
+        internal readonly bool exceptionExpected;
 
-            internal TestData(string json, Type type, object? expectedValue)
-            {
-                this.json = json;
-                this.type = type;
-                this.expectedValue = expectedValue;
-                this.settings = DefaultSettings;
-            }
-
-            internal TestData(string json, object expectedValue)
-            {
-                this.json = json;
-                this.type = expectedValue.GetType();
-                this.expectedValue = expectedValue;
-                this.settings = DefaultSettings;
-            }
-
-            internal TestData(string json, ToObjectSettings settings, object expectedValue)
-            {
-                this.json = json;
-                this.type = expectedValue.GetType();
-                this.expectedValue = expectedValue;
-                this.settings = settings;
-            }
-
-            internal static TestData CreateException(string json, Type type)
-            {
-                return new TestData(json, type, null, DefaultSettings, exceptionExpected: true);
-            }
-
-            private TestData(string json, Type type, object? expectedValue, ToObjectSettings settings, bool exceptionExpected)
-            {
-                this.json = json;
-                this.type = type;
-                this.expectedValue = expectedValue;
-                this.settings = settings;
-                this.exceptionExpected = exceptionExpected;
-            }
+        internal TestData(string json, Type type, object? expectedValue)
+        {
+            this.json = json;
+            this.type = type;
+            this.expectedValue = expectedValue;
+            this.settings = DefaultSettings;
         }
 
-        private readonly ObjectsComparer.Comparer m_comparer = new ObjectsComparer.Comparer();
-
-        [Fact]
-        public void TestComparer()
+        internal TestData(string json, object expectedValue)
         {
-            Assert.True(this.m_comparer.Compare("a", "a")); // a == a
-            Assert.False(this.m_comparer.Compare("a", "b")); // a != b
-            //TODO: WTF! see https://github.com/ValeraT1982/ObjectsComparer/issues/23
-            Assert.True(this.m_comparer.Compare(typeof(object), "a", "b")); // a == b (obj)
+            this.json = json;
+            this.type = expectedValue.GetType();
+            this.expectedValue = expectedValue;
+            this.settings = DefaultSettings;
         }
 
-
-        [Theory, MemberData(nameof(GetTestCases))]
-        public void Check(TestData data)
+        internal TestData(string json, ToObjectSettings settings, object expectedValue)
         {
-            JToken token = JToken.Parse(data.json);
-            object? value;
-            try
-            { 
-                value = token.ToObject(data.type, data.settings);
-            }
-            catch (Exception)
-            {
-                if (data.exceptionExpected)
-                {
-                    // Expected exception - test passes
-                    return;
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            this.json = json;
+            this.type = expectedValue.GetType();
+            this.expectedValue = expectedValue;
+            this.settings = settings;
+        }
 
+        internal static TestData CreateException(string json, Type type)
+        {
+            return new TestData(json, type, null, DefaultSettings, exceptionExpected: true);
+        }
+
+        private TestData(string json, Type type, object? expectedValue, ToObjectSettings settings, bool exceptionExpected)
+        {
+            this.json = json;
+            this.type = type;
+            this.expectedValue = expectedValue;
+            this.settings = settings;
+            this.exceptionExpected = exceptionExpected;
+        }
+    }
+
+    private readonly ObjectsComparer.Comparer m_comparer = new ObjectsComparer.Comparer();
+
+    [Fact]
+    public void TestComparer()
+    {
+        Assert.True(this.m_comparer.Compare("a", "a")); // a == a
+        Assert.False(this.m_comparer.Compare("a", "b")); // a != b
+                                                         //TODO: WTF! see https://github.com/ValeraT1982/ObjectsComparer/issues/23
+        Assert.True(this.m_comparer.Compare(typeof(object), "a", "b")); // a == b (obj)
+    }
+
+
+    [Theory, MemberData(nameof(GetTestCases))]
+    public void Check(TestData data)
+    {
+        JToken token = JToken.Parse(data.json);
+        object? value;
+        try
+        {
+            value = token.ToObject(data.type, data.settings);
+        }
+        catch (Exception)
+        {
             if (data.exceptionExpected)
             {
-                throw new Exception("Expected exception");
+                // Expected exception - test passes
+                return;
             }
-
-            bool areEqual = this.m_comparer.Compare(data.type, data.expectedValue, value, out IEnumerable<ObjectsComparer.Difference> diffs);
-            Assert.True(areEqual, $"Mismatch:\n{String.Join("\n", diffs)}");
+            else
+            {
+                throw;
+            }
         }
 
-        public static IEnumerable<object[]> GetTestCases()
+        if (data.exceptionExpected)
         {
-            List<TestData> tests = new List<TestData>() {
+            throw new Exception("Expected exception");
+        }
+
+        bool areEqual = this.m_comparer.Compare(data.type, data.expectedValue, value, out IEnumerable<ObjectsComparer.Difference> diffs);
+        Assert.True(areEqual, $"Mismatch:\n{String.Join("\n", diffs)}");
+    }
+
+    public static IEnumerable<object[]> GetTestCases()
+    {
+        List<TestData> tests = new List<TestData>() {
                 new TestData("null", typeof(object), null),
                 new TestData("null ", typeof(int?), null),
                 new TestData("10", 10),
@@ -138,13 +139,12 @@ namespace Jsonata.Net.Native.Tests
                 new TestData("{'foo': 'goo', 'bar': 10, 'zoo': 1}", TestData.AllowUndeclaredProps, new TestObj() { foo = "goo", bar = 10 }),
             };
 
-            return tests.Select(v => new object[] { v });
-        }
+        return tests.Select(v => new object[] { v });
+    }
 
-        private sealed class TestObj
-        {
-            public string foo { get; set; } = default!;
-            public int? bar { get; set; }
-        }
+    private sealed class TestObj
+    {
+        public string foo { get; set; } = default!;
+        public int? bar { get; set; }
     }
 }

@@ -20,59 +20,59 @@ namespace Jsonata.Net.Native.SystemTextJson
         {
             switch (element.ValueKind)
             {
-            case JsonValueKind.Array:
-                {
-                    JArray result = new JArray(element.GetArrayLength());
-                    foreach (JsonElement child in element.EnumerateArray())
+                case JsonValueKind.Array:
                     {
-                        result.Add(FromSystemTextJson(child));
+                        JArray result = new JArray(element.GetArrayLength());
+                        foreach (JsonElement child in element.EnumerateArray())
+                        {
+                            result.Add(FromSystemTextJson(child));
+                        }
+                        return result;
                     }
-                    return result;
-                }
-            case JsonValueKind.True:
-                return new JValue(true);
-            case JsonValueKind.False:
-                return new JValue(false);
-            case JsonValueKind.Number:
-                {
-                    if (element.TryGetInt32(out int intValue))
+                case JsonValueKind.True:
+                    return new JValue(true);
+                case JsonValueKind.False:
+                    return new JValue(false);
+                case JsonValueKind.Number:
                     {
-                        return new JValue(intValue);
+                        if (element.TryGetInt32(out int intValue))
+                        {
+                            return new JValue(intValue);
+                        }
+                        else if (element.TryGetInt64(out long longValue))
+                        {
+                            return new JValue(longValue);
+                        }
+                        else if (element.TryGetDecimal(out decimal decimalValue))
+                        {
+                            return new JValue(decimalValue);
+                        }
+                        else if (element.TryGetDouble(out double doubleValue))
+                        {
+                            return new JValue(doubleValue);
+                        }
+                        else
+                        {
+                            throw new Exception("Failed to parse number from " + element);
+                        }
                     }
-                    else if (element.TryGetInt64(out long longValue))
+                case JsonValueKind.Null:
+                    return JValue.CreateNull();
+                case JsonValueKind.Object:
                     {
-                        return new JValue(longValue);
+                        JObject result = new JObject();
+                        foreach (JsonProperty prop in element.EnumerateObject())
+                        {
+                            result.Add(prop.Name, FromSystemTextJson(prop.Value));
+                        }
+                        return result;
                     }
-                    else if (element.TryGetDecimal(out decimal decimalValue))
-                    {
-                        return new JValue(decimalValue);
-                    }
-                    else if (element.TryGetDouble(out double doubleValue))
-                    {
-                        return new JValue(doubleValue);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to parse number from " + element);
-                    }
-                }
-            case JsonValueKind.Null:
-                return JValue.CreateNull();
-            case JsonValueKind.Object:
-                {
-                    JObject result = new JObject();
-                    foreach (JsonProperty prop in element.EnumerateObject())
-                    {
-                        result.Add(prop.Name, FromSystemTextJson(prop.Value));
-                    }
-                    return result;
-                }
-            case JsonValueKind.String:
-                return new JValue(element.GetString()!);
-            case JsonValueKind.Undefined:
-                return JValue.CreateUndefined();
-            default:
-                throw new ArgumentException("JsonValueKind " + element.ValueKind);
+                case JsonValueKind.String:
+                    return new JValue(element.GetString()!);
+                case JsonValueKind.Undefined:
+                    return JValue.CreateUndefined();
+                default:
+                    throw new ArgumentException("JsonValueKind " + element.ValueKind);
             }
         }
 
@@ -150,51 +150,51 @@ namespace Jsonata.Net.Native.SystemTextJson
         {
             switch (value.Type)
             {
-            case JTokenType.Array:
-                {
-                    JArray source = (JArray)value;
-                    JsonArray result = new JsonArray();
-                    foreach (JToken child in source.ChildrenTokens)
+                case JTokenType.Array:
                     {
-                        result.Add(ToSystemTextJsonNode(child));
+                        JArray source = (JArray)value;
+                        JsonArray result = new JsonArray();
+                        foreach (JToken child in source.ChildrenTokens)
+                        {
+                            result.Add(ToSystemTextJsonNode(child));
+                        }
+                        return result;
                     }
-                    return result;
-                }
-            case JTokenType.Object:
-                {
-                    JObject source = (JObject)value;
-                    JsonObject result = new JsonObject();
-                    foreach (KeyValuePair<string, JToken> prop in source.Properties)
+                case JTokenType.Object:
                     {
-                        result.Add(prop.Key, ToSystemTextJsonNode(prop.Value));
+                        JObject source = (JObject)value;
+                        JsonObject result = new JsonObject();
+                        foreach (KeyValuePair<string, JToken> prop in source.Properties)
+                        {
+                            result.Add(prop.Key, ToSystemTextJsonNode(prop.Value));
+                        }
+                        return result;
                     }
-                    return result;
-                }
-            case JTokenType.Function:
-                throw new NotSupportedException("Not supported for functions");
-            case JTokenType.Null:
-                return null;    //seems there's no JsonValue for Null: https://github.com/dotnet/runtime/blob/eeadd653e1982d7037a93a9ab38129c07336e7db/src/libraries/System.Text.Json/src/System/Text/Json/Nodes/JsonValue.cs#L67
-            case JTokenType.Undefined:
-                return JsonValue.Create(new JsonElement()); //this would create a node with JsonValueKind.Undefined, see https://github.com/mikhail-barg/jsonata.net.native/issues/38#issuecomment-2813936416 
-            case JTokenType.Float:
-                try
-                {
-                    decimal decimalValue = (decimal)value;
-                    return JsonValue.Create(decimalValue);
-                }
-                catch (OverflowException)
-                {
-                    //throw new JsonataException("S0102", $"Number out of range: {value} ({ex.Message})");
-                    return JsonValue.Create((double)value);
-                }
-            case JTokenType.Integer:
-                return JsonValue.Create((long)value);
-            case JTokenType.String:
-                return JsonValue.Create((string)value);
-            case JTokenType.Boolean:
-                return JsonValue.Create((bool)value);
-            default:
-                throw new Exception("Unexpected type " + value.Type);
+                case JTokenType.Function:
+                    throw new NotSupportedException("Not supported for functions");
+                case JTokenType.Null:
+                    return null;    //seems there's no JsonValue for Null: https://github.com/dotnet/runtime/blob/eeadd653e1982d7037a93a9ab38129c07336e7db/src/libraries/System.Text.Json/src/System/Text/Json/Nodes/JsonValue.cs#L67
+                case JTokenType.Undefined:
+                    return JsonValue.Create(new JsonElement()); //this would create a node with JsonValueKind.Undefined, see https://github.com/mikhail-barg/jsonata.net.native/issues/38#issuecomment-2813936416 
+                case JTokenType.Float:
+                    try
+                    {
+                        decimal decimalValue = (decimal)value;
+                        return JsonValue.Create(decimalValue);
+                    }
+                    catch (OverflowException)
+                    {
+                        //throw new JsonataException("S0102", $"Number out of range: {value} ({ex.Message})");
+                        return JsonValue.Create((double)value);
+                    }
+                case JTokenType.Integer:
+                    return JsonValue.Create((long)value);
+                case JTokenType.String:
+                    return JsonValue.Create((string)value);
+                case JTokenType.Boolean:
+                    return JsonValue.Create((bool)value);
+                default:
+                    throw new Exception("Unexpected type " + value.Type);
             }
         }
 

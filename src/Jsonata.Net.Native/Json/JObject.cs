@@ -4,151 +4,150 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Json
+namespace Jsonata.Net.Native.Json;
+
+public sealed class JObject : JToken
 {
-    public sealed class JObject : JToken
+    private readonly Dictionary<string, JToken> properties = new Dictionary<string, JToken>();
+
+    public int Count => this.properties.Count;
+
+    public IReadOnlyDictionary<string, JToken> Properties => this.properties;
+    public ICollection<string> Keys => this.properties.Keys;
+
+    public JObject()
+        : base(JTokenType.Object)
     {
-        private readonly Dictionary<string, JToken> m_properties = new Dictionary<string, JToken>();
+    }
 
-        public int Count => this.m_properties.Count;
+    public void Add(string name, JToken value)
+    {
+        this.properties.Add(name, value);
+    }
 
-        public IReadOnlyDictionary<string, JToken> Properties => this.m_properties;
-        public ICollection<string> Keys => this.m_properties.Keys;
+    public void Set(string key, JToken value)
+    {
+        this.properties[key] = value;
+    }
 
-        public JObject() 
-            : base(JTokenType.Object)
+    public void Merge(JObject update)
+    {
+        foreach (KeyValuePair<string, JToken> prop in update.Properties)
         {
+            this.properties[prop.Key] = prop.Value;
         }
+    }
 
-        public void Add(string name, JToken value)
+    public void Remove(string key)
+    {
+        this.properties.Remove(key);
+    }
+
+    protected override void ClearParentNested()
+    {
+        foreach (JToken child in this.properties.Values)
         {
-            this.m_properties.Add(name, value);
+            child.ClearParent();
         }
+    }
 
-        public void Set(string key, JToken value)
+    internal override void ToIndentedStringImpl(StringBuilder builder, int indent, SerializationSettings options)
+    {
+        builder.Append('{');
+        bool serializedSomething = false;
+        foreach (KeyValuePair<string, JToken> prop in this.properties)
         {
-            this.m_properties[key] = value;
-        }
-
-        public void Merge(JObject update)
-        {
-            foreach (KeyValuePair<string, JToken> prop in update.Properties)
+            if (!options.SerializeNullProperties && prop.Value.Type == JTokenType.Null)
             {
-                this.m_properties[prop.Key] = prop.Value;
-            }
-        }
-
-        public void Remove(string key)
-        {
-            this.m_properties.Remove(key);
-        }
-
-        protected override void ClearParentNested()
-        {
-            foreach (JToken child in this.m_properties.Values)
-            {
-                child.ClearParent();
-            }
-        }
-
-        internal override void ToIndentedStringImpl(StringBuilder builder, int indent, SerializationSettings options)
-        {
-            builder.Append('{');
-            bool serializedSomething = false;
-            foreach (KeyValuePair<string, JToken> prop in this.m_properties)
-            {
-                if (!options.SerializeNullProperties && prop.Value.Type == JTokenType.Null)
-                {
-                    //skip null properties
-                    continue;
-                }
-
-                if (serializedSomething)
-                {
-                    builder.Append(',');
-                }
-                builder.AppendJsonLine();
-
-                builder.Indent(indent + 1);
-
-                builder.Append('"');
-                JToken.EscapeString(prop.Key, builder);
-                builder.Append('"').Append(':').Append(' ');
-                prop.Value.ToIndentedStringImpl(builder, indent + 1, options);
-                serializedSomething = true;
+                //skip null properties
+                continue;
             }
 
             if (serializedSomething)
             {
-                builder.AppendJsonLine();
-                builder.Indent(indent);
+                builder.Append(',');
             }
-            builder.Append('}');
+            builder.AppendJsonLine();
+
+            builder.Indent(indent + 1);
+
+            builder.Append('"');
+            JToken.EscapeString(prop.Key, builder);
+            builder.Append('"').Append(':').Append(' ');
+            prop.Value.ToIndentedStringImpl(builder, indent + 1, options);
+            serializedSomething = true;
         }
 
-        internal override void ToStringFlatImpl(StringBuilder builder, SerializationSettings options)
+        if (serializedSomething)
         {
-            builder.Append('{');
-            bool serializedSomething = false;
-            foreach (KeyValuePair<string, JToken> prop in this.m_properties)
+            builder.AppendJsonLine();
+            builder.Indent(indent);
+        }
+        builder.Append('}');
+    }
+
+    internal override void ToStringFlatImpl(StringBuilder builder, SerializationSettings options)
+    {
+        builder.Append('{');
+        bool serializedSomething = false;
+        foreach (KeyValuePair<string, JToken> prop in this.properties)
+        {
+            if (!options.SerializeNullProperties && prop.Value.Type == JTokenType.Null)
             {
-                if (!options.SerializeNullProperties && prop.Value.Type == JTokenType.Null)
-                {
-                    //skip null properties
-                    continue;
-                }
-
-                if (serializedSomething)
-                {
-                    builder.Append(',');
-                }
-
-                builder.Append('"');
-                JToken.EscapeString(prop.Key, builder);
-                builder.Append('"').Append(':');
-                prop.Value.ToStringFlatImpl(builder, options);
-                serializedSomething = true;
+                //skip null properties
+                continue;
             }
-            builder.Append('}');
-        }
 
-        public override JToken DeepClone()
-        {
-            JObject result = new JObject();
-            foreach (KeyValuePair<string, JToken> prop in this.m_properties)
+            if (serializedSomething)
             {
-                result.Add(prop.Key, prop.Value.DeepClone());
+                builder.Append(',');
             }
-            return result;
-        }
 
-        public override bool DeepEquals(JToken other)
+            builder.Append('"');
+            JToken.EscapeString(prop.Key, builder);
+            builder.Append('"').Append(':');
+            prop.Value.ToStringFlatImpl(builder, options);
+            serializedSomething = true;
+        }
+        builder.Append('}');
+    }
+
+    public override JToken DeepClone()
+    {
+        JObject result = new JObject();
+        foreach (KeyValuePair<string, JToken> prop in this.properties)
         {
-            if (this.Type != other.Type)
+            result.Add(prop.Key, prop.Value.DeepClone());
+        }
+        return result;
+    }
+
+    public override bool DeepEquals(JToken other)
+    {
+        if (this.Type != other.Type)
+        {
+            return false;
+        }
+        JObject otherObj = (JObject)other;
+        if (this.properties.Count != otherObj.properties.Count)
+        {
+            return false;
+        }
+        foreach (KeyValuePair<string, JToken> prop in this.properties)
+        {
+            if (!otherObj.properties.TryGetValue(prop.Key, out JToken? otherValue))
             {
                 return false;
             }
-            JObject otherObj = (JObject)other;
-            if (this.m_properties.Count != otherObj.m_properties.Count)
+            if (otherValue == null)
             {
                 return false;
             }
-            foreach (KeyValuePair<string, JToken> prop in this.m_properties)
+            if (!prop.Value.DeepEquals(otherValue))
             {
-                if (!otherObj.m_properties.TryGetValue(prop.Key, out JToken? otherValue))
-                {
-                    return false;
-                }
-                if (otherValue == null)
-                {
-                    return false;
-                }
-                if (!prop.Value.DeepEquals(otherValue))
-                {
-                    return false;
-                }
+                return false;
             }
-            return true;
         }
+        return true;
     }
 }

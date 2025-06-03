@@ -40,12 +40,12 @@ namespace Jsonata.Net.Native.Eval
 
             switch (arg.Type)
             {
-            case JTokenType.Undefined:
-                return EvalProcessor.UNDEFINED;
-            case JTokenType.String:
-                break;
-            default:
-                throw new JsonataException("????", $"Argument 1 of regex should be String, got {arg.Type}");
+                case JTokenType.Undefined:
+                    return EvalProcessor.UNDEFINED;
+                case JTokenType.String:
+                    break;
+                default:
+                    throw new JsonataException("????", $"Argument 1 of regex should be String, got {arg.Type}");
             }
 
             string str = (string)arg!;

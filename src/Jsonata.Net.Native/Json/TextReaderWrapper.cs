@@ -6,69 +6,68 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Json
+namespace Jsonata.Net.Native.Json;
+
+internal sealed class TextReaderWrapper
 {
-    internal sealed class TextReaderWrapper
+    private readonly TextReader reader;
+    private readonly char[] chars = new char[1024];
+    private int charsCount = 0;
+    private int firstCharIndex = 0;
+    private bool endOfReaderReached = false;
+
+    internal TextReaderWrapper(TextReader reader)
     {
-        private readonly TextReader m_reader;
-        private readonly char[] m_chars = new char[1024];
-        private int m_charsCount = 0;
-        private int m_firstCharIndex = 0;
-        private bool m_endOfReaderReached = false;
+        this.reader = reader;
+    }
 
-        internal TextReaderWrapper(TextReader reader)
+    internal async Task<int> PeekAsync(CancellationToken ct)
+    {
+        await this.AssureChars(ct);
+
+        if (this.endOfReaderReached)
         {
-            this.m_reader = reader;
+            return -1;
         }
 
-        internal async Task<int> PeekAsync(CancellationToken ct)
+        return (this.chars[this.firstCharIndex]);
+    }
+
+    internal async Task<int> ReadAsync(CancellationToken ct)
+    {
+        await this.AssureChars(ct);
+
+        if (this.endOfReaderReached)
         {
-            await this.AssureChars(ct);
-
-            if (this.m_endOfReaderReached)
-            {
-                return -1;
-            }
-
-            return (this.m_chars[this.m_firstCharIndex]);
+            return -1;
         }
 
-        internal async Task<int> ReadAsync(CancellationToken ct)
+        int result = this.chars[this.firstCharIndex];
+
+        ++this.firstCharIndex;
+
+        return result;
+    }
+
+    private async Task AssureChars(CancellationToken ct)
+    {
+        if (ct.IsCancellationRequested)
         {
-            await this.AssureChars(ct);
-
-            if (this.m_endOfReaderReached)
-            {
-                return -1;
-            }
-
-            int result = this.m_chars[this.m_firstCharIndex];
-
-            ++this.m_firstCharIndex;
-
-            return result;
+            throw new OperationCanceledException();
         }
 
-        private async Task AssureChars(CancellationToken ct)
+        if (this.endOfReaderReached)
         {
-            if (ct.IsCancellationRequested)
-            {
-                throw new OperationCanceledException();
-            }
+            return;
+        }
 
-            if (this.m_endOfReaderReached)
+        if (this.firstCharIndex >= this.charsCount)
+        {
+            this.charsCount = await this.reader.ReadAsync(this.chars, 0, this.chars.Length);
+            this.firstCharIndex = 0;
+            if (this.charsCount == 0)
             {
-                return;
-            }
-
-            if (this.m_firstCharIndex >= this.m_charsCount)
-            {
-                this.m_charsCount = await this.m_reader.ReadAsync(this.m_chars, 0, this.m_chars.Length);
-                this.m_firstCharIndex = 0;
-                if (this.m_charsCount == 0)
-                {
-                    this.m_endOfReaderReached = true;
-                }
+                this.endOfReaderReached = true;
             }
         }
     }

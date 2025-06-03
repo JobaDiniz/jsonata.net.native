@@ -12,8 +12,8 @@ namespace Jsonata.Net.Native.Dom
         public Node updates { get; }
         public Node? deletes { get; }
 
-        public ObjectTransformationNode(Node pattern, Node updates, Node? deletes) 
-        { 
+        public ObjectTransformationNode(Node pattern, Node updates, Node? deletes)
+        {
             this.pattern = pattern;
             this.updates = updates;
             this.deletes = deletes;

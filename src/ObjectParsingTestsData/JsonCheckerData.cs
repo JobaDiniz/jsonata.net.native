@@ -61,7 +61,8 @@ namespace ObjectParsingTestsData
                     throw new Exception("Unexpected file name " + fileName);
                 }
 
-                JsonCheckerData caseInfo = new JsonCheckerData() {
+                JsonCheckerData caseInfo = new JsonCheckerData()
+                {
                     displayName = displayName,
                     fileName = fileName,
                     json = json,
@@ -96,7 +97,8 @@ namespace ObjectParsingTestsData
                     throw new Exception("Unexpected file name " + fileName);
                 }
 
-                JsonCheckerData caseInfo = new JsonCheckerData() {
+                JsonCheckerData caseInfo = new JsonCheckerData()
+                {
                     displayName = displayName,
                     fileName = fileName,
                     json = json,

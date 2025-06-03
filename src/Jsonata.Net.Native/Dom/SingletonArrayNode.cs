@@ -4,25 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+// A singletonArrayNode is an interim data structure used when
+// processing path expressions. It is deliberately unexported
+// and gets converted into a PathNode during optimization.
+internal sealed class SingletonArrayNode_ : Node
 {
-    // A singletonArrayNode is an interim data structure used when
-    // processing path expressions. It is deliberately unexported
-    // and gets converted into a PathNode during optimization.
-    internal sealed class SingletonArrayNode_ : Node
+    private readonly Node lhs;
+
+    internal SingletonArrayNode_(Node lhs)
     {
-        private readonly Node m_lhs;
+        this.lhs = lhs;
+    }
 
-        internal SingletonArrayNode_(Node lhs)
+    internal override Node optimize()
+    {
+        Node lhs = this.lhs.optimize();
+        switch (lhs)
         {
-            this.m_lhs = lhs;
-        }
-
-        internal override Node optimize()
-        {
-            Node lhs = this.m_lhs.optimize();
-            switch (lhs)
-            {
             case PathNode pathNode:
                 if (pathNode.keepArrays)
                 {
@@ -31,17 +31,16 @@ namespace Jsonata.Net.Native.Dom
                 return pathNode.CloneWithKeepArrays();
             default:
                 return new PathNode(new List<Node>() { lhs }, keepArrays: true);
-            }
         }
+    }
 
-        public override string ToString()
-        {
-            return $"{this.m_lhs}[]";
-        }
+    public override string ToString()
+    {
+        return $"{this.lhs}[]";
+    }
 
-        protected override bool EqualsSpecific(Node other)
-        {
-            throw new NotImplementedException();
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        throw new NotImplementedException();
     }
 }

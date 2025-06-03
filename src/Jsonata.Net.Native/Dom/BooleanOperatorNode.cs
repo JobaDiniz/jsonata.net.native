@@ -4,60 +4,60 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+public sealed class BooleanOperatorNode : Node
 {
-    public sealed class BooleanOperatorNode : Node
+    public Operator op { get; }
+    public Node lhs { get; }
+    public Node rhs { get; }
+
+    public enum Operator
     {
-        public Operator op { get; }
-        public Node lhs { get; }
-        public Node rhs { get; }
+        And,
+        Or,
+    }
 
-        public enum Operator
+    public static string OperatorToString(Operator op) => op switch
+    {
+        Operator.And => "and",
+        Operator.Or => "or",
+        _ => throw new ArgumentException($"Unexpected operator '{op}'")
+    };
+
+    public BooleanOperatorNode(Operator op, Node lhs, Node rhs)
+    {
+        this.op = op;
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+
+    internal override Node optimize()
+    {
+        Node lhs = this.lhs.optimize();
+        Node rhs = this.rhs.optimize();
+
+        if (lhs != this.lhs || rhs != this.rhs)
         {
-            And,
-            Or,
+            return new BooleanOperatorNode(this.op, lhs, rhs);
         }
-
-        public static string OperatorToString(Operator op) => op switch {
-            Operator.And => "and",
-            Operator.Or => "or",
-            _ => throw new ArgumentException($"Unexpected operator '{op}'")
-        };
-
-        public BooleanOperatorNode(Operator op, Node lhs, Node rhs)
+        else
         {
-            this.op = op;
-            this.lhs = lhs;
-            this.rhs = rhs;
+            return this;
         }
+    }
 
-        internal override Node optimize()
-        {
-            Node lhs = this.lhs.optimize();
-            Node rhs = this.rhs.optimize();
+    public override string ToString()
+    {
+        return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
+    }
 
-            if (lhs != this.lhs || rhs != this.rhs)
-            {
-                return new BooleanOperatorNode(this.op, lhs, rhs);
-            }
-            else
-            {
-                return this;
-            }
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        BooleanOperatorNode otherNode = (BooleanOperatorNode)other;
 
-        public override string ToString()
-        {
-            return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
-        }
-
-        protected override bool EqualsSpecific(Node other)
-        {
-            BooleanOperatorNode otherNode = (BooleanOperatorNode)other;
-
-            return this.op == otherNode.op
-                && this.lhs.Equals(otherNode.lhs)
-                && this.rhs.Equals(otherNode.rhs);
-        }
+        return this.op == otherNode.op
+            && this.lhs.Equals(otherNode.lhs)
+            && this.rhs.Equals(otherNode.rhs);
     }
 }

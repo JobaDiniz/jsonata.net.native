@@ -14,171 +14,170 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Eval;
 
-namespace Jsonata.Net.Native.Json
+namespace Jsonata.Net.Native.Json;
+[DebuggerDisplay("{Type}: {ToFlatString()}")]
+public abstract class JToken
 {
-    [DebuggerDisplay("{Type}: {ToFlatString()}")]
-    public abstract class JToken
+    public readonly JTokenType Type;
+
+    private JToken? parentToken = null;
+    internal JToken? parent
     {
-        public readonly JTokenType Type;
-
-        private JToken? m_parent = null;
-        internal JToken? parent
+        get => this.parentToken;
+        set
         {
-            get => this.m_parent;
-            set 
+            if (this == EvalProcessor.UNDEFINED && value != null)
             {
-                if (this == EvalProcessor.UNDEFINED && value != null)
-                {
-                    throw new InvalidOperationException($"Attempt to set parent on {nameof(EvalProcessor)}.{nameof(EvalProcessor.UNDEFINED)}");
-                }
-                this.m_parent = value;
+                throw new InvalidOperationException($"Attempt to set parent on {nameof(EvalProcessor)}.{nameof(EvalProcessor.UNDEFINED)}");
             }
+            this.parentToken = value;
+        }
+    }
+
+    protected JToken(JTokenType type)
+    {
+        this.Type = type;
+    }
+
+    private static JValue AsValue(JToken token)
+    {
+        if (token is JValue value)
+        {
+            return value;
+        }
+        throw new Exception("Token is not a JValue");
+    }
+
+    public static explicit operator int(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.Integer)
+        {
+            throw new Exception("Cannot convert to int");
+        }
+        return Convert.ToInt32(v.Value, CultureInfo.InvariantCulture);
+    }
+
+    public static explicit operator long(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.Integer)
+        {
+            throw new Exception("Cannot convert to long");
+        }
+        return Convert.ToInt64(v.Value, CultureInfo.InvariantCulture);
+    }
+
+    public static explicit operator decimal(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.Float)
+        {
+            throw new ArgumentException("Can not convert to Decimal");
         }
 
-        protected JToken(JTokenType type)
+        return Convert.ToDecimal(v.Value, CultureInfo.InvariantCulture);
+    }
+
+    public static explicit operator double(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.Float)
         {
-            this.Type = type;
+            throw new ArgumentException("Can not convert to Double");
         }
 
-        private static JValue AsValue(JToken token)
+        return Convert.ToDouble(v.Value, CultureInfo.InvariantCulture);
+    }
+
+    public static explicit operator float(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.Float)
         {
-            if (token is JValue value)
-            {
-                return value;
-            }
-            throw new Exception("Token is not a JValue");
+            throw new ArgumentException("Can not convert to Double");
         }
 
-        public static explicit operator int(JToken value)
+        return Convert.ToSingle(v.Value, CultureInfo.InvariantCulture);
+    }
+
+    public static explicit operator string(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.String)
         {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.Integer)
-            {
-                throw new Exception("Cannot convert to int");
-            }
-            return Convert.ToInt32(v.Value, CultureInfo.InvariantCulture);
+            throw new ArgumentException("Can not convert to String");
         }
 
-        public static explicit operator long(JToken value)
+        return Convert.ToString(v.Value, CultureInfo.InvariantCulture)!;
+    }
+
+    public static explicit operator bool(JToken value)
+    {
+        JValue v = AsValue(value);
+        if (v.Type != JTokenType.Boolean)
         {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.Integer)
-            {
-                throw new Exception("Cannot convert to long");
-            }
-            return Convert.ToInt64(v.Value, CultureInfo.InvariantCulture);
+            throw new ArgumentException("Can not convert to Bool");
         }
 
-        public static explicit operator decimal(JToken value)
-        {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.Float)
-            {
-                throw new ArgumentException("Can not convert to Decimal");
-            }
+        return Convert.ToBoolean(v.Value, CultureInfo.InvariantCulture);
+    }
 
-            return Convert.ToDecimal(v.Value, CultureInfo.InvariantCulture);
+
+    public static JToken Parse(TextReader reader, ParseSettings? settings = null)
+    {
+        var jsonText = reader.ReadToEnd();
+        return ParseViaSystemTextJson(jsonText, settings);
+    }
+
+    public static JToken Parse(string source, ParseSettings? settings = null)
+    {
+        return ParseViaSystemTextJson(source, settings);
+    }
+
+    public static async Task<JToken> ParseAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
+    {
+        string jsonText;
+        if (reader is StreamReader streamReader)
+        {
+            jsonText = await streamReader.ReadToEndAsync();
         }
-
-        public static explicit operator double(JToken value)
+        else
         {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.Float)
-            {
-                throw new ArgumentException("Can not convert to Double");
-            }
-
-            return Convert.ToDouble(v.Value, CultureInfo.InvariantCulture);
+            jsonText = reader.ReadToEnd();
         }
+        return ParseViaSystemTextJson(jsonText, settings);
+    }
 
-        public static explicit operator float(JToken value)
+    public static void Validate(TextReader reader, ParseSettings? settings = null)
+    {
+        var jsonText = reader.ReadToEnd();
+        ValidateViaSystemTextJson(jsonText, settings);
+    }
+
+    public static void Validate(string source, ParseSettings? settings = null)
+    {
+        ValidateViaSystemTextJson(source, settings);
+    }
+
+    public static async Task ValidateAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
+    {
+        string jsonText;
+        if (reader is StreamReader streamReader)
         {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.Float)
-            {
-                throw new ArgumentException("Can not convert to Double");
-            }
-
-            return Convert.ToSingle(v.Value, CultureInfo.InvariantCulture);
+            jsonText = await streamReader.ReadToEndAsync();
         }
-
-        public static explicit operator string(JToken value)
+        else
         {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.String)
-            {
-                throw new ArgumentException("Can not convert to String");
-            }
-
-            return Convert.ToString(v.Value, CultureInfo.InvariantCulture)!;
+            jsonText = reader.ReadToEnd();
         }
+        ValidateViaSystemTextJson(jsonText, settings);
+    }
 
-        public static explicit operator bool(JToken value)
+    public static JToken FromObject(object? sourceObj)
+    {
+        switch (sourceObj)
         {
-            JValue v = AsValue(value);
-            if (v.Type != JTokenType.Boolean)
-            {
-                throw new ArgumentException("Can not convert to Bool");
-            }
-
-            return Convert.ToBoolean(v.Value, CultureInfo.InvariantCulture);
-        }
-
-
-        public static JToken Parse(TextReader reader, ParseSettings? settings = null)
-        {
-            var jsonText = reader.ReadToEnd();
-            return ParseViaSystemTextJson(jsonText, settings);
-        }
-
-        public static JToken Parse(string source, ParseSettings? settings = null)
-        {
-            return ParseViaSystemTextJson(source, settings);
-        }
-
-        public static async Task<JToken> ParseAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
-        {
-            string jsonText;
-            if (reader is StreamReader streamReader)
-            {
-                jsonText = await streamReader.ReadToEndAsync();
-            }
-            else
-            {
-                jsonText = reader.ReadToEnd();
-            }
-            return ParseViaSystemTextJson(jsonText, settings);
-        }
-
-        public static void Validate(TextReader reader, ParseSettings? settings = null)
-        {
-            var jsonText = reader.ReadToEnd();
-            ValidateViaSystemTextJson(jsonText, settings);
-        }
-
-        public static void Validate(string source, ParseSettings? settings = null)
-        {
-            ValidateViaSystemTextJson(source, settings);
-        }
-
-        public static async Task ValidateAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
-        {
-            string jsonText;
-            if (reader is StreamReader streamReader)
-            {
-                jsonText = await streamReader.ReadToEndAsync();
-            }
-            else
-            {
-                jsonText = reader.ReadToEnd();
-            }
-            ValidateViaSystemTextJson(jsonText, settings);
-        }
-
-        public static JToken FromObject(object? sourceObj)
-        {
-            switch (sourceObj)
-            {
             case null:
                 return JValue.CreateNull();
             case bool value:
@@ -215,233 +214,233 @@ namespace Jsonata.Net.Native.Json
                 return FromCollection(list);
             default:
                 return FromObj(sourceObj);
-            }
         }
+    }
 
-        private static JToken FromObj(object sourceObj)
+    private static JToken FromObj(object sourceObj)
+    {
+        JObject result = new JObject();
+        foreach (PropertyInfo pi in sourceObj.GetType().GetProperties())
         {
-            JObject result = new JObject();
-            foreach (PropertyInfo pi in sourceObj.GetType().GetProperties())
-            {
-                result.Add(pi.Name, JToken.FromObject(pi.GetValue(sourceObj)));
-            }
-            return result;
+            result.Add(pi.Name, JToken.FromObject(pi.GetValue(sourceObj)));
         }
+        return result;
+    }
 
-        private static JToken FromCollection(ICollection list)
+    private static JToken FromCollection(ICollection list)
+    {
+        JArray array = new JArray(list.Count);
+        foreach (object? item in list)
         {
-            JArray array = new JArray(list.Count);
-            foreach (object? item in list)
-            {
-                array.Add(JToken.FromObject(item));
-            }
-            return array;
+            array.Add(JToken.FromObject(item));
         }
+        return array;
+    }
 
-        private static JToken FromDictionary(IDictionary dictionary)
+    private static JToken FromDictionary(IDictionary dictionary)
+    {
+        JObject result = new JObject();
+        foreach (DictionaryEntry entry in dictionary)
         {
-            JObject result = new JObject();
-            foreach (DictionaryEntry entry in dictionary)
-            {
-                result.Add(entry.Key.ToString()!, JToken.FromObject(entry.Value));
-            }
-            return result;
+            result.Add(entry.Key.ToString()!, JToken.FromObject(entry.Value));
         }
+        return result;
+    }
 
-        internal void ClearParent()
+    internal void ClearParent()
+    {
+        this.parent = null;
+        this.ClearParentNested();
+    }
+
+    protected abstract void ClearParentNested();
+
+    public string ToIndentedString()
+    {
+        return this.ToIndentedString(SerializationSettings.DefaultSettings);
+    }
+
+    public string ToIndentedString(SerializationSettings options)
+    {
+        StringBuilder builder = new StringBuilder();
+        this.ToIndentedStringImpl(builder, 0, options);
+        return builder.ToString();
+    }
+
+    internal abstract void ToIndentedStringImpl(StringBuilder builder, int indent, SerializationSettings options);
+
+    public string ToFlatString()
+    {
+        return this.ToFlatString(SerializationSettings.DefaultSettings);
+    }
+
+    public string ToFlatString(SerializationSettings options)
+    {
+        StringBuilder builder = new StringBuilder();
+        this.ToStringFlatImpl(builder, options);
+        return builder.ToString();
+    }
+
+    internal abstract void ToStringFlatImpl(StringBuilder builder, SerializationSettings options);
+
+    public abstract JToken DeepClone();
+
+    public static bool DeepEquals(JToken lhs, JToken rhs)
+    {
+        return lhs.DeepEquals(rhs);
+    }
+
+    public abstract bool DeepEquals(JToken other);
+
+    public T ToObject<T>()
+    {
+        return this.ToObject<T>(ToObjectSettings.DefaultSettings)!;
+    }
+
+    public T ToObject<T>(ToObjectSettings settings)
+    {
+        return (T)this.ToObject(typeof(T), settings)!;
+    }
+
+    public object? ToObject(Type type)
+    {
+        return this.ToObject(type, ToObjectSettings.DefaultSettings);
+    }
+
+    public object? ToObject(Type type, ToObjectSettings settings)
+    {
+        if (type == typeof(string))
         {
-            this.parent = null;
-            this.ClearParentNested();
+            if (this.Type == JTokenType.Null)
+            {
+                return null;
+            }
+            return (string)this;
         }
-
-        protected abstract void ClearParentNested();
-
-        public string ToIndentedString()
+        else if (type == typeof(int))
         {
-            return this.ToIndentedString(SerializationSettings.DefaultSettings);
+            return (int)this;
         }
-
-        public string ToIndentedString(SerializationSettings options)
+        else if (type == typeof(long))
         {
-            StringBuilder builder = new StringBuilder();
-            this.ToIndentedStringImpl(builder, 0, options);
-            return builder.ToString();
+            return (long)this;
         }
-
-        internal abstract void ToIndentedStringImpl(StringBuilder builder, int indent, SerializationSettings options);
-
-        public string ToFlatString()
+        else if (type == typeof(float))
         {
-            return this.ToFlatString(SerializationSettings.DefaultSettings);
+            if (this.Type == JTokenType.Integer)
+            {
+                //explicit support, because casts are strict for a reason
+                return (float)(long)this;
+            }
+            return (float)this;
         }
-
-        public string ToFlatString(SerializationSettings options)
+        else if (type == typeof(double))
         {
-            StringBuilder builder = new StringBuilder();
-            this.ToStringFlatImpl(builder, options);
-            return builder.ToString();
+            if (this.Type == JTokenType.Integer)
+            {
+                //explicit support, because casts are strict for a reason
+                return (double)(long)this;
+            }
+            return (double)this;
         }
-
-        internal abstract void ToStringFlatImpl(StringBuilder builder, SerializationSettings options);
-
-        public abstract JToken DeepClone();
-
-        public static bool DeepEquals(JToken lhs, JToken rhs)
+        else if (type == typeof(decimal))
         {
-            return lhs.DeepEquals(rhs);
+            if (this.Type == JTokenType.Integer)
+            {
+                //explicit support, because casts are strict for a reason
+                return (decimal)(long)this;
+            }
+            return (decimal)this;
         }
-
-        public abstract bool DeepEquals(JToken other);
-
-        public T ToObject<T>()
+        else if (type == typeof(bool))
         {
-            return this.ToObject<T>(ToObjectSettings.DefaultSettings)!;
+            return (bool)this;
         }
-
-        public T ToObject<T>(ToObjectSettings settings)
+        else if (Nullable.GetUnderlyingType(type) != null)
         {
-            return (T)this.ToObject(typeof(T), settings)!;
-        }
-
-        public object? ToObject(Type type)
-        {
-            return this.ToObject(type, ToObjectSettings.DefaultSettings);
-        }
-
-        public object? ToObject(Type type, ToObjectSettings settings)
-        {
-            if (type == typeof(string))
+            if (this.Type == JTokenType.Null)
             {
-                if (this.Type == JTokenType.Null)
-                {
-                    return null;
-                }
-                return (string)this;
+                return null;
             }
-            else if (type == typeof(int))
+            else
             {
-                return (int)this;
-            }
-            else if (type == typeof(long))
-            {
-                return (long)this;
-            }
-            else if (type == typeof(float))
-            {
-                if (this.Type == JTokenType.Integer)
-                {
-                    //explicit support, because casts are strict for a reason
-                    return (float)(long)this;
-                }
-                return (float)this;
-            }
-            else if (type == typeof(double))
-            {
-                if (this.Type == JTokenType.Integer)
-                {
-                    //explicit support, because casts are strict for a reason
-                    return (double)(long)this;
-                }
-                return (double)this;
-            }
-            else if (type == typeof(decimal))
-            {
-                if (this.Type == JTokenType.Integer)
-                {
-                    //explicit support, because casts are strict for a reason
-                    return (decimal)(long)this;
-                }
-                return (decimal)this;
-            }
-            else if (type == typeof(bool))
-            {
-                return (bool)this;
-            }
-            else if (Nullable.GetUnderlyingType(type) != null)
-            {
-                if (this.Type == JTokenType.Null)
-                {
-                    return null;
-                }
-                else
-                {
-                    //wrap value in Nullable<T>
-                    Type valueType = Nullable.GetUnderlyingType(type)!;
-                    object? value = this.ToObject(valueType, settings);
-                    object? result = Activator.CreateInstance(type, new object?[] { value });
-                    return result;
-                }
-            }
-            
-            else if (typeof(IDictionary).IsAssignableFrom(type))
-            {
-                if (type.GenericTypeArguments.Length != 2 || type.GenericTypeArguments[0] != typeof(string))
-                {
-                    throw new ArgumentException($"Cannot convert to dict of type {type.Name}: unexpected generic args");
-                }
-
-                Type valueType = type.GenericTypeArguments[1];
-                Type resultType = typeof(Dictionary<,>).MakeGenericType(typeof(string), valueType);
-
-                if (!type.IsAssignableFrom(resultType))
-                {
-                    throw new ArgumentException($"Cannot convert to dict of type {type.Name}: not assignable from Dictionary");
-                }
-                
-                if (this.Type == JTokenType.Null)
-                {
-                    return null;
-                }
-                else if (this.Type == JTokenType.Object)
-                {
-                    return ConvertToDictionary(resultType, valueType, settings);
-                }
-                else
-                {
-                    throw new ArgumentException($"Cannot convert {this.Type} to dict {type.Name}");
-                }
-            }
-            else if (typeof(IList).IsAssignableFrom(type))
-            {
-                if (type.GenericTypeArguments.Length != 1)
-                {
-                    throw new ArgumentException($"Cannot convert to list of type {type.Name}: unexpected generic args");
-                }
-
-                Type valueType = type.GenericTypeArguments[0];
-                Type resultType = typeof(List<>).MakeGenericType(valueType);
-
-                if (!type.IsAssignableFrom(resultType))
-                {
-                    throw new ArgumentException($"Cannot convert to list of type {type.Name}: not assignable from List");
-                }
-
-                if (this.Type == JTokenType.Null)
-                {
-                    return null;
-                }
-                else if (this.Type == JTokenType.Array)
-                {
-                    return this.ConvertToList(resultType, valueType, settings);
-                }
-                else
-                {
-                    throw new ArgumentException($"Cannot convert {this.Type} to array {type.Name}");
-                }
-            }
-            else if (type.IsEnum)
-            {
-                string? value = (string)this;
-                if (!Enum.TryParse(type, value, out object? result))
-                {
-                    throw new ArgumentException($"Failed to parse '{value}' to enum {type.Name}");
-                }
+                //wrap value in Nullable<T>
+                Type valueType = Nullable.GetUnderlyingType(type)!;
+                object? value = this.ToObject(valueType, settings);
+                object? result = Activator.CreateInstance(type, new object?[] { value });
                 return result;
             }
-            else if (type == typeof(object))
+        }
+
+        else if (typeof(IDictionary).IsAssignableFrom(type))
+        {
+            if (type.GenericTypeArguments.Length != 2 || type.GenericTypeArguments[0] != typeof(string))
             {
-                switch (this.Type)
-                {
+                throw new ArgumentException($"Cannot convert to dict of type {type.Name}: unexpected generic args");
+            }
+
+            Type valueType = type.GenericTypeArguments[1];
+            Type resultType = typeof(Dictionary<,>).MakeGenericType(typeof(string), valueType);
+
+            if (!type.IsAssignableFrom(resultType))
+            {
+                throw new ArgumentException($"Cannot convert to dict of type {type.Name}: not assignable from Dictionary");
+            }
+
+            if (this.Type == JTokenType.Null)
+            {
+                return null;
+            }
+            else if (this.Type == JTokenType.Object)
+            {
+                return ConvertToDictionary(resultType, valueType, settings);
+            }
+            else
+            {
+                throw new ArgumentException($"Cannot convert {this.Type} to dict {type.Name}");
+            }
+        }
+        else if (typeof(IList).IsAssignableFrom(type))
+        {
+            if (type.GenericTypeArguments.Length != 1)
+            {
+                throw new ArgumentException($"Cannot convert to list of type {type.Name}: unexpected generic args");
+            }
+
+            Type valueType = type.GenericTypeArguments[0];
+            Type resultType = typeof(List<>).MakeGenericType(valueType);
+
+            if (!type.IsAssignableFrom(resultType))
+            {
+                throw new ArgumentException($"Cannot convert to list of type {type.Name}: not assignable from List");
+            }
+
+            if (this.Type == JTokenType.Null)
+            {
+                return null;
+            }
+            else if (this.Type == JTokenType.Array)
+            {
+                return this.ConvertToList(resultType, valueType, settings);
+            }
+            else
+            {
+                throw new ArgumentException($"Cannot convert {this.Type} to array {type.Name}");
+            }
+        }
+        else if (type.IsEnum)
+        {
+            string? value = (string)this;
+            if (!Enum.TryParse(type, value, out object? result))
+            {
+                throw new ArgumentException($"Failed to parse '{value}' to enum {type.Name}");
+            }
+            return result;
+        }
+        else if (type == typeof(object))
+        {
+            switch (this.Type)
+            {
                 case JTokenType.Object:
                     return this.ConvertToDictionary(typeof(Dictionary<,>).MakeGenericType(typeof(string), typeof(object)), typeof(object), settings);
                 case JTokenType.Array:
@@ -458,109 +457,109 @@ namespace Jsonata.Net.Native.Json
                     return null;
                 default:
                     throw new ArgumentException($"Cannot convert {this.Type} to object");
-                }
             }
-            else if (type.IsClass)
+        }
+        else if (type.IsClass)
+        {
+            if (this.Type == JTokenType.Null)
             {
-                if (this.Type == JTokenType.Null)
+                return null;
+            }
+            else if (this.Type == JTokenType.Object)
+            {
+                object result;
+                try
                 {
-                    return null;
+                    result = Activator.CreateInstance(type)!;
                 }
-                else if (this.Type == JTokenType.Object)
+                catch (Exception ex)
                 {
-                    object result;
+                    throw new ArgumentException($"Failed to create instance of class {type.Name}: {ex.Message}", ex);
+                }
+
+                Dictionary<string, PropertyInfo> resultProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .ToDictionary(pi => pi.Name);
+
+                JObject thisObj = (JObject)this;
+
+                foreach (KeyValuePair<string, PropertyInfo> resultProperty in resultProperties)
+                {
+                    if (!thisObj.Properties.TryGetValue(resultProperty.Key, out JToken? thisProperty))
+                    {
+                        if (settings.AllowMissingProperties)
+                        {
+                            continue;
+                        }
+                        throw new ArgumentException($"Missing value for '{resultProperty.Key}'");
+                    }
+                    object? value;
                     try
                     {
-                        result = Activator.CreateInstance(type)!;
+                        value = thisProperty.ToObject(resultProperty.Value.PropertyType, settings);
                     }
                     catch (Exception ex)
                     {
-                        throw new ArgumentException($"Failed to create instance of class {type.Name}: {ex.Message}", ex);
+                        throw new ArgumentException($"Failed to convert value for '{resultProperty.Key}': {ex.Message}", ex);
                     }
 
-                    Dictionary<string, PropertyInfo> resultProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                        .ToDictionary(pi => pi.Name);
-
-                    JObject thisObj = (JObject)this;
-
-                    foreach (KeyValuePair<string, PropertyInfo> resultProperty in resultProperties)
+                    try
                     {
-                        if (!thisObj.Properties.TryGetValue(resultProperty.Key, out JToken? thisProperty))
-                        {
-                            if (settings.AllowMissingProperties)
-                            {
-                                continue;
-                            }
-                            throw new ArgumentException($"Missing value for '{resultProperty.Key}'");
-                        }
-                        object? value;
-                        try
-                        {
-                            value = thisProperty.ToObject(resultProperty.Value.PropertyType, settings);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new ArgumentException($"Failed to convert value for '{resultProperty.Key}': {ex.Message}", ex);
-                        }
-
-                        try
-                        {
-                            resultProperty.Value.SetValue(result, value);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new ArgumentException($"Failed to set value for '{resultProperty.Key}': {ex.Message}", ex);
-                        }
+                        resultProperty.Value.SetValue(result, value);
                     }
-
-                    if (!settings.AllowUndecaredProperties && thisObj.Keys.Except(resultProperties.Keys).Any())
+                    catch (Exception ex)
                     {
-                        throw new ArgumentException($"Specified unknown properties: {String.Join(",", thisObj.Keys.Except(resultProperties.Keys))}");
+                        throw new ArgumentException($"Failed to set value for '{resultProperty.Key}': {ex.Message}", ex);
                     }
-
-                    return result;
                 }
-                else
+
+                if (!settings.AllowUndecaredProperties && thisObj.Keys.Except(resultProperties.Keys).Any())
                 {
-                    throw new ArgumentException($"Cannot convert {this.Type} to obj {type.Name}");
+                    throw new ArgumentException($"Specified unknown properties: {String.Join(",", thisObj.Keys.Except(resultProperties.Keys))}");
                 }
+
+                return result;
             }
             else
             {
-                throw new ArgumentException($"Cannot convert {this.Type} to some {type.Name}");
+                throw new ArgumentException($"Cannot convert {this.Type} to obj {type.Name}");
             }
         }
-
-        private object ConvertToList(Type listType, Type valueType, ToObjectSettings settings)
+        else
         {
-            System.Collections.IList result = (System.Collections.IList)Activator.CreateInstance(listType)!;
-            foreach (JToken element in ((JArray)this).ChildrenTokens)
-            {
-                object? value = element.ToObject(valueType, settings);
-                result.Add(value);
-            }
-            return result;
+            throw new ArgumentException($"Cannot convert {this.Type} to some {type.Name}");
         }
+    }
 
-        private object ConvertToDictionary(Type dictionaryType, Type valueType, ToObjectSettings settings)
+    private object ConvertToList(Type listType, Type valueType, ToObjectSettings settings)
+    {
+        System.Collections.IList result = (System.Collections.IList)Activator.CreateInstance(listType)!;
+        foreach (JToken element in ((JArray)this).ChildrenTokens)
         {
-            System.Collections.IDictionary result = (System.Collections.IDictionary)Activator.CreateInstance(dictionaryType)!;
-            foreach (KeyValuePair<string, JToken> property in ((JObject)this).Properties)
-            {
-                object? value = property.Value.ToObject(valueType, settings);
-                result.Add(property.Key, value);
-            }
-            return result;
+            object? value = element.ToObject(valueType, settings);
+            result.Add(value);
         }
+        return result;
+    }
 
-        //see https://stackoverflow.com/questions/19176024/how-to-escape-special-characters-in-building-a-json-string
-        // https://www.freeformatter.com/json-escape.html
-        public static void EscapeString(string source, StringBuilder target)
+    private object ConvertToDictionary(Type dictionaryType, Type valueType, ToObjectSettings settings)
+    {
+        System.Collections.IDictionary result = (System.Collections.IDictionary)Activator.CreateInstance(dictionaryType)!;
+        foreach (KeyValuePair<string, JToken> property in ((JObject)this).Properties)
         {
-            foreach (char c in source)
+            object? value = property.Value.ToObject(valueType, settings);
+            result.Add(property.Key, value);
+        }
+        return result;
+    }
+
+    //see https://stackoverflow.com/questions/19176024/how-to-escape-special-characters-in-building-a-json-string
+    // https://www.freeformatter.com/json-escape.html
+    public static void EscapeString(string source, StringBuilder target)
+    {
+        foreach (char c in source)
+        {
+            switch (c)
             {
-                switch (c)
-                {
                 case '\b':
                     target.Append(@"\b");
                     break;
@@ -585,93 +584,92 @@ namespace Jsonata.Net.Native.Json
                 default:
                     target.Append(c);
                     break;
+            }
+        }
+    }
+
+    // Helper method to parse JSON using System.Text.Json only
+    private static JToken ParseViaSystemTextJson(string jsonText, ParseSettings? settings)
+    {
+        var options = new JsonDocumentOptions
+        {
+            AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+            CommentHandling = JsonCommentHandling.Skip
+        };
+
+        using var doc = JsonDocument.Parse(jsonText, options);
+        return ConvertFromJsonElement(doc.RootElement);
+    }
+
+    private static JToken ConvertFromJsonElement(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Array:
+                {
+                    JArray result = new JArray(element.GetArrayLength());
+                    foreach (JsonElement child in element.EnumerateArray())
+                    {
+                        result.Add(ConvertFromJsonElement(child));
+                    }
+                    return result;
                 }
-            }
-        }
-        
-        // Helper method to parse JSON using System.Text.Json only
-        private static JToken ParseViaSystemTextJson(string jsonText, ParseSettings? settings)
-        {
-            var options = new JsonDocumentOptions
-            {
-                AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
-                CommentHandling = JsonCommentHandling.Skip
-            };
-            
-            using var doc = JsonDocument.Parse(jsonText, options);
-            return ConvertFromJsonElement(doc.RootElement);
-        }
-        
-        private static JToken ConvertFromJsonElement(JsonElement element)
-        {
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Array:
+            case JsonValueKind.True:
+                return new JValue(true);
+            case JsonValueKind.False:
+                return new JValue(false);
+            case JsonValueKind.Number:
+                {
+                    if (element.TryGetInt32(out int intValue))
                     {
-                        JArray result = new JArray(element.GetArrayLength());
-                        foreach (JsonElement child in element.EnumerateArray())
-                        {
-                            result.Add(ConvertFromJsonElement(child));
-                        }
-                        return result;
+                        return new JValue(intValue);
                     }
-                case JsonValueKind.True:
-                    return new JValue(true);
-                case JsonValueKind.False:
-                    return new JValue(false);
-                case JsonValueKind.Number:
+                    else if (element.TryGetInt64(out long longValue))
                     {
-                        if (element.TryGetInt32(out int intValue))
-                        {
-                            return new JValue(intValue);
-                        }
-                        else if (element.TryGetInt64(out long longValue))
-                        {
-                            return new JValue(longValue);
-                        }
-                        else if (element.TryGetDecimal(out decimal decimalValue))
-                        {
-                            return new JValue(decimalValue);
-                        }
-                        else if (element.TryGetDouble(out double doubleValue))
-                        {
-                            return new JValue(doubleValue);
-                        }
-                        else
-                        {
-                            throw new Exception("Failed to parse number from " + element);
-                        }
+                        return new JValue(longValue);
                     }
-                case JsonValueKind.Null:
-                    return JValue.CreateNull();
-                case JsonValueKind.Object:
+                    else if (element.TryGetDecimal(out decimal decimalValue))
                     {
-                        JObject result = new JObject();
-                        foreach (JsonProperty prop in element.EnumerateObject())
-                        {
-                            result.Add(prop.Name, ConvertFromJsonElement(prop.Value));
-                        }
-                        return result;
+                        return new JValue(decimalValue);
                     }
-                case JsonValueKind.String:
-                    return new JValue(element.GetString()!);
-                case JsonValueKind.Undefined:
-                    return JValue.CreateUndefined();
-                default:
-                    throw new ArgumentException("JsonValueKind " + element.ValueKind);
-            }
+                    else if (element.TryGetDouble(out double doubleValue))
+                    {
+                        return new JValue(doubleValue);
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to parse number from " + element);
+                    }
+                }
+            case JsonValueKind.Null:
+                return JValue.CreateNull();
+            case JsonValueKind.Object:
+                {
+                    JObject result = new JObject();
+                    foreach (JsonProperty prop in element.EnumerateObject())
+                    {
+                        result.Add(prop.Name, ConvertFromJsonElement(prop.Value));
+                    }
+                    return result;
+                }
+            case JsonValueKind.String:
+                return new JValue(element.GetString()!);
+            case JsonValueKind.Undefined:
+                return JValue.CreateUndefined();
+            default:
+                throw new ArgumentException("JsonValueKind " + element.ValueKind);
         }
-        
-        private static void ValidateViaSystemTextJson(string jsonText, ParseSettings? settings)
+    }
+
+    private static void ValidateViaSystemTextJson(string jsonText, ParseSettings? settings)
+    {
+        var options = new JsonDocumentOptions
         {
-            var options = new JsonDocumentOptions
-            {
-                AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
-                CommentHandling = JsonCommentHandling.Skip
-            };
-            
-            using var doc = JsonDocument.Parse(jsonText, options);
-            // If parsing succeeds, the JSON is valid according to System.Text.Json standards
-        }
+            AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+            CommentHandling = JsonCommentHandling.Skip
+        };
+
+        using var doc = JsonDocument.Parse(jsonText, options);
+        // If parsing succeeds, the JSON is valid according to System.Text.Json standards
     }
 }

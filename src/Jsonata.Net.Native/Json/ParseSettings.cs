@@ -8,11 +8,13 @@ namespace Jsonata.Net.Native.Json
 {
     public sealed class ParseSettings
     {
-        internal static readonly ParseSettings DefaultSettings = new ParseSettings() {
+        internal static readonly ParseSettings DefaultSettings = new ParseSettings()
+        {
             AllowTrailingComma = true,
         };
 
-        private static readonly ParseSettings s_strictSettings = new ParseSettings() {
+        private static readonly ParseSettings s_strictSettings = new ParseSettings()
+        {
             AllowTrailingComma = false,
         };
 

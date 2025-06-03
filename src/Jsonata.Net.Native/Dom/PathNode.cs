@@ -5,54 +5,53 @@ using System.Text;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Parsing;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+// A PathNode represents a JSON object path. It consists of one
+// or more 'steps' or Nodes (most commonly NameNode objects).
+public sealed class PathNode : Node
 {
-    // A PathNode represents a JSON object path. It consists of one
-    // or more 'steps' or Nodes (most commonly NameNode objects).
-    public sealed class PathNode : Node
+    internal readonly List<Node> steps;
+    public IReadOnlyList<Node> Steps => this.steps;
+    public bool keepArrays { get; }
+
+    public PathNode(List<Node> steps, bool keepArrays)
     {
-        private readonly List<Node> m_steps;
-        public IReadOnlyList<Node> steps => this.m_steps;
-        public bool keepArrays { get; }
+        this.steps = steps;
+        this.keepArrays = keepArrays;
+    }
 
-        public PathNode(List<Node> steps, bool keepArrays)
+    internal override Node optimize()
+    {
+        return this;
+    }
+
+    public override string ToString()
+    {
+        string result = Helpers.JoinNodes(this.Steps, ".");
+        if (this.keepArrays)
         {
-            this.m_steps = steps;
-            this.keepArrays = keepArrays;
+            result += "[]";
         }
+        return result;
+    }
 
-        internal override Node optimize()
-        {
-            return this;
-        }
+    internal void ReplaceLastStep(PredicateNode replacement)
+    {
+        this.steps.RemoveAt(this.steps.Count - 1);
+        this.steps.Add(replacement);
+    }
 
-        public override string ToString()
-        {
-            string result = Helpers.JoinNodes(this.steps, ".");
-            if (this.keepArrays)
-            {
-                result += "[]";
-            }
-            return result;
-        }
+    internal PathNode CloneWithKeepArrays()
+    {
+        return new PathNode(this.steps, keepArrays: true);
+    }
 
-        internal void ReplaceLastStep(PredicateNode replacement)
-        {
-            this.m_steps.RemoveAt(this.m_steps.Count - 1);
-            this.m_steps.Add(replacement);
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        PathNode otherNode = (PathNode)other;
 
-        internal PathNode CloneWithKeepArrays()
-        {
-            return new PathNode(this.m_steps, keepArrays: true);
-        }
-
-        protected override bool EqualsSpecific(Node other)
-        {
-            PathNode otherNode = (PathNode)other;
-
-            return this.keepArrays == otherNode.keepArrays
-                && Helpers.NodeListsEqual(this.m_steps, otherNode.m_steps);
-        }
+        return this.keepArrays == otherNode.keepArrays
+            && Helpers.NodeListsEqual(this.steps, otherNode.steps);
     }
 }

@@ -6,44 +6,43 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
-namespace Jsonata.Net.Native.Tests
+namespace Jsonata.Net.Native.Tests;
+public class DomTests
 {
-    public class DomTests
+
+    private void CheckStructure(string expectedQueryString, Node value)
     {
-
-        private void CheckStructure(string expectedQueryString, Node value)
-        {
-            JsonataQuery expectedQuery = new JsonataQuery(expectedQueryString);
-            Assert.IsTrue(expectedQuery.GetDom().Equals(value), "Structural comparison failed");
-        }
+        JsonataQuery expectedQuery = new JsonataQuery(expectedQueryString);
+        Assert.IsTrue(expectedQuery.GetDom().Equals(value), "Structural comparison failed");
+    }
 
 
-        [Test] 
-        public void TestSimple_1()
-        {
-            string expectedQuery = "$x := $count($foo) > 0";
-            Node node = new AssignmentNode(
-                "x",
-                new ComparisonOperatorNode(
-                    ComparisonOperatorNode.Operator.Greater,
-                    new FunctionCallNode(
-                        "count",
-                        new List<Node>() { new VariableNode("foo") }
-                    ),
-                    new NumberIntNode(0)
-                )
-            );
-            JsonataQuery query = new JsonataQuery(node);
-            string result = query.Eval("{}");
-            Assert.AreEqual("false", result);
-            CheckStructure(expectedQuery, node);
-        }
+    [Test]
+    public void TestSimple_1()
+    {
+        string expectedQuery = "$x := $count($foo) > 0";
+        Node node = new AssignmentNode(
+            "x",
+            new ComparisonOperatorNode(
+                ComparisonOperatorNode.Operator.Greater,
+                new FunctionCallNode(
+                    "count",
+                    new List<Node>() { new VariableNode("foo") }
+                ),
+                new NumberIntNode(0)
+            )
+        );
+        JsonataQuery query = new JsonataQuery(node);
+        string result = query.Eval("{}");
+        Assert.AreEqual("false", result);
+        CheckStructure(expectedQuery, node);
+    }
 
 
-        [Test]
-        public void TestSimple_2()
-        {
-            string expectedQuery = @"
+    [Test]
+    public void TestSimple_2()
+    {
+        string expectedQuery = @"
                 (
                   $factorial := function($x) {
                     $x <= 1 ? 1 : $x * $factorial($x-1)
@@ -52,8 +51,8 @@ namespace Jsonata.Net.Native.Tests
                 )             
             ";
 
-            Node node = new BlockNode(
-                new List<Node> {
+        Node node = new BlockNode(
+            new List<Node> {
                     new AssignmentNode(
                         "factorial",
                         new LambdaNode(
@@ -88,12 +87,11 @@ namespace Jsonata.Net.Native.Tests
                             new NumberIntNode(5)
                         }
                     )
-                }
-            );
-            JsonataQuery query = new JsonataQuery(node);
-            string result = query.Eval("{}");
-            Assert.AreEqual("120", result);
-            CheckStructure(expectedQuery, node);
-        }
+            }
+        );
+        JsonataQuery query = new JsonataQuery(node);
+        string result = query.Eval("{}");
+        Assert.AreEqual("120", result);
+        CheckStructure(expectedQuery, node);
     }
 }

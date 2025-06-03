@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Json
 {
-    public class JValue: JToken
+    public class JValue : JToken
     {
         public static JValue CreateUndefined()
         {
@@ -28,7 +28,7 @@ namespace Jsonata.Net.Native.Json
             this.Value = value;
         }
 
-        public JValue(double value) : this(JTokenType.Float, DoubleToDecimal(value)) {}
+        public JValue(double value) : this(JTokenType.Float, DoubleToDecimal(value)) { }
         public JValue(decimal value) : this(JTokenType.Float, value) { }
         public JValue(long value) : this(JTokenType.Integer, value) { }
         public JValue(int value) : this(JTokenType.Integer, value) { }
@@ -62,35 +62,35 @@ namespace Jsonata.Net.Native.Json
         {
             switch (this.Type)
             {
-            case JTokenType.Null:
-                builder.Append("null");
-                break;
-            case JTokenType.Undefined:
-                builder.Append("undefined");
-                break;
-            case JTokenType.Float:
-                if (this.Value is decimal decimalValue)
-                {
-                    builder.Append(decimalValue.ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
-                }
-                else
-                {
-                    builder.Append(((double)this).ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
-                }
-                break;
-            case JTokenType.Integer:
-                builder.Append(((long)this).ToString(CultureInfo.InvariantCulture));
-                break;
-            case JTokenType.String:
-                builder.Append('"');
-                JToken.EscapeString((string)this, builder);
-                builder.Append('"');
-                break;
-            case JTokenType.Boolean:
-                builder.Append((bool)this? "true" : "false");
-                break;
-            default:
-                throw new Exception("Unexpected type " + this.Type);
+                case JTokenType.Null:
+                    builder.Append("null");
+                    break;
+                case JTokenType.Undefined:
+                    builder.Append("undefined");
+                    break;
+                case JTokenType.Float:
+                    if (this.Value is decimal decimalValue)
+                    {
+                        builder.Append(decimalValue.ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
+                    }
+                    else
+                    {
+                        builder.Append(((double)this).ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
+                    }
+                    break;
+                case JTokenType.Integer:
+                    builder.Append(((long)this).ToString(CultureInfo.InvariantCulture));
+                    break;
+                case JTokenType.String:
+                    builder.Append('"');
+                    JToken.EscapeString((string)this, builder);
+                    builder.Append('"');
+                    break;
+                case JTokenType.Boolean:
+                    builder.Append((bool)this ? "true" : "false");
+                    break;
+                default:
+                    throw new Exception("Unexpected type " + this.Type);
             }
         }
 
@@ -145,43 +145,43 @@ namespace Jsonata.Net.Native.Json
             switch (this.Type)
             {
 
-            case JTokenType.Float:
-                {
-                    try
+                case JTokenType.Float:
                     {
-                        decimal thisV = (decimal)this;
-                        decimal otherV = (decimal)otherValue;
-                        return Decimal.Compare(thisV, otherV) == 0;
+                        try
+                        {
+                            decimal thisV = (decimal)this;
+                            decimal otherV = (decimal)otherValue;
+                            return Decimal.Compare(thisV, otherV) == 0;
+                        }
+                        catch (System.OverflowException)
+                        {
+                            double thisV = (double)this;
+                            double otherV = (double)otherValue;
+                            return ApproxEquals(thisV, otherV);
+                        }
                     }
-                    catch (System.OverflowException)
+                case JTokenType.Integer:
                     {
-                        double thisV = (double)this;
-                        double otherV = (double)otherValue;
-                        return ApproxEquals(thisV, otherV);
+                        long thisV = (long)this;
+                        long otherV = (long)otherValue;
+                        return thisV == otherV;
                     }
-                }
-            case JTokenType.Integer:
-                {
-                    long thisV = (long)this;
-                    long otherV = (long)otherValue;
-                    return thisV == otherV;
-                }
-            case JTokenType.String:
-                {
-                    string thisV = (string)this;
-                    string otherV = (string)other;
-                    return String.CompareOrdinal(thisV, otherV) == 0;
-                }
-            case JTokenType.Boolean:
-                {
-                    bool thisV = (bool)this;
-                    bool otherV = (bool)otherValue;
-                    return thisV == otherV;
-                }
-            case JTokenType.Null:
-            case JTokenType.Undefined:
-            default:
-                throw new Exception("Unexpected type " + this.Type);
+                case JTokenType.String:
+                    {
+                        string thisV = (string)this;
+                        string otherV = (string)other;
+                        return String.CompareOrdinal(thisV, otherV) == 0;
+                    }
+                case JTokenType.Boolean:
+                    {
+                        bool thisV = (bool)this;
+                        bool otherV = (bool)otherValue;
+                        return thisV == otherV;
+                    }
+                case JTokenType.Null:
+                case JTokenType.Undefined:
+                default:
+                    throw new Exception("Unexpected type " + this.Type);
             }
         }
     }

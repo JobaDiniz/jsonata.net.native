@@ -26,8 +26,8 @@ namespace ObjectParsingTestsData
             yield return new TestData("double", 1.1, "1.1");
             yield return new TestData("string", "abc", "\"abc\"");
             yield return new TestData("bool", true, "true");
-            yield return new TestData("list", new List<object?>() { null, 0, 1.1, "a"}, "[null,0,1.1,\"a\"]");
-            yield return new TestData("dict", new Dictionary<string, object?>() { { "a", 0 }, { "b", "c"} }, "{\"a\":0,\"b\":\"c\"}");
+            yield return new TestData("list", new List<object?>() { null, 0, 1.1, "a" }, "[null,0,1.1,\"a\"]");
+            yield return new TestData("dict", new Dictionary<string, object?>() { { "a", 0 }, { "b", "c" } }, "{\"a\":0,\"b\":\"c\"}");
             yield return new TestData("obj", new { a = 0, b = "c" }, "{\"a\":0,\"b\":\"c\"}");
             yield return new TestData("nested", new { a = 0, b = new { c = new int[] { 1 } } }, "{\"a\":0,\"b\":{\"c\":[1]}}");
         }

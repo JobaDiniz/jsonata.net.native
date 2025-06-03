@@ -53,9 +53,9 @@ namespace Jsonata.Net.Native.ResultsExporter.Tests
             string extractFile = Path.Combine(Path.GetTempPath(), $"extract-{Guid.NewGuid()}.txt");
 
             // Act & Assert
-            var exception = Assert.Throws<FileNotFoundException>(() => 
+            var exception = Assert.Throws<FileNotFoundException>(() =>
                 sut.ExtractTestResults(nonExistentFile, extractFile));
-            
+
             Assert.Contains("Test log file not found", exception.Message);
         }
 
@@ -75,15 +75,15 @@ namespace Jsonata.Net.Native.ResultsExporter.Tests
 
                 // Assert
                 var badges = new Dictionary<string, object>();
-                
+
                 foreach (var fileName in new[] { "array-constructor.json", "function-abs.json", "conditional.json", "_all.json" })
                 {
                     string actualFile = Path.Combine(outputDir, fileName);
                     Assert.True(File.Exists(actualFile), $"Badge file {fileName} was not created");
-                    
+
                     string actualJson = await File.ReadAllTextAsync(actualFile);
                     var actualBadge = JsonSerializer.Deserialize<TestResultsBadgeGenerator.BadgeDescription>(actualJson);
-                    
+
                     Assert.NotNull(actualBadge);
                     badges[Path.GetFileNameWithoutExtension(fileName)] = actualBadge;
                 }
@@ -106,9 +106,9 @@ namespace Jsonata.Net.Native.ResultsExporter.Tests
             string outputDir = Path.Combine(Path.GetTempPath(), $"output-{Guid.NewGuid()}");
 
             // Act & Assert
-            var exception = Assert.Throws<FileNotFoundException>(() => 
+            var exception = Assert.Throws<FileNotFoundException>(() =>
                 sut.GenerateBadgeJsonFiles(nonExistentFile, outputDir));
-            
+
             Assert.Contains("Extract file not found", exception.Message);
         }
 
@@ -138,7 +138,7 @@ namespace Jsonata.Net.Native.ResultsExporter.Tests
             Assert.Equal(label, badge.label);
             Assert.Equal(expectedMessage, badge.message);
             Assert.Equal(expectedColor, badge.color);
-            
+
             await Verify(badge).UseDirectory("_Snapshots").UseParameters(label.Replace(" ", "_"));
         }
 
@@ -149,10 +149,10 @@ namespace Jsonata.Net.Native.ResultsExporter.Tests
             var sut = new TestResultsBadgeGenerator();
             string testReportDir = Path.Combine(Path.GetTempPath(), $"report-{Guid.NewGuid()}");
             Directory.CreateDirectory(testReportDir);
-            
+
             string xmlFile = Path.Combine(testReportDir, "Jsonata.Net.Native.TestSuite.xml");
             string sourceXmlFile = Path.Combine(assetsDir, "sample-test-results.xml");
-            
+
             // Copy the sample XML file to the expected location
             File.Copy(sourceXmlFile, xmlFile);
 
@@ -164,10 +164,10 @@ namespace Jsonata.Net.Native.ResultsExporter.Tests
                 // Assert
                 string extractFile = Path.Combine(testReportDir, "extract.txt");
                 string extractDir = Path.Combine(testReportDir, "extract");
-                
+
                 Assert.True(File.Exists(extractFile));
                 Assert.True(Directory.Exists(extractDir));
-                
+
                 // Verify some badge files were created
                 Assert.True(File.Exists(Path.Combine(extractDir, "array-constructor.json")));
                 Assert.True(File.Exists(Path.Combine(extractDir, "function-abs.json")));

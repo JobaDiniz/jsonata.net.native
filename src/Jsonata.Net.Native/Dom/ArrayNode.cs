@@ -5,37 +5,36 @@ using System.Text;
 using System.Threading.Tasks;
 using Jsonata.Net.Native.Parsing;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+// An ArrayNode represents an array of items.
+public sealed class ArrayNode : Node
 {
-    // An ArrayNode represents an array of items.
-    public sealed class ArrayNode : Node
+    internal readonly List<Node> items;
+    public IReadOnlyList<Node> Items => this.items;
+
+    public ArrayNode(List<Node> items)
     {
-        private readonly List<Node> m_items;
-        public IReadOnlyList<Node> items => this.m_items;
+        this.items = items ?? throw new ArgumentNullException(nameof(items));
+    }
 
-        public ArrayNode(List<Node> items)
+    internal override Node optimize()
+    {
+        for (int i = 0; i < this.items.Count; ++i)
         {
-            this.m_items = items ?? throw new ArgumentNullException(nameof(items));
+            this.items[i] = this.items[i].optimize();
         }
+        return this;
+    }
 
-        internal override Node optimize()
-        {
-            for (int i = 0; i < this.m_items.Count; ++i)
-            {
-                this.m_items[i] = this.m_items[i].optimize();
-            }
-            return this;
-        }
+    public override string ToString()
+    {
+        return "[" + Helpers.JoinNodes(this.Items, ", ") + "]";
+    }
 
-        public override string ToString()
-        {
-            return "[" + Helpers.JoinNodes(this.items, ", ") + "]";
-        }
-
-        protected override bool EqualsSpecific(Node other)
-        {
-            ArrayNode otherNode = (ArrayNode)other;
-            return Helpers.NodeListsEqual(this.m_items, otherNode.m_items);
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        ArrayNode otherNode = (ArrayNode)other;
+        return Helpers.NodeListsEqual(this.items, otherNode.items);
     }
 }

@@ -4,70 +4,70 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Dom
+namespace Jsonata.Net.Native.Dom;
+
+public sealed class ComparisonOperatorNode : Node
 {
-    public sealed class ComparisonOperatorNode: Node
+    public enum Operator
     {
-        public enum Operator
+        Equal,
+        NotEqual,
+        Less,
+        LessEqual,
+        Greater,
+        GreaterEqual,
+        In
+    }
+
+    public static string OperatorToString(Operator op) => op switch
+    {
+        Operator.Equal => "=",
+        Operator.NotEqual => "!=",
+        Operator.Less => "<",
+        Operator.LessEqual => "<=",
+        Operator.Greater => ">",
+        Operator.GreaterEqual => ">=",
+        Operator.In => "in",
+        _ => throw new ArgumentException($"Unexpected operator '{op}'")
+    };
+
+    public Operator op { get; }
+    public Node lhs { get; }
+    public Node rhs { get; }
+
+    public ComparisonOperatorNode(Operator op, Node lhs, Node rhs)
+    {
+        this.op = op;
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+
+    internal override Node optimize()
+    {
+        Node lhs = this.lhs.optimize();
+        Node rhs = this.rhs.optimize();
+
+        if (lhs != this.lhs || rhs != this.rhs)
         {
-            Equal,
-            NotEqual,
-            Less,
-            LessEqual,
-            Greater,
-            GreaterEqual,
-            In
+            return new ComparisonOperatorNode(this.op, lhs, rhs);
         }
-
-        public static string OperatorToString(Operator op) => op switch {
-            Operator.Equal => "=",
-            Operator.NotEqual => "!=",
-            Operator.Less => "<",
-            Operator.LessEqual => "<=",
-            Operator.Greater => ">",
-            Operator.GreaterEqual => ">=",
-            Operator.In => "in",
-            _ => throw new ArgumentException($"Unexpected operator '{op}'")
-        };
-
-        public Operator op { get; }
-        public Node lhs { get; }
-        public Node rhs { get; }
-
-        public ComparisonOperatorNode(Operator op, Node lhs, Node rhs)
+        else
         {
-            this.op = op;
-            this.lhs = lhs;
-            this.rhs = rhs;
+            return this;
         }
+    }
 
-        internal override Node optimize()
-        {
-            Node lhs = this.lhs.optimize();
-            Node rhs = this.rhs.optimize();
+    public override string ToString()
+    {
+        return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
+    }
 
-            if (lhs != this.lhs || rhs != this.rhs)
-            {
-                return new ComparisonOperatorNode(this.op, lhs, rhs);
-            }
-            else
-            {
-                return this;
-            }
-        }
+    protected override bool EqualsSpecific(Node other)
+    {
+        ComparisonOperatorNode otherNode = (ComparisonOperatorNode)other;
 
-        public override string ToString()
-        {
-            return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
-        }
-
-        protected override bool EqualsSpecific(Node other)
-        {
-            ComparisonOperatorNode otherNode = (ComparisonOperatorNode)other;
-
-            return this.op == otherNode.op
-                && this.lhs.Equals(otherNode.lhs)
-                && this.rhs.Equals(otherNode.rhs);
-        }
+        return this.op == otherNode.op
+            && this.lhs.Equals(otherNode.lhs)
+            && this.rhs.Equals(otherNode.rhs);
     }
 }

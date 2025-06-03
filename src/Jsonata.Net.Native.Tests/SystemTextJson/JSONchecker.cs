@@ -5,30 +5,28 @@ using Jsonata.Net.Native.SystemTextJson;
 using ObjectParsingTestsData;
 using Xunit;
 
-namespace Jsonata.Net.Native.Tests.SystemTextJson
+namespace Jsonata.Net.Native.Tests.SystemTextJson;
+public class JSONChecker
 {
-    public class JSONChecker
+    [Theory]
+    [MemberData(nameof(JsonCheckerData.GetTestCasesXunit), MemberType = typeof(JsonCheckerData))]
+    public void TestJsonDocument(JsonCheckerData testCase)
     {
-        [Theory]
-        [MemberData(nameof(JsonCheckerData.GetTestCasesXunit), MemberType = typeof(JsonCheckerData))]
-        public void TestJsonDocument(JsonCheckerData testCase)
+        if (testCase.expectedResult != true)
         {
-            if (testCase.expectedResult != true)
-            {
-                Exception exc = Assert.ThrowsAny<Exception>(() => JsonDocument.Parse(testCase.json));
-                Assert.IsType<JsonException>(exc);
-            }
-            else
-            {
-                JsonDocument doc = JsonDocument.Parse(testCase.json);
-                JToken parsed = JsonataExtensions.FromSystemTextJson(doc);
+            Exception exc = Assert.ThrowsAny<Exception>(() => JsonDocument.Parse(testCase.json));
+            Assert.IsType<JsonException>(exc);
+        }
+        else
+        {
+            JsonDocument doc = JsonDocument.Parse(testCase.json);
+            JToken parsed = JsonataExtensions.FromSystemTextJson(doc);
 
-                JToken expected = JToken.Parse(testCase.json);
-                string flatExpected = expected.ToFlatString();
-                string flatParsed = parsed.ToFlatString();
+            JToken expected = JToken.Parse(testCase.json);
+            string flatExpected = expected.ToFlatString();
+            string flatParsed = parsed.ToFlatString();
 
-                Assert.Equal(flatExpected, flatParsed);
-            }
+            Assert.Equal(flatExpected, flatParsed);
         }
     }
 }

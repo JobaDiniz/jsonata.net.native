@@ -6,7 +6,7 @@ using Jsonata.Net.Native.Json;
 
 namespace Jsonata.Net.Native.Eval
 {
-    internal sealed class Sequence: JArray
+    internal sealed class Sequence : JArray
     {
         public bool keepSingletons;
         public bool outerWrapper;
@@ -33,7 +33,8 @@ namespace Jsonata.Net.Native.Eval
 
         protected override JArray DeepCloneArrayNoChildren()
         {
-            return new Sequence() {
+            return new Sequence()
+            {
                 keepSingletons = this.keepSingletons,
                 outerWrapper = this.outerWrapper
             };

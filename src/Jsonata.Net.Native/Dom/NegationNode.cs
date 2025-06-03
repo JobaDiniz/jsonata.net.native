@@ -11,8 +11,8 @@ namespace Jsonata.Net.Native.Dom
     {
         public Node rhs { get; }
 
-        public NegationNode(Node rhs) 
-        { 
+        public NegationNode(Node rhs)
+        {
             this.rhs = rhs;
         }
 
