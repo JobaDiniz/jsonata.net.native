@@ -13,7 +13,7 @@ internal sealed partial class Parser
 
     private Node parseString(Token t)
     {
-        string s = Helpers.Unescape(t.value!);
+        string s = StringUtils.Unescape(t.value!);
         return new StringNode(value: s);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Jsonata.Net.Native.Parsing;
 using Jsonata.Net.Native.Json;
+using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -302,7 +303,7 @@ namespace Jsonata.Net.Native.Eval
         private static JToken evalConditional(ConditionalNode conditionalNode, JToken input, EvaluationEnvironment env)
         {
             JToken condition = Eval(conditionalNode.predicate, input, env);
-            if (Helpers.Booleanize(condition))
+            if (condition.Booleanize())
             {
                 return Eval(conditionalNode.thenExpr, input, env);
             }
@@ -556,14 +557,14 @@ namespace Jsonata.Net.Native.Eval
                     {
                         CheckAppendToken(result, item, index, res);
                     }
-                    else if (Helpers.IsArrayOfNumbers(res))
+                    else if (res.IsArrayOfNumbers())
                     {
                         foreach (JToken subtoken in ((JArray)res).ChildrenTokens)
                         {
                             CheckAppendToken(result, item, index, subtoken);
                         }
                     }
-                    else if (Helpers.Booleanize(res))
+                    else if (res.Booleanize())
                     {
                         result.Add(item);
                     }
@@ -800,7 +801,7 @@ namespace Jsonata.Net.Native.Eval
 
         private static JToken evalBooleanOperator(BooleanOperatorNode booleanOperatorNode, JToken input, EvaluationEnvironment env)
         {
-            bool lhs = Helpers.Booleanize(Eval(booleanOperatorNode.lhs, input, env)); //here undefined works as false? see boolize() in jsonata-js
+            bool lhs = Eval(booleanOperatorNode.lhs, input, env).Booleanize(); //here undefined works as false? see boolize() in jsonata-js
                                                                                       //short-cirquit the operators if possible:
             switch (booleanOperatorNode.op)
             {
@@ -819,7 +820,7 @@ namespace Jsonata.Net.Native.Eval
             };
 
 
-            bool rhs = Helpers.Booleanize(Eval(booleanOperatorNode.rhs, input, env));
+            bool rhs = Eval(booleanOperatorNode.rhs, input, env).Booleanize();
 
             bool result = booleanOperatorNode.op switch
             {

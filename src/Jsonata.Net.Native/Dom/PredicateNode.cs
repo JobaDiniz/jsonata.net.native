@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Jsonata.Net.Native.Parsing;
+using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom;
 
@@ -82,7 +82,7 @@ public sealed class PredicateNode : Node
 
     public override string ToString()
     {
-        return $"{this.expr}[{Helpers.JoinNodes(this.filters, ", ")}]";
+        return $"{this.expr}[{this.filters.JoinNodes(", ")}]";
     }
 
     protected override bool EqualsSpecific(Node other)
@@ -90,6 +90,6 @@ public sealed class PredicateNode : Node
         PredicateNode otherNode = (PredicateNode)other;
 
         return this.expr.Equals(otherNode.expr)
-            && Helpers.NodeListsEqual(this.filters, otherNode.filters);
+            && NodeListExtensions.NodeListsEqual(this.filters, otherNode.filters);
     }
 }

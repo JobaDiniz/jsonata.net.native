@@ -1,5 +1,6 @@
 using Jsonata.Net.Native.Json;
 using Jsonata.Net.Native.Eval;
+using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ public static class HigherOrderFunctions
             context: null,
             env: null! //TODO: pass some real environment?
         );
-        bool result = Eval.Helpers.Booleanize(res);
+        bool result = res.Booleanize();
         return result;
     }
 
@@ -274,7 +275,7 @@ public static class HigherOrderFunctions
                 context: null,
                 env: null! //TODO: pass some real environment?
             );
-            bool result = Eval.Helpers.Booleanize(res);
+            bool result = res.Booleanize();
             return result;
         }
     }

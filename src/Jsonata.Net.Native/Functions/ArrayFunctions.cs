@@ -1,5 +1,6 @@
 using Jsonata.Net.Native.Json;
 using Jsonata.Net.Native.Eval;
+using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,11 +104,11 @@ public static class ArrayFunctions
 
         if (function == null || function.Type == JTokenType.Undefined)
         {
-            if (Eval.Helpers.IsArrayOfNumbers(array))
+            if (array.IsArrayOfNumbers())
             {
-                comparator = (a, b) => Eval.Helpers.GetDoubleValue(a).CompareTo(Eval.Helpers.GetDoubleValue(b));
+                comparator = (a, b) => a.GetDoubleValue().CompareTo(b.GetDoubleValue());
             }
-            else if (Eval.Helpers.IsArrayOfStrings(array))
+            else if (array.IsArrayOfStrings())
             {
                 comparator = (a, b) => String.CompareOrdinal((string)a!, (string)b!);
             }
@@ -126,7 +127,7 @@ public static class ArrayFunctions
                     context: null,
                     env: null! //TODO: pass some real environment?
                 );
-                bool result = Eval.Helpers.Booleanize(res);
+                bool result = res.Booleanize();
                 return result ? 1 : -1; //may cause problems because of no zero (
             };
         }
@@ -341,7 +342,7 @@ public static class ArrayFunctions
                 throw new JsonataException("T0410", $"Argument 1 of function {nameof(Sum)} should be an array of numbers, but specified {arg.Type}");
         }
 
-        decimal result = Eval.Helpers.EnumerateNumericArray((JArray)arg, nameof(Sum), 1).Sum();
+        decimal result = ((JArray)arg).EnumerateNumericValues(nameof(Sum), 1).Sum();
         return FunctionToken.ReturnDecimalResult(result);
     }
 
@@ -368,7 +369,7 @@ public static class ArrayFunctions
 
         decimal result = Decimal.MinValue;
         bool found = false;
-        foreach (decimal value in Eval.Helpers.EnumerateNumericArray((JArray)arg, nameof(Max), 1))
+        foreach (decimal value in ((JArray)arg).EnumerateNumericValues(nameof(Max), 1))
         {
             if (value > result)
             {
@@ -408,7 +409,7 @@ public static class ArrayFunctions
 
         decimal result = Decimal.MaxValue;
         bool found = false;
-        foreach (decimal value in Eval.Helpers.EnumerateNumericArray((JArray)arg, nameof(Min), 1))
+        foreach (decimal value in ((JArray)arg).EnumerateNumericValues(nameof(Min), 1))
         {
             if (value < result)
             {
@@ -447,7 +448,7 @@ public static class ArrayFunctions
 
         decimal result = 0;
         int count = 0;
-        foreach (decimal value in Eval.Helpers.EnumerateNumericArray((JArray)arg, nameof(Average), 1))
+        foreach (decimal value in ((JArray)arg).EnumerateNumericValues(nameof(Average), 1))
         {
             result += value;
             ++count;

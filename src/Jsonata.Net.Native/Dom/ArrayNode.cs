@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Jsonata.Net.Native.Parsing;
+using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom;
 
@@ -29,12 +29,12 @@ public sealed class ArrayNode : Node
 
     public override string ToString()
     {
-        return "[" + Helpers.JoinNodes(this.Items, ", ") + "]";
+        return "[" + this.Items.JoinNodes(", ") + "]";
     }
 
     protected override bool EqualsSpecific(Node other)
     {
         ArrayNode otherNode = (ArrayNode)other;
-        return Helpers.NodeListsEqual(this.items, otherNode.items);
+        return NodeListExtensions.NodeListsEqual(this.items, otherNode.items);
     }
 }

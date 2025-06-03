@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Jsonata.Net.Native.Parsing;
+using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom;
 
@@ -28,7 +28,7 @@ public sealed class PathNode : Node
 
     public override string ToString()
     {
-        string result = Helpers.JoinNodes(this.Steps, ".");
+        string result = this.Steps.JoinNodes(".");
         if (this.keepArrays)
         {
             result += "[]";
@@ -52,6 +52,6 @@ public sealed class PathNode : Node
         PathNode otherNode = (PathNode)other;
 
         return this.keepArrays == otherNode.keepArrays
-            && Helpers.NodeListsEqual(this.steps, otherNode.steps);
+            && NodeListExtensions.NodeListsEqual(this.steps, otherNode.steps);
     }
 }

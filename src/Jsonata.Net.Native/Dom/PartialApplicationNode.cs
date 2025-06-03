@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Jsonata.Net.Native.Parsing;
+using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Dom
 {
@@ -36,7 +36,7 @@ namespace Jsonata.Net.Native.Dom
             PartialApplicationNode otherNode = (PartialApplicationNode)other;
 
             return this.func.Equals(otherNode.func)
-                && Helpers.NodeListsEqual(this.args, otherNode.args);
+                && NodeListExtensions.NodeListsEqual(this.args, otherNode.args);
         }
     }
 }

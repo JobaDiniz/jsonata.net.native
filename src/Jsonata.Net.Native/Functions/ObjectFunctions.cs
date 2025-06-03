@@ -1,5 +1,6 @@
 using Jsonata.Net.Native.Json;
 using Jsonata.Net.Native.Eval;
+using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
