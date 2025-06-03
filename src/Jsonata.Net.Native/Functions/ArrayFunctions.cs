@@ -121,8 +121,7 @@ public static class ArrayFunctions
         {
             comparator = (a, b) =>
             {
-                JToken res = EvalProcessor.InvokeFunction(
-                    function: (FunctionToken)function,
+                JToken res = function.TryInvoke(
                     args: new List<JToken>() { a, b },
                     context: null,
                     env: null! //TODO: pass some real environment?

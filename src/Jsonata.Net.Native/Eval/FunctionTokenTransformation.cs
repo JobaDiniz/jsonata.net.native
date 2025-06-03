@@ -20,14 +20,16 @@ namespace Jsonata.Net.Native.Eval
         internal readonly Node updates;
         internal readonly Node? deletes;
         internal readonly EvaluationEnvironment environment;
+        private readonly EvalProcessor evalProcessor;
 
-        public FunctionTokenTransformation(Node pattern, Node updates, Node? deletes, EvaluationEnvironment environment)
+        public FunctionTokenTransformation(Node pattern, Node updates, Node? deletes, EvaluationEnvironment environment, EvalProcessor evalProcessor)
             : base("transform", 1)
         {
             this.pattern = pattern;
             this.updates = updates;
             this.deletes = deletes;
             this.environment = environment;
+            this.evalProcessor = evalProcessor;
         }
 
         /**
@@ -59,7 +61,7 @@ namespace Jsonata.Net.Native.Eval
 
             JToken arg = args[0].DeepClone();
 
-            JToken matches = EvalProcessor.Eval(this.pattern, arg, this.environment);
+            JToken matches = this.evalProcessor.Eval(this.pattern, arg, this.environment);
             if (matches.Type != JTokenType.Undefined)
             {
                 if (matches.Type != JTokenType.Array)
@@ -89,7 +91,7 @@ namespace Jsonata.Net.Native.Eval
 
             //update
             {
-                JToken update = EvalProcessor.Eval(this.updates, item, this.environment);
+                JToken update = this.evalProcessor.Eval(this.updates, item, this.environment);
                 if (update.Type != JTokenType.Undefined)
                 {
                     if (update.Type != JTokenType.Object)
@@ -104,7 +106,7 @@ namespace Jsonata.Net.Native.Eval
             //delete
             if (this.deletes != null)
             {
-                JToken delete = EvalProcessor.Eval(this.deletes, item, this.environment);
+                JToken delete = this.evalProcessor.Eval(this.deletes, item, this.environment);
                 if (delete.Type != JTokenType.Undefined)
                 {
                     switch (delete.Type)
@@ -139,7 +141,7 @@ namespace Jsonata.Net.Native.Eval
 
         public override JToken DeepClone()
         {
-            return new FunctionTokenTransformation(this.pattern, this.updates, this.deletes, this.environment);
+            return new FunctionTokenTransformation(this.pattern, this.updates, this.deletes, this.environment, this.evalProcessor);
         }
 
         protected override void ClearParentNested()

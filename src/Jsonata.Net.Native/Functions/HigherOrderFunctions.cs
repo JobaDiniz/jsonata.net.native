@@ -28,8 +28,7 @@ public static class HigherOrderFunctions
         {
             args.Add(array);
         };
-        JToken res = EvalProcessor.InvokeFunction(
-            function: function,
+        JToken res = ((JToken)function).TryInvoke(
             args: args,
             context: null,
             env: null! //TODO: pass some real environment?
@@ -72,8 +71,7 @@ public static class HigherOrderFunctions
             {
                 args.Add(array);
             };
-            JToken res = EvalProcessor.InvokeFunction(
-                function: function,
+            JToken res = ((JToken)function).TryInvoke(
                 args: args,
                 context: null,
                 env: null! //TODO: pass some real environment?
@@ -212,8 +210,7 @@ public static class HigherOrderFunctions
             {
                 args.Add(array);
             };
-            accumulator = EvalProcessor.InvokeFunction(
-                function: function,
+            accumulator = ((JToken)function).TryInvoke(
                 args: args,
                 context: null,
                 env: null! //TODO: pass some real environment?
@@ -269,8 +266,7 @@ public static class HigherOrderFunctions
             {
                 args.Add(obj);
             };
-            JToken res = EvalProcessor.InvokeFunction(
-                function: function,
+            JToken res = ((JToken)function).TryInvoke(
                 args: args,
                 context: null,
                 env: null! //TODO: pass some real environment?

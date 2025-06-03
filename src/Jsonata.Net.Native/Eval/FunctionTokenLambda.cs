@@ -18,9 +18,10 @@ internal sealed class FunctionTokenLambda : FunctionToken
     internal readonly Node body;
     internal readonly JToken context;
     internal readonly EvaluationEnvironment environment;
+    private readonly EvalProcessor evalProcessor;
 
 
-    private FunctionTokenLambda(ProcessedSignature? processedSignature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment)
+    private FunctionTokenLambda(ProcessedSignature? processedSignature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment, EvalProcessor evalProcessor)
         : base("lambda", paramNames.Count)
     {
         this.signature = processedSignature;
@@ -28,13 +29,14 @@ internal sealed class FunctionTokenLambda : FunctionToken
         this.body = body;
         this.context = context;
         this.environment = environment;
+        this.evalProcessor = evalProcessor;
     }
 
 
-    internal FunctionTokenLambda(LambdaNode.Signature? signature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment)
+    internal FunctionTokenLambda(LambdaNode.Signature? signature, IReadOnlyList<string> paramNames, Node body, JToken context, EvaluationEnvironment environment, EvalProcessor evalProcessor)
         : this(
               signature != null ? new ProcessedSignature(signature) : null,
-              paramNames, body, context, environment
+              paramNames, body, context, environment, evalProcessor
         )
     {
     }
@@ -66,7 +68,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
             executionEnv.BindValue(name, value);
         };
 
-        JToken result = EvalProcessor.Eval(this.body, this.context, executionEnv);
+        JToken result = this.evalProcessor.Eval(this.body, this.context, executionEnv);
         return result;
     }
 
@@ -95,7 +97,7 @@ internal sealed class FunctionTokenLambda : FunctionToken
 
     public override JToken DeepClone()
     {
-        return new FunctionTokenLambda(this.signature, this.paramNames, this.body, context.DeepClone(), this.environment);
+        return new FunctionTokenLambda(this.signature, this.paramNames, this.body, context.DeepClone(), this.environment, this.evalProcessor);
     }
 
     protected override void ClearParentNested()

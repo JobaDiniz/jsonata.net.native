@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jsonata.Net.Native.Json;
+using Jsonata.Net.Native.Eval;
 
 namespace Jsonata.Net.Native.Extensions;
 
@@ -151,5 +152,23 @@ internal static class JTokenExtensions
                     throw new JsonataException("T0412", $"Argument {argIndex} of function {functionName} must be an array of numbers. Got {token.Type}");
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to invoke the token as a function with the specified arguments.
+    /// </summary>
+    /// <param name="token">The token to invoke as a function</param>
+    /// <param name="args">The arguments to pass to the function</param>
+    /// <param name="context">The context value for the function call</param>
+    /// <param name="env">The evaluation environment</param>
+    /// <returns>The result of the function invocation</returns>
+    /// <exception cref="JsonataException">Thrown if the token is not a function</exception>
+    public static JToken TryInvoke(this JToken token, List<JToken> args, JToken? context, EvaluationEnvironment env)
+    {
+        if (token is FunctionToken function)
+        {
+            return function.Invoke(args, context, env);
+        }
+        throw new JsonataException("T1006", $"Attempted to invoke a non-function '{token.ToFlatString()}'");
     }
 }

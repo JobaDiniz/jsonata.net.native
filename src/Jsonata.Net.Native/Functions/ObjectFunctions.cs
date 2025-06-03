@@ -223,8 +223,7 @@ public static class ObjectFunctions
             {
                 args.Add(new JValue(prop.Key));
             };
-            JToken res = EvalProcessor.InvokeFunction(
-                function: function,
+            JToken res = ((JToken)function).TryInvoke(
                 args: args,
                 context: null,
                 env: null! //TODO: pass some real environment?

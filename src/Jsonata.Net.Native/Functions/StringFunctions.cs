@@ -1,5 +1,6 @@
 using Jsonata.Net.Native.Json;
 using Jsonata.Net.Native.Eval;
+using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -598,7 +599,7 @@ public static class StringFunctions
                                         builder.Append(str.Substring(replaceStartAt, match.Index - replaceStartAt));
                                     };
                                     JObject matchObject = FunctionTokenRegex.ConvertRegexMatch(match);
-                                    JToken replacementToken = EvalProcessor.InvokeFunction(replacementFunction, new List<JToken>() { matchObject }, null, env);
+                                    JToken replacementToken = ((JToken)replacementFunction).TryInvoke(new List<JToken>() { matchObject }, null, env);
                                     if (replacementToken.Type != JTokenType.String)
                                     {
                                         throw new JsonataException("D3012", "Attempted to replace a matched string with a non-string value");

@@ -13,6 +13,7 @@ namespace Jsonata.Net.Native;
 public sealed class JsonataQuery
 {
     private readonly Node node;
+    private readonly EvalProcessor evalProcessor;
 
     public JsonataQuery(string queryText)
         : this(Parser.Parse(queryText))
@@ -22,6 +23,7 @@ public sealed class JsonataQuery
     internal JsonataQuery(Node node)
     {
         this.node = node.optimize();
+        this.evalProcessor = new EvalProcessor();
     }
 
     public string Eval(string dataJson)
@@ -42,12 +44,12 @@ public sealed class JsonataQuery
         {
             env = EvaluationEnvironment.DefaultEnvironment;
         };
-        return EvalProcessor.EvaluateJson(this.node, data, env);
+        return this.evalProcessor.EvaluateJson(this.node, data, env);
     }
 
     public JToken Eval(JToken data, EvaluationEnvironment environment)
     {
-        return EvalProcessor.EvaluateJson(this.node, data, environment);
+        return this.evalProcessor.EvaluateJson(this.node, data, environment);
     }
 
     public override string ToString()
