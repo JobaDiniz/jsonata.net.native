@@ -1,8 +1,7 @@
-using Jsonata.Net.Native.Eval;
 using System;
 using System.Globalization;
 
-namespace Jsonata.Net.Native.Functions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Provides date and time manipulation functions for JSONata expressions.

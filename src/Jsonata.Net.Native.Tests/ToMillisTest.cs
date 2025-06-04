@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using Jsonata.Net.Native.Functions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;

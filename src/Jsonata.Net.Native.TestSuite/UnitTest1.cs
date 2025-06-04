@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
-using Jsonata.Net.Native.SystemTextJson;
 
 namespace Jsonata.Net.Native.TestSuite;
 public sealed class Tests

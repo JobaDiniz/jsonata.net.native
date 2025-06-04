@@ -1,0 +1,73 @@
+﻿using System;
+
+namespace Jsonata.Net.Native.Syntax;
+
+/// <summary>
+/// Represents a comparison expression in a JSONata query.
+/// Performs equality, relational, and membership comparisons between operands.
+/// </summary>
+internal sealed class ComparisonOperatorNode : Node
+{
+    internal enum Operator
+    {
+        Equal,
+        NotEqual,
+        Less,
+        LessEqual,
+        Greater,
+        GreaterEqual,
+        In
+    }
+
+    public static string OperatorToString(Operator op) => op switch
+    {
+        Operator.Equal => "=",
+        Operator.NotEqual => "!=",
+        Operator.Less => "<",
+        Operator.LessEqual => "<=",
+        Operator.Greater => ">",
+        Operator.GreaterEqual => ">=",
+        Operator.In => "in",
+        _ => throw new ArgumentException($"Unexpected operator '{op}'")
+    };
+
+    public Operator op { get; }
+    public Node lhs { get; }
+    public Node rhs { get; }
+
+    public ComparisonOperatorNode(Operator op, Node lhs, Node rhs)
+    {
+        this.op = op;
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+
+    internal override Node optimize()
+    {
+        Node lhs = this.lhs.optimize();
+        Node rhs = this.rhs.optimize();
+
+        if (lhs != this.lhs || rhs != this.rhs)
+        {
+            return new ComparisonOperatorNode(this.op, lhs, rhs);
+        }
+        else
+        {
+            return this;
+        }
+    }
+
+    public override string ToString()
+    {
+        return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
+    }
+
+    protected override bool EqualsSpecific(Node other)
+    {
+        ComparisonOperatorNode otherNode = (ComparisonOperatorNode)other;
+
+        return this.op == otherNode.op
+            && this.lhs.Equals(otherNode.lhs)
+            && this.rhs.Equals(otherNode.rhs);
+    }
+}

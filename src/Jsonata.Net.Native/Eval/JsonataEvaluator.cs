@@ -1,8 +1,8 @@
 using Jsonata.Net.Native.Json;
 using System;
-using Jsonata.Net.Native.Dom;
+using Jsonata.Net.Native.Syntax;
 
-namespace Jsonata.Net.Native.Eval;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Delegate for evaluating JSONata expression nodes.

@@ -1,9 +1,8 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Dom;
-using Jsonata.Net.Native.Extensions;
+using Jsonata.Net.Native.Syntax;
 using System;
 
-namespace Jsonata.Net.Native.Eval;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Evaluates operator nodes including arithmetic, comparison, boolean, negation, and string concatenation operations.

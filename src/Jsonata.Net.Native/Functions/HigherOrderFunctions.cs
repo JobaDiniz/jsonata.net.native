@@ -1,11 +1,9 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Eval;
-using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Jsonata.Net.Native.Functions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Provides higher-order functions that operate on arrays and objects using callback functions for JSONata expressions.

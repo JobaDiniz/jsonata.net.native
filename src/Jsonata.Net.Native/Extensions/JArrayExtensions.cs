@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Jsonata.Net.Native.Json;
 
-namespace Jsonata.Net.Native.Extensions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Extension methods for JArray.

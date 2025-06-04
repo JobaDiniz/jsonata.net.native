@@ -12,7 +12,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using Jsonata.Net.Native.Eval;
 
 namespace Jsonata.Net.Native.Json;
 

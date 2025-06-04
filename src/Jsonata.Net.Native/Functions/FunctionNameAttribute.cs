@@ -1,6 +1,6 @@
 using System;
 
-namespace Jsonata.Net.Native.Functions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Specifies the JSONata function name for a method when it differs from the C# method name.

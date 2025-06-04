@@ -1,6 +1,4 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Eval;
-using Jsonata.Net.Native.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Functions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Provides string manipulation and conversion functions for JSONata expressions.

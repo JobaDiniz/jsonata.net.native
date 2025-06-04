@@ -1,10 +1,9 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Dom;
-using Jsonata.Net.Native.Extensions;
+using Jsonata.Net.Native.Syntax;
 using System;
 using System.Collections.Generic;
 
-namespace Jsonata.Net.Native.Eval;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Evaluates functional nodes including variables, lambdas, function calls, partial application, and object transformations.

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Jsonata.Net.Native.Extensions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Extension methods for StringBuilder to support JSON formatting.

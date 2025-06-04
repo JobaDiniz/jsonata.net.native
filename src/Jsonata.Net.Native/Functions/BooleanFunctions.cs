@@ -1,8 +1,7 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Eval;
 using System;
 
-namespace Jsonata.Net.Native.Functions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Provides boolean operations and conversion functions for JSONata expressions.

@@ -1,8 +1,7 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Dom;
-using System;
+using Jsonata.Net.Native.Syntax;
 
-namespace Jsonata.Net.Native.Eval;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Evaluates literal value nodes including strings, numbers, booleans, null, and regular expressions.

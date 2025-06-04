@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Eval;
 
 namespace Jsonata.Net.Native.Tests;
 

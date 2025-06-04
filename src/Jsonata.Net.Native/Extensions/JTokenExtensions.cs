@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Eval;
 
-namespace Jsonata.Net.Native.Extensions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Extension methods for JToken and related JSON types.

@@ -1,11 +1,8 @@
 using Jsonata.Net.Native.Json;
-using Jsonata.Net.Native.Dom;
-using Jsonata.Net.Native.Extensions;
-using System;
+using Jsonata.Net.Native.Syntax;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Jsonata.Net.Native.Eval;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Evaluates path-related nodes including field access, parent references, wildcards, descendant searches, and path traversal.

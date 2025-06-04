@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Jsonata.Net.Native.Extensions;
 
 namespace Jsonata.Net.Native.Json;
 

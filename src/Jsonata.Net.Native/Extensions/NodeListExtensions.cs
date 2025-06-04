@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Jsonata.Net.Native.Dom;
+using Jsonata.Net.Native.Syntax;
 
-namespace Jsonata.Net.Native.Extensions;
+namespace Jsonata.Net.Native;
 
 /// <summary>
 /// Extension methods for Node collections.

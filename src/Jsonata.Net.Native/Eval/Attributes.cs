@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Jsonata.Net.Native.Eval
+namespace Jsonata.Net.Native
 {
     //provides support for cases when
     // "undefined inputs always return undefined"
