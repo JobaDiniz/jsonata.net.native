@@ -13,8 +13,13 @@ internal sealed class WildcardNode() : Node
         return "*";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        return true;
+        return other is WildcardNode;
+    }
+
+    public override int GetHashCode()
+    {
+        return typeof(WildcardNode).GetHashCode();
     }
 }

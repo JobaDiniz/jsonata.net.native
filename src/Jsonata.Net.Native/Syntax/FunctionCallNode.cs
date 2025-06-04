@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Jsonata.Net.Native.Syntax;
@@ -36,11 +37,16 @@ internal sealed class FunctionCallNode : Node
         return $"{this.func}({this.args.JoinNodes(", ")})";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        FunctionCallNode otherNode = (FunctionCallNode)other;
+        return other is FunctionCallNode otherCall &&
+               this.func.Equals(otherCall.func) &&
+               NodeListExtensions.NodeListsEqual(this.args, otherCall.args);
+    }
 
-        return this.func.Equals(otherNode.func)
-            && NodeListExtensions.NodeListsEqual(this.args, otherNode.args);
+    public override int GetHashCode()
+    {
+        var argsHash = args.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode()));
+        return HashCode.Combine(func, argsHash);
     }
 }

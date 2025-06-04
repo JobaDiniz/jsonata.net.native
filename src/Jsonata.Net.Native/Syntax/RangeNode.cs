@@ -1,4 +1,6 @@
-﻿namespace Jsonata.Net.Native.Syntax;
+﻿using System;
+
+namespace Jsonata.Net.Native.Syntax;
 
 // A RangeNode represents the range operator.
 internal sealed class RangeNode : Node
@@ -31,11 +33,15 @@ internal sealed class RangeNode : Node
         return this.lhs.ToString() + ".." + this.rhs.ToString();
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        RangeNode otherNode = (RangeNode)other;
+        return other is RangeNode otherRange &&
+               this.lhs.Equals(otherRange.lhs) &&
+               this.rhs.Equals(otherRange.rhs);
+    }
 
-        return this.lhs.Equals(otherNode.lhs)
-            && this.rhs.Equals(otherNode.rhs);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(lhs, rhs);
     }
 }

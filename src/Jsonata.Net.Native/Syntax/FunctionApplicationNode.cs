@@ -1,4 +1,6 @@
-﻿namespace Jsonata.Net.Native.Syntax;
+﻿using System;
+
+namespace Jsonata.Net.Native.Syntax;
 
 // A FunctionApplicationNode represents a function application
 // operation.
@@ -32,11 +34,15 @@ internal sealed class FunctionApplicationNode : Node
         return $"{this.lhs} ~> {this.rhs}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        FunctionApplicationNode otherNode = (FunctionApplicationNode)other;
+        return other is FunctionApplicationNode otherApp &&
+               this.lhs.Equals(otherApp.lhs) &&
+               this.rhs.Equals(otherApp.rhs);
+    }
 
-        return this.lhs.Equals(otherNode.lhs)
-            && this.rhs.Equals(otherNode.rhs);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(lhs, rhs);
     }
 }

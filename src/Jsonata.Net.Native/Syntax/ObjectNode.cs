@@ -33,25 +33,28 @@ internal sealed class ObjectNode : Node
         return "{" + String.Join(", ", this.Pairs.Select(p => p.Item1.ToString() + ": " + p.Item2.ToString())) + "}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        ObjectNode otherNode = (ObjectNode)other;
-
-        if (this.pairs.Count != otherNode.pairs.Count)
+        if (other is not ObjectNode otherObj || this.pairs.Count != otherObj.pairs.Count)
         {
             return false;
         }
 
-        //TODO: in case order is not preserved, this will not work (
+        //TODO: in case order is not preserved, this will not work
         for (int i = 0; i < this.pairs.Count; ++i)
         {
-            if (!this.pairs[i].Item1.Equals(otherNode.pairs[i].Item1)
-                || !this.pairs[i].Item2.Equals(otherNode.pairs[i].Item2)
-            )
+            if (!this.pairs[i].Item1.Equals(otherObj.pairs[i].Item1) ||
+                !this.pairs[i].Item2.Equals(otherObj.pairs[i].Item2))
             {
                 return false;
             }
         }
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        return pairs.Aggregate(0, (hash, pair) => 
+            HashCode.Combine(hash, pair.Item1.GetHashCode(), pair.Item2.GetHashCode()));
     }
 }

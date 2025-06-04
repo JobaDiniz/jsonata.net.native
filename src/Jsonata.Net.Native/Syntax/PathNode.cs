@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Jsonata.Net.Native.Syntax;
 
@@ -44,11 +46,16 @@ internal sealed class PathNode : Node
         return new PathNode(this.steps, keepArrays: true);
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        PathNode otherNode = (PathNode)other;
+        return other is PathNode otherPath && 
+               this.keepArrays == otherPath.keepArrays &&
+               NodeListExtensions.NodeListsEqual(this.steps, otherPath.steps);
+    }
 
-        return this.keepArrays == otherNode.keepArrays
-            && NodeListExtensions.NodeListsEqual(this.steps, otherNode.steps);
+    public override int GetHashCode()
+    {
+        var stepsHash = steps.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode()));
+        return HashCode.Combine(keepArrays, stepsHash);
     }
 }

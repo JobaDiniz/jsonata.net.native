@@ -23,9 +23,13 @@ internal sealed class BooleanNode : Node
         return this.value.ToString();
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        BooleanNode otherNode = (BooleanNode)other;
-        return otherNode.value == this.value;
+        return other is BooleanNode otherBool && this.value == otherBool.value;
+    }
+
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
     }
 }

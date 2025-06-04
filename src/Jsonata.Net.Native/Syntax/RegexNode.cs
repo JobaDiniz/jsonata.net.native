@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Jsonata.Net.Native.Syntax;
@@ -40,11 +41,15 @@ internal sealed class RegexNode : Node
         return builder.ToString();
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        RegexNode otherNode = (RegexNode)other;
+        return other is RegexNode otherRegex &&
+               this.regex.Options == otherRegex.regex.Options &&
+               this.regex.ToString() == otherRegex.regex.ToString();
+    }
 
-        return this.regex.Options == otherNode.regex.Options
-            && this.regex.ToString() == otherNode.regex.ToString();
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(regex.ToString(), regex.Options);
     }
 }

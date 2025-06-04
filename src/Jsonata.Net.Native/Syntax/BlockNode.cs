@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jsonata.Net.Native.Syntax;
 
@@ -31,9 +32,14 @@ internal sealed class BlockNode : Node
         return "(" + this.expressions.JoinNodes("; ") + ")";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        BlockNode otherNode = (BlockNode)other;
-        return NodeListExtensions.NodeListsEqual(this.expressions, otherNode.expressions);
+        return other is BlockNode otherBlock &&
+               NodeListExtensions.NodeListsEqual(this.expressions, otherBlock.expressions);
+    }
+
+    public override int GetHashCode()
+    {
+        return expressions.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode()));
     }
 }

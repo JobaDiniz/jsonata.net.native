@@ -1,4 +1,6 @@
-﻿namespace Jsonata.Net.Native.Syntax;
+﻿using System;
+
+namespace Jsonata.Net.Native.Syntax;
 
 /// <summary>
 /// Represents a conditional (ternary) expression in a JSONata query.
@@ -48,14 +50,17 @@ internal sealed class ConditionalNode : Node
         }
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        ConditionalNode otherNode = (ConditionalNode)other;
+        return other is ConditionalNode otherCond &&
+               this.predicate.Equals(otherCond.predicate) &&
+               this.thenExpr.Equals(otherCond.thenExpr) &&
+               ((this.elseExpr == null && otherCond.elseExpr == null) ||
+                (this.elseExpr != null && otherCond.elseExpr != null && this.elseExpr.Equals(otherCond.elseExpr)));
+    }
 
-        return this.predicate.Equals(otherNode.predicate)
-            && this.thenExpr.Equals(otherNode.thenExpr)
-            && ((this.elseExpr == null && otherNode.elseExpr == null)
-                || (this.elseExpr != null && otherNode.elseExpr != null && this.elseExpr.Equals(otherNode.elseExpr))
-            );
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(predicate, thenExpr, elseExpr);
     }
 }

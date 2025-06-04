@@ -62,12 +62,16 @@ internal sealed class ComparisonOperatorNode : Node
         return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        ComparisonOperatorNode otherNode = (ComparisonOperatorNode)other;
+        return other is ComparisonOperatorNode otherComp &&
+               this.op == otherComp.op &&
+               this.lhs.Equals(otherComp.lhs) &&
+               this.rhs.Equals(otherComp.rhs);
+    }
 
-        return this.op == otherNode.op
-            && this.lhs.Equals(otherNode.lhs)
-            && this.rhs.Equals(otherNode.rhs);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(op, lhs, rhs);
     }
 }

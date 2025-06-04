@@ -36,8 +36,14 @@ internal sealed class SingletonArrayNode_ : Node
         return $"{this.lhs}[]";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        throw new NotImplementedException();
+        return other is SingletonArrayNode_ otherSingleton &&
+               this.lhs.Equals(otherSingleton.lhs);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(typeof(SingletonArrayNode_), lhs);
     }
 }

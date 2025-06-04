@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jsonata.Net.Native.Syntax;
 
@@ -53,9 +54,16 @@ internal sealed class PredicateNode_ : Node
         return $"{this.lhs}[{this.rhs}]";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        throw new NotImplementedException();
+        return other is PredicateNode_ otherPred &&
+               this.lhs.Equals(otherPred.lhs) &&
+               this.rhs.Equals(otherPred.rhs);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(lhs, rhs);
     }
 }
 
@@ -81,11 +89,16 @@ internal sealed class PredicateNode : Node
         return $"{this.expr}[{this.filters.JoinNodes(", ")}]";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        PredicateNode otherNode = (PredicateNode)other;
+        return other is PredicateNode otherPred &&
+               this.expr.Equals(otherPred.expr) &&
+               NodeListExtensions.NodeListsEqual(this.filters, otherPred.filters);
+    }
 
-        return this.expr.Equals(otherNode.expr)
-            && NodeListExtensions.NodeListsEqual(this.filters, otherNode.filters);
+    public override int GetHashCode()
+    {
+        var filtersHash = filters.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode()));
+        return HashCode.Combine(expr, filtersHash);
     }
 }

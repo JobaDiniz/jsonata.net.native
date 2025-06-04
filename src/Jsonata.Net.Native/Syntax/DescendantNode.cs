@@ -15,8 +15,13 @@ internal sealed class DescendantNode : Node
         return "**";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        return true;
+        return other is DescendantNode;
+    }
+
+    public override int GetHashCode()
+    {
+        return typeof(DescendantNode).GetHashCode();
     }
 }

@@ -52,12 +52,16 @@ internal sealed class BooleanOperatorNode : Node
         return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        BooleanOperatorNode otherNode = (BooleanOperatorNode)other;
+        return other is BooleanOperatorNode otherOp &&
+               this.op == otherOp.op &&
+               this.lhs.Equals(otherOp.lhs) &&
+               this.rhs.Equals(otherOp.rhs);
+    }
 
-        return this.op == otherNode.op
-            && this.lhs.Equals(otherNode.lhs)
-            && this.rhs.Equals(otherNode.rhs);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(op, lhs, rhs);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Jsonata.Net.Native.Syntax;
+﻿using System;
+
+namespace Jsonata.Net.Native.Syntax;
 
 internal sealed class StringConcatenationNode : Node
 {
@@ -31,10 +33,15 @@ internal sealed class StringConcatenationNode : Node
         return $"{this.lhs} & {this.rhs}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        StringConcatenationNode otherNode = (StringConcatenationNode)other;
-        return this.lhs.Equals(otherNode.lhs)
-            && this.rhs.Equals(otherNode.rhs);
+        return other is StringConcatenationNode otherConcat &&
+               this.lhs.Equals(otherConcat.lhs) &&
+               this.rhs.Equals(otherConcat.rhs);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(lhs, rhs);
     }
 }

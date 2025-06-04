@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Jsonata.Net.Native.Syntax;
 
@@ -31,10 +32,15 @@ internal sealed class FieldNameNode : Node
             : this.value;
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        FieldNameNode otherNode = (FieldNameNode)other;
-        return this.value == otherNode.value
-            && this.escaped == otherNode.escaped;
+        return other is FieldNameNode otherField &&
+               this.value == otherField.value &&
+               this.escaped == otherField.escaped;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(value, escaped);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 ﻿namespace Jsonata.Net.Native.Syntax;
 
 internal sealed class ObjectTransformationNode : Node
@@ -42,14 +43,17 @@ internal sealed class ObjectTransformationNode : Node
         }
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        ObjectTransformationNode otherNode = (ObjectTransformationNode)other;
+        return other is ObjectTransformationNode otherTransform &&
+               this.pattern.Equals(otherTransform.pattern) &&
+               this.updates.Equals(otherTransform.updates) &&
+               ((this.deletes == null && otherTransform.deletes == null) ||
+                (this.deletes != null && otherTransform.deletes != null && this.deletes.Equals(otherTransform.deletes)));
+    }
 
-        return this.pattern.Equals(otherNode.pattern)
-            && this.updates.Equals(otherNode.updates)
-            && ((this.deletes == null && otherNode.deletes == null)
-                || (this.deletes != null && otherNode.deletes != null && this.deletes.Equals(otherNode.deletes))
-            );
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(pattern, updates, deletes);
     }
 }

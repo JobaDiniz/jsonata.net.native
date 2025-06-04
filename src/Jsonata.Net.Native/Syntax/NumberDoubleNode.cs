@@ -26,10 +26,14 @@ internal sealed class NumberDoubleNode : NumberNode
         return (int)this.value;
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        NumberDoubleNode otherNode = (NumberDoubleNode)other;
+        return other is NumberDoubleNode otherDouble && 
+               Math.Abs(this.value - otherDouble.value) <= Double.Epsilon * 2;    //TODO: will fail on NaNs
+    }
 
-        return Math.Abs(this.value - otherNode.value) <= Double.Epsilon * 2;    //TODO: will fail on NaNs
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
     }
 }

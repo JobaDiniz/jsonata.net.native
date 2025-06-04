@@ -17,8 +17,13 @@ internal sealed class ParentNode : Node
         return "%";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        return true;
+        return other is ParentNode;
+    }
+
+    public override int GetHashCode()
+    {
+        return typeof(ParentNode).GetHashCode();
     }
 }

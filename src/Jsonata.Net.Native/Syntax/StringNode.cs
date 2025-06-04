@@ -23,9 +23,13 @@ internal sealed class StringNode : Node
         return this.value;
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        StringNode otherNode = (StringNode)other;
-        return otherNode.value == this.value;
+        return other is StringNode otherString && this.value == otherString.value;
+    }
+
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
     }
 }

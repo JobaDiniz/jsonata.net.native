@@ -78,8 +78,15 @@ internal sealed class DotNode_ : Node
         return $"{this.lhs}.{this.rhs}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        throw new NotImplementedException();
+        return other is DotNode_ otherDot &&
+               this.lhs.Equals(otherDot.lhs) &&
+               this.rhs.Equals(otherDot.rhs);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(lhs, rhs);
     }
 }

@@ -16,8 +16,13 @@ internal sealed class ArgumentPlaceholderNode : Node
         return "?";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        return true;
+        return other is ArgumentPlaceholderNode;
+    }
+
+    public override int GetHashCode()
+    {
+        return typeof(ArgumentPlaceholderNode).GetHashCode();
     }
 }

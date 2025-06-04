@@ -18,8 +18,13 @@ internal sealed class NullNode : Node
         return "null";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        return true;
+        return other is NullNode;
+    }
+
+    public override int GetHashCode()
+    {
+        return typeof(NullNode).GetHashCode();
     }
 }

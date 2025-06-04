@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Jsonata.Net.Native.Syntax;
@@ -72,29 +73,27 @@ internal sealed class SortNode : Node
         return builder.ToString();
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        SortNode otherNode = (SortNode)other;
-
-        if (!this.expr.Equals(otherNode.expr))
-        {
-            return false;
-        }
-
-        if (this.terms.Count != otherNode.terms.Count)
+        if (other is not SortNode otherSort || !this.expr.Equals(otherSort.expr) || this.terms.Count != otherSort.terms.Count)
         {
             return false;
         }
 
         for (int i = 0; i < this.terms.Count; ++i)
         {
-            if (this.terms[i].dir != otherNode.terms[i].dir
-                || !this.terms[i].expr.Equals(otherNode.terms[i].expr)
-            )
+            if (this.terms[i].dir != otherSort.terms[i].dir ||
+                !this.terms[i].expr.Equals(otherSort.terms[i].expr))
             {
                 return false;
             }
         }
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var termsHash = terms.Aggregate(0, (hash, term) => HashCode.Combine(hash, term.dir, term.expr));
+        return HashCode.Combine(expr, termsHash);
     }
 }

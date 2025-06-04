@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Jsonata.Net.Native.Syntax;
@@ -27,11 +28,16 @@ internal sealed class PartialApplicationNode : Node
         return $"{this.func}({this.args.JoinNodes(", ")})";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        PartialApplicationNode otherNode = (PartialApplicationNode)other;
+        return other is PartialApplicationNode otherPartial &&
+               this.func.Equals(otherPartial.func) &&
+               NodeListExtensions.NodeListsEqual(this.args, otherPartial.args);
+    }
 
-        return this.func.Equals(otherNode.func)
-            && NodeListExtensions.NodeListsEqual(this.args, otherNode.args);
+    public override int GetHashCode()
+    {
+        var argsHash = args.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode()));
+        return HashCode.Combine(func, argsHash);
     }
 }

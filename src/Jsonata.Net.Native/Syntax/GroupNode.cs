@@ -1,3 +1,4 @@
+using System;
 ﻿namespace Jsonata.Net.Native.Syntax;
 
 // A GroupNode represents a group expression.
@@ -37,11 +38,15 @@ internal sealed class GroupNode : Node
         return $"{this.expr}{this.objectNode}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        GroupNode otherNode = (GroupNode)other;
+        return other is GroupNode otherGroup &&
+               this.expr.Equals(otherGroup.expr) &&
+               this.objectNode.Equals(otherGroup.objectNode);
+    }
 
-        return this.expr.Equals(otherNode.expr)
-            && this.objectNode.Equals(otherNode.expr);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(expr, objectNode);
     }
 }

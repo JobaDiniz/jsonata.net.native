@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jsonata.Net.Native.Syntax;
 
@@ -31,9 +32,14 @@ internal sealed class ArrayNode : Node
         return "[" + this.Items.JoinNodes(", ") + "]";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        ArrayNode otherNode = (ArrayNode)other;
-        return NodeListExtensions.NodeListsEqual(this.items, otherNode.items);
+        return other is ArrayNode otherArray && 
+               NodeListExtensions.NodeListsEqual(this.items, otherArray.items);
+    }
+
+    public override int GetHashCode()
+    {
+        return items.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode()));
     }
 }

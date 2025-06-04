@@ -55,12 +55,16 @@ internal sealed class NumericOperatorNode : Node
         return $"{this.lhs} {OperatorToString(this.op)} {this.rhs}";
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        NumericOperatorNode otherNode = (NumericOperatorNode)other;
+        return other is NumericOperatorNode otherNum &&
+               this.op == otherNum.op &&
+               this.lhs.Equals(otherNum.lhs) &&
+               this.rhs.Equals(otherNum.rhs);
+    }
 
-        return this.op == otherNode.op
-            && this.lhs.Equals(otherNode.lhs)
-            && this.rhs.Equals(otherNode.rhs);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(op, lhs, rhs);
     }
 }

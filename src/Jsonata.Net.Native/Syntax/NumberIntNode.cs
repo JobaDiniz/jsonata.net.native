@@ -28,9 +28,13 @@ internal sealed class NumberIntNode : NumberNode
         return (int)this.value;
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        NumberIntNode otherNode = (NumberIntNode)other;
-        return otherNode.value == this.value;
+        return other is NumberIntNode otherInt && this.value == otherInt.value;
+    }
+
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
     }
 }

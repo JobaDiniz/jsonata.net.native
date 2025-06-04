@@ -73,14 +73,19 @@ internal sealed class LambdaNode : Node
         return builder.ToString();
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        LambdaNode otherNode = (LambdaNode)other;
+        return other is LambdaNode otherLambda &&
+               this.isShorthand == otherLambda.isShorthand &&
+               this.paramNames.SequenceEqual(otherLambda.paramNames) &&
+               // && this.signature.Equals(otherLambda.signature) //TODO: implement Signature equals
+               this.body.Equals(otherLambda.body);
+    }
 
-        return this.isShorthand == otherNode.isShorthand
-            && this.paramNames.SequenceEqual(otherNode.paramNames)
-            // && this.signature.Equals(otherNode.signature) //TODO: implement Signature equals
-            && this.body.Equals(otherNode.body);
+    public override int GetHashCode()
+    {
+        var paramNamesHash = paramNames.Aggregate(0, (hash, name) => HashCode.Combine(hash, name));
+        return HashCode.Combine(isShorthand, paramNamesHash, body);
     }
 
     internal enum ParamOpt

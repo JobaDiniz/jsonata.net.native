@@ -1,3 +1,4 @@
+using System;
 ﻿namespace Jsonata.Net.Native.Syntax;
 
 // A NegationNode represents a numeric negation operation.
@@ -40,10 +41,14 @@ internal sealed class NegationNode : Node
         return "-" + this.rhs.ToString();
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        NegationNode otherNode = (NegationNode)other;
+        return other is NegationNode otherNeg &&
+               this.rhs.Equals(otherNeg.rhs);
+    }
 
-        return this.rhs.Equals(otherNode.rhs);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(typeof(NegationNode), rhs);
     }
 }

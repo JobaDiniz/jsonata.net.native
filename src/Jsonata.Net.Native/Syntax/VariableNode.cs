@@ -23,9 +23,13 @@ internal sealed class VariableNode : Node
         return "$" + this.name;
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        VariableNode otherNode = (VariableNode)other;
-        return otherNode.name == this.name;
+        return other is VariableNode otherVar && this.name == otherVar.name;
+    }
+
+    public override int GetHashCode()
+    {
+        return name.GetHashCode();
     }
 }

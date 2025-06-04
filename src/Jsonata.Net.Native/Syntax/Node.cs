@@ -10,21 +10,15 @@ internal abstract class Node : IEquatable<Node>
 {
     internal abstract Node optimize();
 
-    //used for DOM comparison only
-    public bool Equals(Node? other)
+    // Standard object.Equals override
+    public override bool Equals(object? obj) => Equals(obj as Node);
+
+    // Virtual IEquatable<Node> implementation - derived classes override completely
+    public virtual bool Equals(Node? other)
     {
-        if (other == null)
-        {
-            return false;
-        }
-
-        if (other.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return this.EqualsSpecific(other);
+        return other?.GetType() == GetType();
     }
 
-    protected abstract bool EqualsSpecific(Node other);
+    // Each derived class must implement
+    public abstract override int GetHashCode();
 }

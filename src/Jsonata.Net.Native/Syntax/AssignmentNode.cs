@@ -1,4 +1,6 @@
-﻿namespace Jsonata.Net.Native.Syntax;
+﻿using System;
+
+namespace Jsonata.Net.Native.Syntax;
 
 // An AssignmentNode represents a variable assignment.
 internal sealed class AssignmentNode : Node
@@ -25,10 +27,15 @@ internal sealed class AssignmentNode : Node
         }
     }
 
-    protected override bool EqualsSpecific(Node other)
+    public override bool Equals(Node? other)
     {
-        AssignmentNode otherNode = (AssignmentNode)other;
-        return this.name == otherNode.name
-            && this.value.Equals(otherNode.value);
+        return other is AssignmentNode otherAssign &&
+               this.name == otherAssign.name &&
+               this.value.Equals(otherAssign.value);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(name, value);
     }
 }
