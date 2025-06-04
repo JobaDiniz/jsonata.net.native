@@ -17,6 +17,7 @@ internal sealed class FunctionTokenCsharp : FunctionToken
     private readonly string functionName;
     private readonly bool hasContextParameter;
     private readonly bool hasEnvParameter;
+    private readonly bool hasEvaluationEnvironmentParameter;
 
     internal FunctionTokenCsharp(string funcName, MethodInfo methodInfo)
         : this(funcName, methodInfo, null)
@@ -43,8 +44,9 @@ internal sealed class FunctionTokenCsharp : FunctionToken
             .ToList();
         this.hasContextParameter = this.parameters.Any(p => p.allowContextAsValue);
         this.hasEnvParameter = this.parameters.Any(p => p.isQueryExecutionState);
+        this.hasEvaluationEnvironmentParameter = this.parameters.Any(p => p.isEvaluationEnvironment);
 
-        this.RequiredArgsCount = this.parameters.Where(p => !p.isOptional && !p.isQueryExecutionState).Count();
+        this.RequiredArgsCount = this.parameters.Where(p => !p.isOptional && !p.isQueryExecutionState && !p.isEvaluationEnvironment).Count();
     }
 
     internal sealed class ArgumentInfo
@@ -57,6 +59,7 @@ internal sealed class FunctionTokenCsharp : FunctionToken
         internal readonly bool isOptional;
         internal readonly object? defaultValueForOptional;
         internal readonly bool isQueryExecutionState;
+        internal readonly bool isEvaluationEnvironment;
         internal readonly bool isVariableArgumentsArray;
 
         internal ArgumentInfo(string functionName, ParameterInfo parameterInfo)
@@ -84,6 +87,8 @@ internal sealed class FunctionTokenCsharp : FunctionToken
             {
                 throw new JsonataException("????", $"Declaration error for function '{functionName}': attribute [{nameof(ExecutionStateArgumentAttribute)}] can only be specified for arguments of type {nameof(QueryExecutionState)}");
             };
+
+            this.isEvaluationEnvironment = parameterInfo.ParameterType == typeof(EvaluationEnvironment);
 
             this.isVariableArgumentsArray = parameterInfo.IsDefined(typeof(VariableNumberArgumentAsArrayAttribute), false);
             if (this.isVariableArgumentsArray && parameterInfo.ParameterType != typeof(JArray))
@@ -164,6 +169,10 @@ internal sealed class FunctionTokenCsharp : FunctionToken
             {
                 result[targetIndex] = env.GetQueryExecutionState();
             }
+            else if (argumentInfo.isEvaluationEnvironment)
+            {
+                result[targetIndex] = env;
+            }
             else if (sourceIndex >= args.Count)
             {
                 if (argumentInfo.isOptional)
@@ -173,7 +182,8 @@ internal sealed class FunctionTokenCsharp : FunctionToken
                 }
                 else
                 {
-                    throw new JsonataException("T0410", $"Function '{functionName}' requires {this.parameters.Count + (this.hasEnvParameter ? -1 : 0)} arguments. Passed {args.Count} arguments");
+                    int automaticArgCount = (this.hasEnvParameter ? 1 : 0) + (this.hasEvaluationEnvironmentParameter ? 1 : 0);
+                    throw new JsonataException("T0410", $"Function '{functionName}' requires {this.parameters.Count - automaticArgCount} arguments. Passed {args.Count} arguments");
                 }
             }
             else if (argumentInfo.isVariableArgumentsArray)
@@ -201,7 +211,8 @@ internal sealed class FunctionTokenCsharp : FunctionToken
 
         if (sourceIndex < args.Count)
         {
-            throw new JsonataException("T0410", $"Function '{functionName}' requires {this.parameters.Count + (this.hasEnvParameter ? -1 : 0)} arguments. Passed {args.Count} arguments");
+            int automaticArgCount = (this.hasEnvParameter ? 1 : 0) + (this.hasEvaluationEnvironmentParameter ? 1 : 0);
+            throw new JsonataException("T0410", $"Function '{functionName}' requires {this.parameters.Count - automaticArgCount} arguments. Passed {args.Count} arguments");
         };
 
         return result;

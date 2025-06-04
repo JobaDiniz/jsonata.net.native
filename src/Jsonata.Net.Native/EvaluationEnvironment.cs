@@ -9,28 +9,6 @@ namespace Jsonata.Net.Native;
 
 public sealed class EvaluationEnvironment
 {
-    public static readonly EvaluationEnvironment DefaultEnvironment;
-
-    static EvaluationEnvironment()
-    {
-        EvaluationEnvironment.DefaultEnvironment = EvaluationEnvironment.CreateDefault();
-    }
-
-    internal static EvaluationEnvironment CreateDefault() //main parent, contains default function bindings
-    {
-        EvaluationEnvironment result = new EvaluationEnvironment(null, null);
-
-        // Register functions from new organized static classes
-        RegisterFunctionsFromType(result, typeof(StringFunctions));
-        RegisterFunctionsFromType(result, typeof(NumericFunctions));
-        RegisterFunctionsFromType(result, typeof(ArrayFunctions));
-        RegisterFunctionsFromType(result, typeof(BooleanFunctions));
-        RegisterFunctionsFromType(result, typeof(ObjectFunctions));
-        RegisterFunctionsFromType(result, typeof(DateTimeFunctions));
-        RegisterFunctionsFromType(result, typeof(HigherOrderFunctions));
-
-        return result;
-    }
 
     private static void RegisterFunctionsFromType(EvaluationEnvironment env, Type type)
     {
@@ -51,22 +29,77 @@ public sealed class EvaluationEnvironment
     }
 
     /// <summary>
+    /// Creates a standard evaluation environment with all built-in JSONata functions.
+    /// This is the entry point for most JSONata usage.
+    /// </summary>
+    public static EvaluationEnvironment CreateStandard()
+    {
+        return new EvaluationEnvironment();
+    }
+
+    /// <summary>
+    /// Creates a child environment for query execution with its own execution state.
+    /// Used internally when starting a new JSONata query evaluation.
+    /// </summary>
+    internal EvaluationEnvironment CreateChildForQueryExecution()
+    {
+        return new EvaluationEnvironment(this, new QueryExecutionState());
+    }
+
+    /// <summary>
+    /// Creates a child environment for lambda function execution with parameter bindings.
+    /// Used internally when evaluating lambda functions.
+    /// </summary>
+    internal EvaluationEnvironment CreateChildForLambda(IEnumerable<(string name, JToken value)> parameterBindings)
+    {
+        EvaluationEnvironment child = new EvaluationEnvironment(this, this.queryExecutionState);
+        foreach ((string name, JToken value) in parameterBindings)
+        {
+            child.BindValue(name, value);
+        }
+        return child;
+    }
+
+    /// <summary>
+    /// Creates a child environment for block scope evaluation.
+    /// Used internally for block expressions that need variable scoping.
+    /// </summary>
+    internal EvaluationEnvironment CreateChildForBlock()
+    {
+        return new EvaluationEnvironment(this, this.queryExecutionState);
+    }
+
+    /// <summary>
+    /// Creates a child environment with additional user-defined variable bindings.
+    /// This allows users to provide custom variables for query evaluation.
+    /// </summary>
+    public EvaluationEnvironment CreateChildWithUserBindings(JObject bindings)
+    {
+        EvaluationEnvironment child = new EvaluationEnvironment(this, this.queryExecutionState);
+        foreach (KeyValuePair<string, JToken> property in bindings.Properties)
+        {
+            child.BindValue(property.Key, property.Value);
+        }
+        return child;
+    }
+
+    /// <summary>
     /// Creates an evaluation environment with query execution state for a new query evaluation.
     /// </summary>
+    [Obsolete("Use CreateChildForQueryExecution() instead")]
     internal static EvaluationEnvironment CreateWithExecutionState(EvaluationEnvironment parentEnvironment)
     {
-        EvaluationEnvironment result = new EvaluationEnvironment(parentEnvironment, new QueryExecutionState());
-        return result;
+        return parentEnvironment.CreateChildForQueryExecution();
     }
 
     /// <summary>
     /// Creates a nested evaluation environment that shares the parent's execution state.
     /// Used for lambda functions and scoped expressions.
     /// </summary>
+    [Obsolete("Use CreateChildForLambda() or CreateChildForBlock() instead")]
     internal static EvaluationEnvironment CreateNested(EvaluationEnvironment parent)
     {
-        EvaluationEnvironment result = new EvaluationEnvironment(parent, parent.queryExecutionState);
-        return result;
+        return parent.CreateChildForBlock();
     }
 
     private readonly Dictionary<string, JToken> bindings = new Dictionary<string, JToken>();
@@ -79,13 +112,27 @@ public sealed class EvaluationEnvironment
         this.queryExecutionState = queryExecutionState;
     }
 
-    //public version to provide for JsonataQuery.Eval()
+    /// <summary>
+    /// Creates a standard evaluation environment with all built-in JSONata functions.
+    /// Equivalent to calling EvaluationEnvironment.CreateStandard().
+    /// </summary>
     public EvaluationEnvironment()
-        : this(EvaluationEnvironment.DefaultEnvironment, null)
+        : this(null, null)
     {
-
+        // Register all built-in functions directly in this instance
+        RegisterFunctionsFromType(this, typeof(StringFunctions));
+        RegisterFunctionsFromType(this, typeof(NumericFunctions));
+        RegisterFunctionsFromType(this, typeof(ArrayFunctions));
+        RegisterFunctionsFromType(this, typeof(BooleanFunctions));
+        RegisterFunctionsFromType(this, typeof(ObjectFunctions));
+        RegisterFunctionsFromType(this, typeof(DateTimeFunctions));
+        RegisterFunctionsFromType(this, typeof(HigherOrderFunctions));
     }
 
+    /// <summary>
+    /// Creates a standard evaluation environment with additional user bindings.
+    /// </summary>
+    [Obsolete("Use EvaluationEnvironment.CreateStandard().CreateChildWithUserBindings(bindings) instead")]
     public EvaluationEnvironment(JObject bindings)
         : this()
     {

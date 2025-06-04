@@ -46,7 +46,7 @@ internal sealed class ControlFlowEvaluator
     {
         // create a new frame to limit the scope of variable assignments
         // TODO, only do this if the post-parse stage has flagged this as required
-        EvaluationEnvironment localEnvironment = EvaluationEnvironment.CreateNested(env);
+        EvaluationEnvironment localEnvironment = env.CreateChildForBlock();
 
         // invoke each expression in turn
         // only return the result of the last one

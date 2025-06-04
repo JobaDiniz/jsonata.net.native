@@ -158,6 +158,8 @@ roslynator find-symbol <PROJECT|SOLUTION>
 
 **TestSuite** are the more important tests. These are tests from the original JSONata-JS implementation.
 
-There are some failing tests because not everything is implemented or supported yet. When running all the tests from the solution, this is the current output: Failed:   236, Passed:  1254, Skipped:   138, Total:  1628
+There are some failing tests because not everything is implemented or supported yet. When running all the tests from the solution, this is the current output: 
+
+Failed:   237, Passed:  1253, Skipped:   136, Total:  1626
 
 You should use `Xunit` framework. You should strive to use `VerifyTests` snapshots for tests that produce complex output.

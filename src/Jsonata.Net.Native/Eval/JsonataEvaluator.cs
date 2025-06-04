@@ -38,7 +38,7 @@ internal sealed class JsonataEvaluator
 
     internal JToken ExecuteQuery(Node rootNode, JToken data, EvaluationEnvironment parentEnvironment)
     {
-        EvaluationEnvironment environment = EvaluationEnvironment.CreateWithExecutionState(parentEnvironment);
+        EvaluationEnvironment environment = parentEnvironment.CreateChildForQueryExecution();
 
         environment.BindValue("$", data);
 

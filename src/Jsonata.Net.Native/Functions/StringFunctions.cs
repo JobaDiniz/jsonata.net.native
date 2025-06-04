@@ -471,7 +471,7 @@ public static class StringFunctions
     /// <param name="limit">Maximum number of replacements</param>
     /// <returns>String with replacements made</returns>
     [FunctionName("replace")]
-    public static string Replace([PropagateUndefined] string str, JToken pattern, JToken replacement, [OptionalArgument(Int32.MaxValue)] int limit)
+    public static string Replace([PropagateUndefined] string str, JToken pattern, JToken replacement, [OptionalArgument(Int32.MaxValue)] int limit, EvaluationEnvironment environment)
     {
         if (limit < 0)
         {
@@ -581,7 +581,7 @@ public static class StringFunctions
                             {
                                 FunctionToken replacementFunction = (FunctionToken)replacement;
                                 StringBuilder builder = new StringBuilder();
-                                EvaluationEnvironment env = EvaluationEnvironment.CreateWithExecutionState(EvaluationEnvironment.DefaultEnvironment); //TODO: think of providing proper env. Maybe via a func param?
+                                EvaluationEnvironment env = environment.CreateChildForQueryExecution();
                                 int replacesCount = 0;
                                 int replaceStartAt = 0;
                                 foreach (Match match in matches)
@@ -602,9 +602,20 @@ public static class StringFunctions
                                     JToken replacementToken = ((JToken)replacementFunction).TryInvoke(new List<JToken>() { matchObject }, null, env);
                                     if (replacementToken.Type != JTokenType.String)
                                     {
-                                        throw new JsonataException("D3012", "Attempted to replace a matched string with a non-string value");
+                                        // Try to convert numeric results to string for replacement
+                                        if (replacementToken.Type == JTokenType.Integer || replacementToken.Type == JTokenType.Float)
+                                        {
+                                            builder.Append(replacementToken.ToFlatString());
+                                        }
+                                        else
+                                        {
+                                            throw new JsonataException("D3012", "Attempted to replace a matched string with a non-string value");
+                                        }
                                     }
-                                    builder.Append((string)replacementToken!);
+                                    else
+                                    {
+                                        builder.Append((string)replacementToken!);
+                                    }
                                     ++replacesCount;
                                     replaceStartAt = match.Index + match.Length;
                                 }
@@ -631,10 +642,10 @@ public static class StringFunctions
     /// <param name="context">Optional context to use for evaluation</param>
     /// <returns>Result of the evaluated expression</returns>
     [FunctionName("eval")]
-    public static JToken Eval([PropagateUndefined] string expr, [AllowContextAsValue] JToken context)
+    public static JToken Eval([PropagateUndefined] string expr, [AllowContextAsValue] JToken context, EvaluationEnvironment environment)
     {
-        JsonataQuery query = new JsonataQuery(expr);
-        return query.Eval(context);    //TODO: think of using bindings from current environment (custom bindings). Also propagating time from parentevaluationEnvironment
+        JsonataQuery query = new JsonataQuery(expr, environment);
+        return query.Eval(context, environment);
     }
 
     /// <summary>

@@ -42,7 +42,7 @@ namespace TestApp
                 JToken data = JToken.Parse("{\"a\": \"b\"}");
 
                 JObject bindings = (JObject)JToken.Parse("{\"x\": \"y\"}");
-                EvaluationEnvironment env = new EvaluationEnvironment(bindings);
+                EvaluationEnvironment env = EvaluationEnvironment.CreateStandard().CreateChildWithUserBindings(bindings);
                 env.BindFunction(typeof(Program).GetMethod(nameof(foo)));
 
                 JsonataQuery query2 = new JsonataQuery("{'a': $.a, 'x': $x, 'z': $foo()}");

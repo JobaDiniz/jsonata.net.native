@@ -14,15 +14,27 @@ public sealed class JsonataQuery
 {
     private readonly Node node;
     private readonly JsonataEvaluator jsonataEvaluator;
+    private readonly EvaluationEnvironment environment;
 
     public JsonataQuery(string queryText)
-        : this(Parser.Parse(queryText))
+        : this(queryText, EvaluationEnvironment.CreateStandard())
+    {
+    }
+
+    public JsonataQuery(string queryText, EvaluationEnvironment environment)
+        : this(Parser.Parse(queryText), environment)
     {
     }
 
     internal JsonataQuery(Node node)
+        : this(node, EvaluationEnvironment.CreateStandard())
+    {
+    }
+
+    internal JsonataQuery(Node node, EvaluationEnvironment environment)
     {
         this.node = node.optimize();
+        this.environment = environment;
         this.jsonataEvaluator = new JsonataEvaluator();
     }
 
@@ -38,11 +50,11 @@ public sealed class JsonataQuery
         EvaluationEnvironment env;
         if (bindings != null)
         {
-            env = new EvaluationEnvironment(bindings);
+            env = this.environment.CreateChildWithUserBindings(bindings);
         }
         else
         {
-            env = EvaluationEnvironment.DefaultEnvironment;
+            env = this.environment;
         };
         return this.jsonataEvaluator.ExecuteQuery(this.node, data, env);
     }

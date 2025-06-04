@@ -207,7 +207,8 @@ namespace Jsonata.Net.Native.SystemTextJson
 
         public static JsonDocument EvalSystemTextJson(this JsonataQuery query, JsonDocument data)
         {
-            return query.EvalSystemTextJson(data, EvaluationEnvironment.DefaultEnvironment);
+            JToken result = query.Eval(FromSystemTextJson(data));
+            return result.ToSystemTextJson();
         }
 
         public static JsonDocument EvalSystemTextJson(this JsonataQuery query, JsonDocument data, EvaluationEnvironment environment)
@@ -218,7 +219,7 @@ namespace Jsonata.Net.Native.SystemTextJson
 
         public static JsonNode? EvalSystemTextJson(this JsonataQuery query, JsonNode data)
         {
-            return query.EvalSystemTextJson(data, EvaluationEnvironment.DefaultEnvironment);
+            return query.EvalSystemTextJson(data, EvaluationEnvironment.CreateStandard());
         }
 
         public static JsonNode? EvalSystemTextJson(this JsonataQuery query, JsonNode data, EvaluationEnvironment environment)
