@@ -116,7 +116,7 @@ Commands:
 
 ### Roslyn Analyzer
 
-If roslynator is not installed, install it with `dotnet tool install -g roslynator.cli`
+If roslynator is not installed, install it with `dotnet tool install -g roslynator.dotnet.cli`
 
 How to use roslynator and finding other commands
 
