@@ -12,7 +12,10 @@ public sealed class ObjectParsingTests
     [TestCaseSource(nameof(GetTestCases))]
     public void RegularCases(TestData testData)
     {
-        JToken token = JToken.FromObject(testData.SourceObject);
+        // Test removed: FromObject is now internal and should not be used by public API consumers
+        // Alternative: Use System.Text.Json for serialization and then parse with JToken.Parse
+        var jsonString = System.Text.Json.JsonSerializer.Serialize(testData.SourceObject);
+        JToken token = JToken.Parse(jsonString);
         string result = token.ToFlatString();
         Assert.That(result, Is.EqualTo(testData.ExpectedJson));
     }

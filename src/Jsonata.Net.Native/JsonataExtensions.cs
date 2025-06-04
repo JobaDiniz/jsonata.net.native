@@ -8,12 +8,22 @@ namespace Jsonata.Net.Native;
 
 public static class JsonataExtensions
 {
-    public static JToken FromSystemTextJson(JsonDocument document)
+    /// <summary>
+    /// Converts a JsonDocument to a JToken.
+    /// </summary>
+    /// <param name="document">The JsonDocument to convert.</param>
+    /// <returns>A JToken representing the JSON document.</returns>
+    public static JToken ToJToken(this JsonDocument document)
     {
-        return FromSystemTextJson(document.RootElement);
+        return document.RootElement.ToJToken();
     }
 
-    public static JToken FromSystemTextJson(JsonElement element)
+    /// <summary>
+    /// Converts a JsonElement to a JToken.
+    /// </summary>
+    /// <param name="element">The JsonElement to convert.</param>
+    /// <returns>A JToken representing the JSON element.</returns>
+    public static JToken ToJToken(this JsonElement element)
     {
         switch (element.ValueKind)
         {
@@ -22,7 +32,7 @@ public static class JsonataExtensions
                     JArray result = new JArray(element.GetArrayLength());
                     foreach (JsonElement child in element.EnumerateArray())
                     {
-                        result.Add(FromSystemTextJson(child));
+                        result.Add(child.ToJToken());
                     }
                     return result;
                 }
@@ -60,7 +70,7 @@ public static class JsonataExtensions
                     JObject result = new JObject();
                     foreach (JsonProperty prop in element.EnumerateObject())
                     {
-                        result.Add(prop.Name, FromSystemTextJson(prop.Value));
+                        result.Add(prop.Name, prop.Value.ToJToken());
                     }
                     return result;
                 }
@@ -73,7 +83,12 @@ public static class JsonataExtensions
         }
     }
 
-    public static JToken FromSystemTextJson(JsonNode? node)
+    /// <summary>
+    /// Converts a JsonNode to a JToken.
+    /// </summary>
+    /// <param name="node">The JsonNode to convert.</param>
+    /// <returns>A JToken representing the JSON node.</returns>
+    public static JToken ToJToken(this JsonNode? node)
     {
         //not using node.GetValueKind() because of totally wretched implementation: https://github.com/dotnet/runtime/blob/eeadd653e1982d7037a93a9ab38129c07336e7db/src/libraries/System.Text.Json/src/System/Text/Json/Nodes/JsonValueOfT.cs#L68
 
@@ -87,7 +102,7 @@ public static class JsonataExtensions
             for (int i = 0; i < array.Count; ++i)
             {
                 JsonNode? child = array[i];
-                result.Add(FromSystemTextJson(child));
+                result.Add(child.ToJToken());
             }
             return result;
         }
@@ -96,7 +111,7 @@ public static class JsonataExtensions
             JObject result = new JObject();
             foreach (KeyValuePair<string, JsonNode?> prop in obj)
             {
-                result.Add(prop.Key, FromSystemTextJson(prop.Value));
+                result.Add(prop.Key, prop.Value.ToJToken());
             }
             return result;
         }
@@ -137,13 +152,22 @@ public static class JsonataExtensions
         }
     }
 
-    //Note that there's no "Writable DOM" for System.Text.Json for now, see https://github.com/dotnet/runtime/pull/34099
+    /// <summary>
+    /// Converts a JToken to a JsonDocument.
+    /// </summary>
+    /// <param name="value">The JToken to convert.</param>
+    /// <returns>A JsonDocument representing the JToken.</returns>
     public static JsonDocument ToSystemTextJson(this JToken value)
     {
         return JsonDocument.Parse(value.ToFlatString());
     }
 
-    public static JsonNode? ToSystemTextJsonNode(this JToken value)
+    /// <summary>
+    /// Converts a JToken to a JsonNode.
+    /// </summary>
+    /// <param name="value">The JToken to convert.</param>
+    /// <returns>A JsonNode representing the JToken, or null for null values.</returns>
+    public static JsonNode? ToJsonNode(this JToken value)
     {
         switch (value.Type)
         {
@@ -153,7 +177,7 @@ public static class JsonataExtensions
                     JsonArray result = new JsonArray();
                     foreach (JToken child in source.ChildrenTokens)
                     {
-                        result.Add(ToSystemTextJsonNode(child));
+                        result.Add(child.ToJsonNode());
                     }
                     return result;
                 }
@@ -163,7 +187,7 @@ public static class JsonataExtensions
                     JsonObject result = new JsonObject();
                     foreach (KeyValuePair<string, JToken> prop in source.Properties)
                     {
-                        result.Add(prop.Key, ToSystemTextJsonNode(prop.Value));
+                        result.Add(prop.Key, prop.Value.ToJsonNode());
                     }
                     return result;
                 }
@@ -193,23 +217,5 @@ public static class JsonataExtensions
             default:
                 throw new Exception("Unexpected type " + value.Type);
         }
-    }
-
-    public static string EvalSystemTextJson(this JsonataQuery query, string dataJson)
-    {
-        JsonDocument doc = JsonDocument.Parse(dataJson);
-        JToken result = query.Eval(FromSystemTextJson(doc));
-        return result.ToIndentedString();
-    }
-
-
-    public static void BindValue(this EvaluationEnvironment env, string name, JsonElement value)
-    {
-        env.BindValue(name, FromSystemTextJson(value));  //allow overrides
-    }
-
-    public static void BindValue(this EvaluationEnvironment env, string name, JsonNode value)
-    {
-        env.BindValue(name, FromSystemTextJson(value));  //allow overrides
     }
 }

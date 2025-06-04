@@ -20,7 +20,7 @@ public class JSONChecker
         else
         {
             JsonDocument doc = JsonDocument.Parse(testCase.json);
-            JToken parsed = JsonataExtensions.FromSystemTextJson(doc);
+            JToken parsed = doc.ToJToken();
 
             JToken expected = JToken.Parse(testCase.json);
             string flatExpected = expected.ToFlatString();

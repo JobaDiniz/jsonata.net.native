@@ -15,7 +15,7 @@ public class UndefinedKindTests
         Assert.NotNull(node);
         Assert.Equal(JsonValueKind.Undefined, node!.GetValueKind());
 
-        JToken token = JsonataExtensions.FromSystemTextJson(node);
+        JToken token = node.ToJToken();
         Assert.Equal(JTokenType.Undefined, token.Type);
     }
 
@@ -24,7 +24,7 @@ public class UndefinedKindTests
     {
         JToken token = JValue.CreateUndefined();
 
-        JsonNode? node = token.ToSystemTextJsonNode();
+        JsonNode? node = token.ToJsonNode();
         Assert.NotNull(node);
         Assert.Equal(JsonValueKind.Undefined, node!.GetValueKind());
     }

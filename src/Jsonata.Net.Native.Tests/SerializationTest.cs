@@ -28,7 +28,9 @@ public sealed class SerializationTest
 
     private static void CheckSimpleType(object? value, string expectedStr)
     {
-        JToken token = JToken.FromObject(value);
+        // Test updated: FromObject is now internal, use System.Text.Json instead
+        var jsonString = System.Text.Json.JsonSerializer.Serialize(value);
+        JToken token = JToken.Parse(jsonString);
         string result = token.ToFlatString();
         Assert.AreEqual(expectedStr, result);
     }
