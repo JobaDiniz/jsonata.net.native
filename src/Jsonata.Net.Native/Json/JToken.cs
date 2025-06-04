@@ -6,12 +6,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Jsonata.Net.Native.Json;
 
@@ -124,54 +120,15 @@ public abstract class JToken
     }
 
 
-    public static JToken Parse(TextReader reader, ParseSettings? settings = null)
+    public static JToken Parse(TextReader reader, JsonDocumentOptions? options = null)
     {
         var jsonText = reader.ReadToEnd();
-        return ParseViaSystemTextJson(jsonText, settings);
+        return ParseFromString(jsonText, options);
     }
 
-    public static JToken Parse(string source, ParseSettings? settings = null)
+    public static JToken Parse(string source, JsonDocumentOptions? options = null)
     {
-        return ParseViaSystemTextJson(source, settings);
-    }
-
-    public static async Task<JToken> ParseAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
-    {
-        string jsonText;
-        if (reader is StreamReader streamReader)
-        {
-            jsonText = await streamReader.ReadToEndAsync();
-        }
-        else
-        {
-            jsonText = reader.ReadToEnd();
-        }
-        return ParseViaSystemTextJson(jsonText, settings);
-    }
-
-    public static void Validate(TextReader reader, ParseSettings? settings = null)
-    {
-        var jsonText = reader.ReadToEnd();
-        ValidateViaSystemTextJson(jsonText, settings);
-    }
-
-    public static void Validate(string source, ParseSettings? settings = null)
-    {
-        ValidateViaSystemTextJson(source, settings);
-    }
-
-    public static async Task ValidateAsync(TextReader reader, CancellationToken ct, ParseSettings? settings = null)
-    {
-        string jsonText;
-        if (reader is StreamReader streamReader)
-        {
-            jsonText = await streamReader.ReadToEndAsync();
-        }
-        else
-        {
-            jsonText = reader.ReadToEnd();
-        }
-        ValidateViaSystemTextJson(jsonText, settings);
+        return ParseFromString(source, options);
     }
 
     public static JToken FromObject(object? sourceObj)
@@ -588,20 +545,39 @@ public abstract class JToken
         }
     }
 
-    // Helper method to parse JSON using System.Text.Json only
-    private static JToken ParseViaSystemTextJson(string jsonText, ParseSettings? settings)
+    /// <summary>
+    /// Creates a JToken from a JsonDocument.
+    /// </summary>
+    /// <param name="document">The JsonDocument to convert.</param>
+    /// <returns>A JToken representing the JSON document.</returns>
+    public static JToken FromJsonDocument(JsonDocument document)
     {
-        var options = new JsonDocumentOptions
+        return FromJsonElement(document.RootElement);
+    }
+
+    /// <summary>
+    /// Creates a JToken from a JsonElement.
+    /// </summary>
+    /// <param name="element">The JsonElement to convert.</param>
+    /// <returns>A JToken representing the JSON element.</returns>
+    public static JToken FromJsonElement(JsonElement element)
+    {
+        return FromJsonElementCore(element);
+    }
+
+    private static JToken ParseFromString(string jsonText, JsonDocumentOptions? options)
+    {
+        var documentOptions = options ?? new JsonDocumentOptions
         {
-            AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
+            AllowTrailingCommas = true,
             CommentHandling = JsonCommentHandling.Skip
         };
 
-        using var doc = JsonDocument.Parse(jsonText, options);
-        return ConvertFromJsonElement(doc.RootElement);
+        using var doc = JsonDocument.Parse(jsonText, documentOptions);
+        return FromJsonElement(doc.RootElement);
     }
 
-    private static JToken ConvertFromJsonElement(JsonElement element)
+    private static JToken FromJsonElementCore(JsonElement element)
     {
         switch (element.ValueKind)
         {
@@ -610,7 +586,7 @@ public abstract class JToken
                     JArray result = new JArray(element.GetArrayLength());
                     foreach (JsonElement child in element.EnumerateArray())
                     {
-                        result.Add(ConvertFromJsonElement(child));
+                        result.Add(FromJsonElementCore(child));
                     }
                     return result;
                 }
@@ -648,7 +624,7 @@ public abstract class JToken
                     JObject result = new JObject();
                     foreach (JsonProperty prop in element.EnumerateObject())
                     {
-                        result.Add(prop.Name, ConvertFromJsonElement(prop.Value));
+                        result.Add(prop.Name, FromJsonElementCore(prop.Value));
                     }
                     return result;
                 }
@@ -659,17 +635,5 @@ public abstract class JToken
             default:
                 throw new ArgumentException("JsonValueKind " + element.ValueKind);
         }
-    }
-
-    private static void ValidateViaSystemTextJson(string jsonText, ParseSettings? settings)
-    {
-        var options = new JsonDocumentOptions
-        {
-            AllowTrailingCommas = settings?.AllowTrailingComma ?? false,
-            CommentHandling = JsonCommentHandling.Skip
-        };
-
-        using var doc = JsonDocument.Parse(jsonText, options);
-        // If parsing succeeds, the JSON is valid according to System.Text.Json standards
     }
 }

@@ -38,7 +38,7 @@ public sealed class JsonataQuery
 
     public string Eval(string dataJson)
     {
-        JToken data = JToken.Parse(dataJson, ParseSettings.DefaultSettings);
+        JToken data = JToken.Parse(dataJson);
         JToken result = this.Eval(data);
         return result.ToIndentedString();
     }
